@@ -24,37 +24,60 @@ class Kalkin::Lexer < RLTK::Lexer
 	rule(/def/)       { :DEF       }
 	rule(/else/)      { :ELSE      }
 	rule(/end/)       { :END       }
+	rule(/false/)     { :FALSE     }
 	rule(/if/)        { :IF        }
 	rule(/let/)       { :LET       }
+	rule(/match/)     { :WITH      }
 	rule(/namespace/) { :NAMESPACE }
+	rule(/nil/)       { :NIL       }
 	rule(/return/)    { :RETURN    }
 	rule(/self/)      { :SELF      }
+	rule(/then/)      { :THEN      }
+	rule(/true/)      { :TRUE      }
+	rule(/when/)      { :WHEN      }
+	rule(/with/)      { :WITH      }
 	
 	###########################
 	# Punctuation and Symbols #
 	###########################
 	
-	rule(/->/) { :ARROW   }
-	rule(/:/)  { :COLON   }
-	rule(/,/)  { :COMMA   }
-	rule(/\./) { :DOT     }
-	rule(/\(/) { :LPAREN  }
-	rule(/\n/) { :NEWLINE }
-	rule(/"/)  { :QUOTE   }
-	rule(/\)/) { :RPAREN  }
+	rule(/->/) { :ARROW    }
+	rule(/=/)  { :ASSIGN   }
+	rule(/:/)  { :COLON    }
+	rule(/,/)  { :COMMA    }
+	rule(/\./) { :DOT      }
+	rule(/{/)  { :LBRACE   }
+	rule(/\[/) { :LBRACKET }
+	rule(/\(/) { :LPAREN   }
+	rule(/\n/) { :NEWLINE  }
+	rule(/}/)  { :RBRACE   }
+	rule(/\]/) { :RBRACKET }
+	rule(/\)/) { :RPAREN   }
+	rule(/\$/) { :SIGIL    }
+	
+	rule(/[~!@$%^&*+=?<>|\-]+/) { |t| [:OPERATOR, t] }
+	
+	###############
+	# Annotations #
+	###############
+	
+	rule(/@[a-z_]/) { |t| [:ANNOTATION, t[1..-1]] }
 	
 	############
 	# Literals #
 	############
 	
-	rule(/\d+/)      { |t| [:INTEGER, t.to_i }
-	rule(/:[a-z_]+/) { |t| [:ATOM, t[1..-1]] }
+	rule(/:[a-z_]+/)        { |t| [:ATOM,    t[1..-1]] }
+	rule(/\d+\.\d+/)        { |t| [:FLOAT,     t.to_f] }
+	rule(/\d+/)             { |t| [:INTEGER,   t.to_i] }
+	rule(/"(\\"|[^"\n])*"/) { |t| [:STRING,         t] }
 	
 	###############
 	# Identifiers #
 	###############
 	
-	
+	rule(/[A-Z][A-Za-z]*/) { |t| [:NSIDENT, t] }
+	rule(/[a-z]\w*/)       { |t| [:IDENT,   t] }
 	
 	############
 	# Comments #
@@ -64,8 +87,8 @@ class Kalkin::Lexer < RLTK::Lexer
 	rule(/\n/,    :line_comment) { pop_state }
 	rule(/[^\n]/, :line_comment)
 	
-	rule(/#\*/)                 { push_state :block_comment }
-	rule(/#\*/, :block_comment) { push_state :block_comment }
-	rule(/\*#/, :block_comment) { pop_state                 }
+	rule(/#\*/)                  { push_state :block_comment }
+	rule(/#\*/, :block_comment)  { push_state :block_comment }
+	rule(/\*#/, :block_comment)  { pop_state                 }
 	rule(/./,   :block_comment)
 end

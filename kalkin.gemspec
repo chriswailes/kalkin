@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 	
 	s.name        = 'kalkin'
 	s.version     = Kalkin::VERSION
-	s.summary     = 'Elegent complexity'
+	s.summary     = 'Elegant complexity'
 	s.description = "A toy language"
 	
 	s.files = [

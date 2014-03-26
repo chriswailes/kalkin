@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<language id="kalkin" _name="Kalkin" version="1.0" _section="Sources">
+	
+	<!--
+		Information about this language description.
+	-->
+	<metadata>
+		<property name="mimetypes">text/x-kalkin;text/x-kalkinscript</property>
+		<property name="globs">*.k;*.ks</property>
+		<property name="line-comment-start">//</property>
+		<property name="block-comment-start">/*</property>
+		<property name="block-comment-end">*/</property>
+	</metadata>
+	
+	<!--
+		Information on what the highlighting should look like.
+	-->
+	<styles>
+		<style id="boolean"	_name="Boolean"	map-to="def:boolean"	/>
+		<style id="comment"	_name="Comment"	map-to="def:comment"	/>
+		<style id="keyword"	_name="Keyword"	map-to="def:keyword"	/>
+		<style id="number"	_name="Number"		map-to="def:decimal"	/>
+		<style id="string"	_name="String"		map-to="def:string"		/>
+		<style id="type"	_name="Data Type"	map-to="def:type"		/>
+	</styles>
+	
+	<!--
+		The language definition proper.
+	-->
+	<definitions>
+		<!-- The main Chapel context -->
+		<context id="chapel" class="no-spell-check">
+			<include>
+				<!-- Use the default highliting for C style comments -->
+				<context ref="def:c-like-comment"/>
+				<context ref="def:c-like-comment-multiline"/>
+				<context ref="def:c-like-close-comment-outside-comment"/>
+				
+				<context ref="boolean"	/>
+				<context ref="keyword"	/>
+				<context ref="number"	/>
+				<context ref="string"	/>
+				<context ref="type"		/>
+			</include>
+		</context>
+		
+		<context id="boolean" style-ref="boolean">
+			<keyword>true</keyword>
+			<keyword>false</keyword>
+		</context>
+		
+		<!-- Chapel's keywords context -->
+		<context id="keyword"  style-ref="keyword">
+			<keyword>atomic</keyword>
+			<keyword>begin</keyword>
+			<keyword>break</keyword>
+			<keyword>by</keyword>
+			<keyword>class</keyword>
+			<keyword>cobegin</keyword>
+			<keyword>coforall</keyword>
+			<keyword>config</keyword>
+			<keyword>const</keyword>
+			<keyword>continue</keyword>
+			<keyword>delte</keyword>
+			<keyword>dmapped</keyword>
+			<keyword>do</keyword>
+			<keyword>domain</keyword>
+			<keyword>else</keyword>
+			<keyword>enum</keyword>
+			<keyword>export</keyword>
+			<keyword>extern</keyword>
+			<keyword>false</keyword>
+			<keyword>for</keyword>
+			<keyword>forall</keyword>
+			<keyword>if</keyword>
+			<keyword>in</keyword>
+			<keyword>index</keyword>
+			<keyword>inline</keyword>
+			<keyword>inout</keyword>
+			<keyword>iter</keyword>
+			<keyword>label</keyword>
+			<keyword>lambda</keyword>
+			<keyword>let</keyword>
+			<keyword>local</keyword>
+			<keyword>module</keyword>
+			<keyword>new</keyword>
+			<keyword>nil</keyword>
+			<keyword>on</keyword>
+			<keyword>otherwise</keyword>
+			<keyword>out</keyword>
+			<keyword>param</keyword>
+			<keyword>pragma</keyword>
+			<keyword>proc</keyword>
+			<keyword>record</keyword>
+			<keyword>reduce</keyword>
+			<keyword>ref</keyword>
+			<keyword>return</keyword>
+			<keyword>scan</keyword>
+			<keyword>select</keyword>
+			<keyword>serial</keyword>
+			<keyword>single</keyword>
+			<keyword>sparse</keyword>
+			<keyword>subdomain</keyword>
+			<keyword>sync</keyword>
+			<keyword>then</keyword>
+			<keyword>true</keyword>
+			<keyword>type</keyword>
+			<keyword>union</keyword>
+			<keyword>use</keyword>
+			<keyword>var</keyword>
+			<keyword>when</keyword>
+			<keyword>where</keyword>
+			<keyword>while</keyword>
+			<keyword>yield</keyword>
+		</context>
+		
+		<!-- Chapel's number context -->
+		<context id="number" style-ref="number">
+			<match>[+-]?((0x[abcdef\d]+)|(([\d]*\.)?[\d]+([eE][+-]?[\d]+)?))</match>
+		</context>
+		
+		<!-- Chapel's string context -->
+		<context id="string" end-at-line-end="true" style-ref="string" class="spell-check">
+			<start>"</start>
+			<end>"</end>
+			
+			<include>
+				<context id="escape" style-ref="escaped-character">
+					<match>\\.</match>
+				</context>
+			</include>
+		</context>
+		
+		<!-- Chapel's type keywords context -->
+		<context id="type"  style-ref="type">
+			<keyword>bool</keyword>
+			<keyword>complex</keyword>
+			<keyword>int</keyword>
+			<keyword>opaque</keyword>
+			<keyword>range</keyword>
+			<keyword>real</keyword>
+			<keyword>string</keyword>
+			<keyword>uint</keyword>
+		</context>
+	</definitions>
+</language>

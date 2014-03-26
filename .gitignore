@@ -1,0 +1,13 @@
+pkg/*
+doc/*
+coverage/*
+examples/kazoo/**/*.o
+examples/kazoo/**/*.so
+
+*.tbl
+
+.yardoc/*
+
+*.gem
+
+Gemfile.lock

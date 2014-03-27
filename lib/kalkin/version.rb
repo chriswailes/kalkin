@@ -3,7 +3,7 @@
 # Date:		2014/03/25
 # Description:	This file specifies the version number for Kalkin.
 
-module RLTK
+module Kalkin
 	# The Kalkin's version number.
 	VERSION = '0.1.0'
 end

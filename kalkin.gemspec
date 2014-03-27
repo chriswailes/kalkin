@@ -3,7 +3,7 @@
 # Date:		2014/03/25
 # Description:	This is the Gem specification for Kalkin.
 
-require File.expand_path("../lib/rltk/version", __FILE__)
+require File.expand_path("../lib/kalkin", __FILE__)
 
 Gem::Specification.new do |s|
 	s.platform = Gem::Platform::RUBY

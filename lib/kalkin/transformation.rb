@@ -1,7 +1,8 @@
 # Author:		Chris Wailes <chris.wailes@gmail.com>
 # Project: 	Kalkin
-# Date:		2014/03/25
-# Description:	This file sets up autoloads for the Kalkin::Passes module.
+# Date:		2014/03/26
+# Description:	This file sets up autoloads for the Kalkin::Transformation 
+#              module.
 
 ############
 # Includes #
@@ -12,8 +13,8 @@ require 'filigree/request_file'
 
 # The module contains AST transformation passes for the Kalkin compiler and
 # language tools library.
-module Kalkin::Passes
-	available_passes = File.join(File.dirname(File.expand_path(__FILE__)), 'passes/*.rb')
+module Kalkin::Transformation
+	available_passes = File.expand_path('../transformation/*.rb', __FILE__)
 	
 	available_passes.each do |pass_file|
 		request_file pass_file

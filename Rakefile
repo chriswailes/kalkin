@@ -92,7 +92,6 @@ request_file('yard', 'Yard is not installed.') do
 	YARD::Rake::YardocTask.new do |t|
 		
 		t.options	= [
-			'-e',       yardlib,
 			'--title',  'Kalkin',
 			'-m',       'markdown',
 			'-M',       'redcarpet',
@@ -100,6 +99,22 @@ request_file('yard', 'Yard is not installed.') do
 		]
 		
 		t.files = Dir['lib/**/*.rb']
+	end
+end
+
+################
+# Kalkin Tasks #
+################
+
+desc 'Re-generate the Kalkin parser table.'
+task :grammar do
+	module Kalkin; end
+	
+	begin
+		require File.expand_path('../lib/kalkin/parser', __FILE__)
+	rescue Exception => e
+		puts e.message
+		puts e.backtrace
 	end
 end
 

@@ -16,6 +16,12 @@ require 'rltk/lexer'
 
 class Kalkin::Lexer < RLTK::Lexer
 	
+	##################
+	# Character Sets #
+	##################
+	
+	OP_CHARACTERS = '[~!$%^&*+=?<>|\-]'
+	
 	############
 	# Keywords #
 	############
@@ -41,27 +47,30 @@ class Kalkin::Lexer < RLTK::Lexer
 	# Punctuation and Symbols #
 	###########################
 	
-	rule(/->/) { :ARROW    }
-	rule(/=/)  { :ASSIGN   }
-	rule(/:/)  { :COLON    }
-	rule(/,/)  { :COMMA    }
-	rule(/\./) { :DOT      }
-	rule(/{/)  { :LBRACE   }
-	rule(/\[/) { :LBRACKET }
-	rule(/\(/) { :LPAREN   }
-	rule(/\n/) { :NEWLINE  }
-	rule(/}/)  { :RBRACE   }
-	rule(/\]/) { :RBRACKET }
-	rule(/\)/) { :RPAREN   }
-	rule(/\$/) { :SIGIL    }
+	rule(/->/) { :ARROW      }
+	rule(/=/)  { :ASSIGN     }
+	rule(/:/)  { :COLON      }
+	rule(/,/)  { :COMMA      }
+	rule(/\./) { :DOT        }
+	rule(/{/)  { :LBRACE     }
+	rule(/\[/) { :LBRACKET   }
+	rule(/\(/) { :LPAREN     }
+	rule(/\n/) { :NEWLINE    }
+	rule(/}/)  { :RBRACE     }
+	rule(/\]/) { :RBRACKET   }
+	rule(/\)/) { :RPAREN     }
+	rule(/\$/) { :SIGIL      }
+	rule(/_/)  { :UNDERSCORE }
 	
-	rule(/[~!@$%^&*+=?<>|\-]+/) { |t| [:OPERATOR, t] }
+	rule(/#{OP_CHARACTERS}+/) { |t| [:OPERATOR, t] }
 	
 	###############
 	# Annotations #
 	###############
 	
-	rule(/@[a-z_]/) { |t| [:ANNOTATION, t[1..-1]] }
+	rule(/@[a-z_]/)  { |t| [:ANNOTATION, [t[1..-1],   :plain]] }
+	rule(/@![a-z_]/) { |t| [:ANNOTATION, [t[1..-1],  :insist]] }
+	rule(/@?[a-z_]/) { |t| [:ANNOTATION, [t[1..-1], :inquire]] }
 	
 	############
 	# Literals #
@@ -70,7 +79,7 @@ class Kalkin::Lexer < RLTK::Lexer
 	rule(/:[a-z_]+/)        { |t| [:ATOM,    t[1..-1]] }
 	rule(/\d+\.\d+/)        { |t| [:FLOAT,     t.to_f] }
 	rule(/\d+/)             { |t| [:INTEGER,   t.to_i] }
-	rule(/"(\\"|[^"\n])*"/) { |t| [:STRING,         t] }
+	rule(/'(\\'|[^'\n])*'/) { |t| [:STRING,         t] }
 	
 	###############
 	# Identifiers #

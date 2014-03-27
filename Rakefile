@@ -108,10 +108,11 @@ end
 
 desc 'Re-generate the Kalkin parser table.'
 task :grammar do
-	module Kalkin; end
-	
 	begin
-		require File.expand_path('../lib/kalkin/parser', __FILE__)
+		$: << File.expand_path('../lib', __FILE__)
+		require 'kalkin'
+		Kalkin::Parser
+		
 	rescue Exception => e
 		puts e.message
 		puts e.backtrace

@@ -14,8 +14,6 @@ require 'rltk/parser'
 # Classes and Modules #
 #######################
 
-module Kalkin; end
-
 class Kalkin::Parser < RLTK::Parser
 	
 	default_arg_type :array

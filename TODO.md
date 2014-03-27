@@ -2,6 +2,7 @@
 
 # Features
 
+* Add production to handle `expr DOT IDENT OPERATOR expr_line`
 * Add support for unary operators
 * Add support for literals in parameter lists
 * Add a re-association transformation pass for operators

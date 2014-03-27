@@ -45,9 +45,16 @@ class Kalkin::Parser < RLTK::Parser
 	
 	p(:expr) do
 		c('expr_line') { |_| nil }
-		c('if_expr') { |_| nil }
+		c('expr_prime') { |_| nil }
+	end
+	
+	p(:expr_prime) do
+		c('LPAREN expr_prime RPAREN') { |_| nil }
 		
-		c('expr_line OPERATOR NEWLINE expr') { |_| nil }
+		c('if_expr') { |_| nil }
+		c('expr_prime OPERATOR NEWLINE+ expr') { |_| nil }
+		c('expr_prime DOT NEWLINE+ IDENT LPAREN expr RPAREN') { |_| nil }
+		c('expr_prime DOT NEWLINE+ IDENT OPERATOR LPAREN EXPR RPAREN') { |_| nil }
 	end
 	
 	p(:if_expr) do
@@ -69,6 +76,8 @@ class Kalkin::Parser < RLTK::Parser
 		# production if the parens are made optional.
 		c('LPAREN expr_line RPAREN') { |_| nil }
 		c('expr_line DOT IDENT LPAREN arg_list RPAREN') { |_| nil }
+		
+		c('expr_line DOT IDENT OPERATOR LPAREN arg_list RPAREN') { |_| nil }
 	end
 	
 	p(:function_body) do

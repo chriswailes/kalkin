@@ -23,6 +23,7 @@ class Kalkin::Parser < RLTK::Parser
 	left  :PREFER_OPERATOR, :PREFER_MESSAGE, :PREFER_COMMA
 	left  :RPAREN
 	left  :OPERATOR
+#	left  :PREFER_UNARY
 	right
 	right
 	right
@@ -68,9 +69,13 @@ class Kalkin::Parser < RLTK::Parser
 		c('LPAREN expr_prime RPAREN') { |_| nil }
 		
 		c('if_expr') { |_| nil }
+		
 		c('expr_prime OPERATOR NEWLINE+ expr') { |_| nil }
 		c('expr_prime DOT NEWLINE+ IDENT LPAREN arg_list RPAREN') { |_| nil }
 		c('expr_prime DOT NEWLINE+ IDENT OPERATOR EXPR') { |_| nil }
+		
+#		c('expr_prime ASSIGN NEWLINE+ expr') { |_| nil }
+#		c('expr_prime DOT NEWLINE+ IDENT ASSIGN EXP') { |_| nil }
 	end
 	
 	p(:if_expr) do
@@ -93,6 +98,11 @@ class Kalkin::Parser < RLTK::Parser
 		c('expr_line DOT IDENT LPAREN arg_list_line RPAREN', :MESSAGE) { |_| nil }
 		c('expr_line DOT IDENT arg_list_line') { |_| nil }
 		c('expr_line DOT IDENT OPERATOR expr_line') { |_| nil }
+		
+#		c('OPERATOR expr_line') { |_| nil }
+		
+#		c('expr_line ASSIGN expr_line') { |_| nil }
+#		c('expr_line DOT IDENT ASSIGN expr_line') { |_| nil }
 	end
 	
 	p(:function_body) do

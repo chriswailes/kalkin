@@ -18,8 +18,16 @@ class Kalkin::Parser < RLTK::Parser
 	
 	default_arg_type :array
 	
+	left  :PREFER_ALL
+	left  :PREFER_ALL_BUT_TUPLE
+	left  :PREFER_OPERATOR, :PREFER_MESSAGE, :PREFER_COMMA
+	left  :RPAREN
 	left  :OPERATOR
-	right :DOT
+	right
+	right
+	right
+	right :COMMA
+	right :DOT, :MESSAGE
 	
 	p(:input) do
 		c('input_prime')              { |_| nil }
@@ -37,13 +45,23 @@ class Kalkin::Parser < RLTK::Parser
 	end
 	
 	p(:arg_list_prime) do
-		c('expr_line') { |_| nil }
-		c('expr_line COMMA arg_list') { |_| nil }
+		c('expr_line', :PREFER_COMMA) { |_| nil }
+		c('expr_line COMMA NEWLINE* arg_list') { |_| nil }
+	end
+	
+	p(:arg_list_line) do
+		c('', :PREFER_OPERATOR) { |_| nil }
+		c('arg_list_line_prime') { |_| nil }
+	end
+	
+	p(:arg_list_line_prime) do
+		c('expr_line', :PREFER_ALL_BUT_TUPLE) { |_| nil }
+		c('expr_line COMMA arg_list_line') { |_| nil }
 	end
 	
 	p(:expr) do
-		c('expr_line') { |_| nil }
-		c('expr_prime') { |_| nil }
+		c('expr_line', :PREFER_OPERATOR) { |_| nil }
+		c('expr_prime', :PREFER_OPERATOR) { |_| nil }
 	end
 	
 	p(:expr_prime) do
@@ -51,8 +69,8 @@ class Kalkin::Parser < RLTK::Parser
 		
 		c('if_expr') { |_| nil }
 		c('expr_prime OPERATOR NEWLINE+ expr') { |_| nil }
-		c('expr_prime DOT NEWLINE+ IDENT LPAREN expr RPAREN') { |_| nil }
-		c('expr_prime DOT NEWLINE+ IDENT OPERATOR LPAREN EXPR RPAREN') { |_| nil }
+		c('expr_prime DOT NEWLINE+ IDENT LPAREN arg_list RPAREN') { |_| nil }
+		c('expr_prime DOT NEWLINE+ IDENT OPERATOR EXPR') { |_| nil }
 	end
 	
 	p(:if_expr) do
@@ -66,16 +84,15 @@ class Kalkin::Parser < RLTK::Parser
 	p(:expr_line) do
 		c('literal') { |_| nil }
 		c('IDENT') { |_| nil }
-		c('expr_line OPERATOR expr_line') { |_| nil }
+		c('LPAREN expr_line RPAREN', :PREFER_MESSAGE) { |_| nil }
+		
 		c('IF expr_line THEN expr_line ELSE expr_line END') { |_| nil }
 		c('IF expr_line THEN expr_line ELSE expr_line NEWLINE') { |_| nil }
 		
-		# Precedence needs be used to resolve these clauses with the arg_list
-		# production if the parens are made optional.
-		c('LPAREN expr_line RPAREN') { |_| nil }
-		c('expr_line DOT IDENT LPAREN arg_list RPAREN') { |_| nil }
-		
-		c('expr_line DOT IDENT OPERATOR LPAREN arg_list RPAREN') { |_| nil }
+		c('expr_line OPERATOR expr_line') { |_| nil }
+		c('expr_line DOT IDENT LPAREN arg_list_line RPAREN', :MESSAGE) { |_| nil }
+		c('expr_line DOT IDENT arg_list_line') { |_| nil }
+		c('expr_line DOT IDENT OPERATOR expr_line') { |_| nil }
 	end
 	
 	p(:function_body) do
@@ -108,7 +125,7 @@ class Kalkin::Parser < RLTK::Parser
 		
 		c('LBRACKET tuple_body RBRACKET') { |_| nil }
 		
-		# c('LPAREN   tuple_body RPAREN')   { |_| nil }
+		c('LPAREN   tuple_body RPAREN')   { |_| nil }
 	end
 	
 	p(:nt_pair, 'IDENT COLON NSIDENT') { |_| nil }
@@ -122,19 +139,22 @@ class Kalkin::Parser < RLTK::Parser
 	p(:param_list_prime) do
 		c('nt_pair')                            { |_| nil }
 		c('UNDERSCORE')                         { |_| nil }
-		c('nt_pair COMMA param_list_prime')     { |_| nil }
-		c('nt_pair COMMA param_w_default_list') { |_| nil }
+		c('nt_pair COMMA NEWLINE* param_list_prime')     { |_| nil }
+		c('nt_pair COMMA NEWLINE* param_w_default_list') { |_| nil }
 	end
 	
 	p(:param_w_default_list) do
-		c('nt_pair ASSIGN literal')                            { |_| nil }
-		c('nt_pair ASSIGN literal COMMA param_w_default_list') { |_| nil }
+		c('nt_pair ASSIGN literal')                                     { |_| nil }
+		c('nt_pair ASSIGN literal COMMA NEWLINE* param_w_default_list') { |_| nil }
 	end
 	
 	# { |a, _, b| [a] + b }
 	p(:tuple_body, 'expr_line COMMA tuple_body_prime') { |_| nil }
 	
-	nonempty_list(:tuple_body_prime, :expr_line, :COMMA)
+	p(:tuple_body_prime) do
+		c('expr_line', :PREFER_ALL) { |_| nil }
+		c('expr_line COMMA tuple_body_prime') { |_| nil }
+	end
 	
 	CACHE_FILE = File.expand_path('../parser.tbl', __FILE__)
 	

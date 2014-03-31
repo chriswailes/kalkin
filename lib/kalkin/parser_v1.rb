@@ -74,7 +74,7 @@ class Kalkin::Parser < RLTK::Parser
 		c('expr_prime DOT NEWLINE+ IDENT LPAREN arg_list RPAREN') { |_| nil }
 		c('expr_prime DOT NEWLINE+ IDENT OPERATOR EXPR') { |_| nil }
 		
-#		c('expr_prime ASSIGN NEWLINE+ expr') { |_| nil }
+#		c('IDENT ASSIGN NEWLINE+ expr') { |_| nil }
 #		c('expr_prime DOT NEWLINE+ IDENT ASSIGN EXP') { |_| nil }
 	end
 	
@@ -99,9 +99,15 @@ class Kalkin::Parser < RLTK::Parser
 		c('expr_line DOT IDENT arg_list_line') { |_| nil }
 		c('expr_line DOT IDENT OPERATOR expr_line') { |_| nil }
 		
+		# Function call
+		c('expr_line LPAREN arg_list_line RPAREN') { |_| nil }
+		
+		# Constructor call
+		c('NSIDENT LPAREN arg_list_line RPAREN') { |_| nil }
+		
 #		c('OPERATOR expr_line') { |_| nil }
 		
-#		c('expr_line ASSIGN expr_line') { |_| nil }
+#		c('IDENT ASSIGN expr_line') { |_| nil }
 #		c('expr_line DOT IDENT ASSIGN expr_line') { |_| nil }
 	end
 	
@@ -112,11 +118,13 @@ class Kalkin::Parser < RLTK::Parser
 	p(:function_body_sub1) do
 		c('NEWLINE') { |_| nil }
 		c('expr NEWLINE+ function_body_sub2') { |_| nil }
+		c('var_decl NEWLINE+ function_body_sub2') { |_| nil }
 	end
 	
 	p(:function_body_sub2) do
 		c('') { |_| nil }
 		c('expr NEWLINE+ function_body_sub2') { |_| nil }
+		c('var_decl NEWLINE+ function_body_sub2') { |_| nil }
 	end
 	
 	p(:function_def) do
@@ -164,6 +172,11 @@ class Kalkin::Parser < RLTK::Parser
 	p(:tuple_body_prime) do
 		c('expr_line', :PREFER_ALL) { |_| nil }
 		c('expr_line COMMA tuple_body_prime') { |_| nil }
+	end
+	
+	p(:var_decl) do
+		c('LET nt_pair NEWLINE') { |_| nil }
+		c('LET nt_pair ASSIGN expr') { |_| nil }
 	end
 	
 	CACHE_FILE = File.expand_path('../parser.tbl', __FILE__)

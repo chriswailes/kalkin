@@ -3,6 +3,7 @@
 # Features
 
 * Add support for unary operators
+* Add support for variable declaration
 * Add support for literals in parameter lists
 * Add support for underscore in parameter list
 * Write string membership tests for the parser

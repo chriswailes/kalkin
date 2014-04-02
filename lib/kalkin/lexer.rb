@@ -59,6 +59,7 @@ class Kalkin::Lexer < RLTK::Lexer
 	rule(/}/)  { :RBRACE     }
 	rule(/\]/) { :RBRACKET   }
 	rule(/\)/) { :RPAREN     }
+	rule(/;/)  { :SEMICOLON  }
 	rule(/\$/) { :SIGIL      }
 	rule(/_/)  { :UNDERSCORE }
 	

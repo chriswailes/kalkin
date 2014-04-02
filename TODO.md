@@ -2,10 +2,11 @@
 
 # Features
 
-* Add support for unary operators
-* Add support for variable declaration
-* Add support for literals in parameter lists
-* Add support for underscore in parameter list
+* Add support for additional syntax:
+  * semicolons to be used in place of newlines as a sequencing operator
+  * tuple construction
+  * array construction
+  * paren-less method/function calls
 * Write string membership tests for the parser
 * Add a re-association transformation pass for operators
 * Add tail-recursion detection pass

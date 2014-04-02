@@ -72,76 +72,44 @@ class Kalkin::Parser < RLTK::Parser
 		c('STRING')  { |_| nil }
 	end
 	
-	p :var_decl do
-		c('var_decl_wo_default') { |_| nil }
-		c('var_decl_w_default')  { |_| nil }
-	end
-	
-	p :var_decl_wo_default do
-		c('IDENT') { |_| nil }
-		c('IDENT COLON NSIDENT') { |_| nil }
-	end
-	
-	p :var_decl_w_default do
-		c('IDENT LPAREN expr RPAREN') { |_| nil }
-		c('IDENT LPAREN expr RPAREN COLON NSIDENT') { |_| nil }
-	end
-	
-	###################################
-	
 	p :param_list do
 		c('') { |_| nil }
+		c('param_list_sub1') { |_| nil }
+	end
+	
+	p :param_list_sub1 do
 		c('IDENT COLON NSIDENT') { |_| nil }
 		c('IDENT LPAREN expr RPAREN COLON NSIDENT') { |_| nil }
-		c('param_wo_default_list COMMA IDENT COLON NSIDENT') { |_| nil }
-		c('param_w_default_list COMMA IDENT LPAREN expr RPAREN COLON NSIDENT') { |_| nil }
+		c('IDENT COMMA param_list_sub1') { |_| nil }
+		c('IDENT COLON NSIDENT COMMA param_list_sub1') { |_| nil }
+		c('IDENT LPAREN expr RPAREN COMMA param_list_sub2') { |_| nil }
+		c('IDENT LPAREN expr RPAREN COLON NSIDENT COMMA param_list_sub2') { |_| nil }
 	end
 	
-	p :param_wo_default_list do
-		c('var_decl_wo_default') { |_| nil }
-		c('var_decl_wo_default COMMA param_wo_default_list') { |_| nil }
-		c('var_decl_wo_default COMMA param_w_default_list')  { |_| nil }
+	p :param_list_sub2 do
+		c('IDENT LPAREN expr RPAREN COLON NSIDENT') { |_| nil }
+		c('IDENT LPAREN expr RPAREN COLON NSIDENT COMMA param_list_sub2')  { |_| nil }
+		c('IDENT LPAREN expr RPAREN COMMA param_list_sub2') { |_| nil }
 	end
-	
-	p :param_w_default_list do
-		c('var_decl_w_default') { |_| nil }
-		c('var_decl_w_default COMMA param_w_default_list') { |_| nil }
-	end
-	
-	###################################
-	
-#	p :param_list do
-#		c('') { |_| nil }
-#		c('param_list_sub1 COLON NSIDENT') { |_| nil }
-#	end
-#	
-#	p :param_list_sub1 do
-#		c('IDENT') { |_| nil }
-#		c('IDENT LPAREN expr RPAREN') { |_| nil }
-#	end
-	
-	####################################
-	
-#	p :param_list do
-#		c('') { |_| nil }
-#		c('param_wo_default_list IDENT COLON NSIDENT') { |_| nil }
-#		c('param_w_default_list IDENT LPAREN expr RPAREN COLON NSIDENT') { |_| nil }
-#	end
-#	
-#	p :param_wo_default_list do
-#		c('') { |_| nil }
-#		c('param_wo_default_list IDENT COMMA') { |_| nil }
-#		c('param_wo_default_list IDENT COLON NSIDENT COMMA') { |_| nil }
-#	end
-#	
-#	p :param_w_default_list do
-#		c('param_wo_default_list') { |_| nil }
-#		c('param_w_default_list IDENT LPAREN expr RPAREN COMMA') { |_| nil }
-#		c('param_w_default_list IDENT LPAREN expr RPAREN COLON NSIDENT COMMA') { |_| nil }
-#	end
 	
 	###################################################
 
+	
+#	p :var_decl do
+#		c('var_decl_wo_default') { |_| nil }
+#		c('var_decl_w_default')  { |_| nil }
+#	end
+#	
+#	p :var_decl_wo_default do
+#		c('IDENT') { |_| nil }
+#		c('IDENT COLON NSIDENT') { |_| nil }
+#	end
+#	
+#	p :var_decl_w_default do
+#		c('IDENT LPAREN expr RPAREN') { |_| nil }
+#		c('IDENT LPAREN expr RPAREN COLON NSIDENT') { |_| nil }
+#	end
+#
 #	p(:nt_pair, 'IDENT COLON NSIDENT') { |_| nil }
 #	
 #	p(:param_list) do

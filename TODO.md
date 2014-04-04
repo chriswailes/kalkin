@@ -7,6 +7,8 @@
   * tuple construction
   * array construction
   * paren-less method/function calls
+* Re-factor if_exprs to not allow multiple else clauses
+* Convert rules to left-recursion if possible
 * Write string membership tests for the parser
 * Add a re-association transformation pass for operators
 * Add tail-recursion detection pass

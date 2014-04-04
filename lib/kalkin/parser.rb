@@ -39,20 +39,13 @@ class Kalkin::Parser < RLTK::Parser
 		c('expr_core COMMA NEWLINE* arg_list_prime') { |_| nil }
 	end
 	
-	p :arg_list_line do
-		c('') { |_| nil }
-		c('arg_list_line_prime') { |_| nil }
-	end
-	
-	p :arg_list_line_prime do
-		c('expr_core') { |_| nil }
-		c('expr_core COMMA arg_list_line_prime') { |_| nil }
-	end
-	
-	p :expr do
-		c('expr_core') { |_| nil }
-		
+	p :expr_toplevel do
+		c('expr_midlevel') { |_| nil }
 		c('if_expr') { |_| nil }
+	end
+	
+	p :expr_midlevel do
+		c('expr_core') { |_| nil }
 		c('let_expr') { |_| nil }
 	end
 	
@@ -61,29 +54,33 @@ class Kalkin::Parser < RLTK::Parser
 		c('LPAREN expr_core RPAREN') { |_| nil }
 		
 		# Single-line if-expr
-		c('IF if_cond THEN expr_core ELSE expr_core END') { |_| nil }
+		c('IF expr_midlevel THEN expr_core ELSE expr_core END') { |_| nil }
 		
 		# Function call
 		c('IDENT LPAREN arg_list RPAREN') { |_| nil }
 		
 		# Method call
 		c('expr_core DOT NEWLINE* IDENT LPAREN arg_list RPAREN') { |_| nil }
+		c('expr_core DOT NEWLINE* IDENT') { |_| nil }
 		
 		# Operator call
 		c('expr_core OPERATOR NEWLINE* expr_core') { |_| nil }
 		c('OPERATOR expr_core') { |_| nil }
+		
+		# Method/Operator Call
+		c('expr_core DOT NEWLINE* IDENT OPERATOR NEWLINE* expr_core') { |_| nil }
 	end
 	
 	p(:expr_sequence, 'NEWLINE* expr_sequence_prime') { |_| nil }
 	
 	p :expr_sequence_prime do
 		c('') { |_| nil }
-		c('expr NEWLINE+ expr_sequence_prime') { |_| nil }
+		c('expr_toplevel NEWLINE+ expr_sequence_prime') { |_| nil }
 	end
 	
 	p :function_def do
 		c('function_sig ARROW literal') { |_| nil }
-		c('function_sig COLON NSIDENT ARROW expr') { |_| nil }
+		c('function_sig COLON NSIDENT ARROW expr_toplevel') { |_| nil }
 		c('function_sig COLON NSIDENT NEWLINE expr_sequence END') { |_| nil }
 	end
 	
@@ -92,16 +89,11 @@ class Kalkin::Parser < RLTK::Parser
 		c('DEF IDENT LPAREN param_list RPAREN') { |_| nil }
 	end
 	
-	p :if_cond do
-		c('expr_core') { |_| nil }
-		c('let_expr') { |_| nil }
-	end
-	
-	p(:if_expr, 'IF if_cond NEWLINE+ if_expr_prime') { |_| nil }
+	p(:if_expr, 'IF expr_midlevel NEWLINE+ if_expr_prime') { |_| nil }
 	
 	p(:if_expr_prime) do
 		c('expr_sequence ELSE NEWLINE+ if_expr_prime') { |_| nil }
-		c('expr_sequence ELSE IF if_cond NEWLINE+ if_expr_prime') { |_| nil }
+		c('expr_sequence ELSE IF expr_midlevel NEWLINE+ if_expr_prime') { |_| nil }
 		c('expr_sequence END') { |_| nil }
 	end
 	
@@ -109,11 +101,11 @@ class Kalkin::Parser < RLTK::Parser
 	
 	p :let_expr_prime do
 		c('IDENT COLON NSIDENT') { |_| nil }
-		c('IDENT LPAREN expr RPAREN COLON NSIDENT') { |_| nil }
+		c('IDENT LPAREN expr_core RPAREN COLON NSIDENT') { |_| nil }
 		c('IDENT COMMA NEWLINE* let_expr_prime') { |_| nil }
-		c('IDENT LPAREN expr RPAREN COMMA NEWLINE* let_expr_prime') { |_| nil }
+		c('IDENT LPAREN expr_core RPAREN COMMA NEWLINE* let_expr_prime') { |_| nil }
 		c('IDENT COLON NSIDENT COMMA NEWLINE* let_expr_prime') { |_| nil }
-		c('IDENT LPAREN expr RPAREN COLON NSIDENT COMMA NEWLINE* let_expr_prime') { |_| nil }
+		c('IDENT LPAREN expr_core RPAREN COLON NSIDENT COMMA NEWLINE* let_expr_prime') { |_| nil }
 	end
 	
 	p :literal do

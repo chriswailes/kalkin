@@ -7,6 +7,8 @@
   * tuple construction
   * array construction
   * paren-less method/function calls
+  * method and operator calls for if-expressions
+* Change expr_core to be right-recursive
 * Write string membership tests for the parser
 * Add a re-association transformation pass for operators
 * Add tail-recursion detection pass

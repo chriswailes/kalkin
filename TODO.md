@@ -7,6 +7,7 @@
   * tuple construction
   * array construction
   * paren-less method/function calls
+  * method and operator calls for if-expressions
 * Re-factor if_exprs to not allow multiple else clauses
 * Convert rules to left-recursion if possible
 * Write string membership tests for the parser

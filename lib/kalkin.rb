@@ -12,7 +12,8 @@ module Kalkin
 	autoload :Pass,        'kalkin/pass'
 	autoload :Passes,      'kalkin/passes'
 	autoload :PassManager, 'kalkin/pass_manager'
-	autoload :Symbol,      'kalkin/symbol'
+	autoload :KSymbol,     'kalkin/symbol'
 	autoload :SymbolTable, 'kalkin/symbol_table'
+	autoload :Type,        'kalkin/type'
 	autoload :VERSION,     'kalkin/version'
 end

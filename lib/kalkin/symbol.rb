@@ -15,15 +15,38 @@ require 'filigree/abstract_class'
 #######################
 
 module Kalkin
-	class Symbol
+	class KSymbol
 		extend Filigree::AbstractClass
+		
+		# @returns [String]
+		attr_reader :name
+		# @returns [Fixnum]
+		attr_reader :version
+		# @returns [Namespace]
+		attr_reader :scope
+		
+		alias :to_s :name
+		
+		# @param [String]    name
+		# @param [Fixnum]    version
+		# @param [Namespace] scope
+		def initialize(name, version, scope)
+			@name, @version, @scope = name, version, scope
+		end
+		
+		def ==(other)
+			self.class   == other.class   &&
+			self.name    == other.name    &&
+			self.version == other.version &&
+			self.scope   == other.scope
+		end
+		
+		def increment
+			self.class.new(@name, @version + 1, @scope)
+		end
+		alias :'+@' :increment
 	end
 	
-	class TextualSymbol < Symbol
-	
-	end
-	
-	class InternalSymbol < Symbol
-	
-	end
+	class TextualSymbol  < KSymbol; end
+	class InternalSymbol < KSymbol; end
 end

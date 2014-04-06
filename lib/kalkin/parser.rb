@@ -18,8 +18,9 @@ class Kalkin::Parser < RLTK::Parser
 	
 	default_arg_type :array
 	
-	right :OPERATOR
-	right :DOT
+	left  ; nonassoc :IDENT ; right
+	left  ; nonassoc        ; right :OPERATOR
+	left  ; nonassoc        ; right :DOT
 
 	p(:input, 'NEWLINE* input_prime') { |_| nil }
 	
@@ -92,7 +93,7 @@ class Kalkin::Parser < RLTK::Parser
 	p(:if_expr, 'IF expr_midlevel NEWLINE+ if_expr_prime') { |_| nil }
 	
 	p(:if_expr_prime) do
-		c('expr_sequence ELSE NEWLINE+ if_expr_prime') { |_| nil }
+		c('expr_sequence ELSE NEWLINE+ expr_sequence END') { |_| nil }
 		c('expr_sequence ELSE IF expr_midlevel NEWLINE+ if_expr_prime') { |_| nil }
 		c('expr_sequence END') { |_| nil }
 	end

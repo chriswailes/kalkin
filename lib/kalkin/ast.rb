@@ -7,6 +7,9 @@
 # Requires #
 ############
 
+# Standard Library
+require 'singleton'
+
 # Filigree
 require 'filigree/abstract_class'
 
@@ -43,6 +46,14 @@ module Kalkin::AST
 		end
 	end
 	
+	class Sink < Expression
+		include Singleton
+		
+		class << self
+			alias :'!' :instance
+		end
+	end
+	
 	class Literal < Expression
 		extend AbstractClass
 		
@@ -72,10 +83,24 @@ module Kalkin::AST
 		
 		value :name,   String
 		value :symbol, KSymbol
+		
+		child :init_args, [Expression]
 	end
 	
-	class VarDef   < Definition; end
-	class ParamDef < VarDef;     end
+	class VarDef < Definition
+	end
+	
+	class ParamDef < VarDef
+		def initialize(*_)
+			super
+			
+			self.init_args = [nil]
+		end
+		
+		def default?
+			self.init_args != [nil]
+		end
+	end
 	
 	class Invocation < Expression
 		value :name, String
@@ -90,6 +115,21 @@ module Kalkin::AST
 		child :cond,  Expression
 		child :then_, ExprSequence
 		child :else_, ExprSequence
+		
+		def self.from_pairs(pairs)
+			cond, then_ = pairs.shift
+			
+			else_ =
+			if pairs.empty?
+				nil
+			elsif pairs.first[0].nil?
+				pairs.first[1]
+			else
+				ExprSequence.new [If.from_pairs pairs ]
+			end
+			
+			If.new nil, cond, then_, else_
+		end
 	end
 	
 	class Let < Expression

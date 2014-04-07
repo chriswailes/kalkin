@@ -18,12 +18,23 @@ class Kalkin::UnresolvedType < Exception
 end
 
 class Kalkin::Type
-	attr_accessor :resolved
+	attr_reader :name
+	attr_reader :kclass
 	
+	# @param [String]  name
 	def initialize(name)
 		@name     = name
 		@kclass   = nil
 		@resolved = false
+	end
+	
+	def ==(other)
+		self.class == other.class &&
+		self.name  == other.name
+	end
+	
+	def ===(other)
+		self.object_id == other.object_id
 	end
 	
 	def kclass
@@ -39,5 +50,9 @@ class Kalkin::Type
 		@name     = nil
 		@kclass   = kclass
 		@resolved = true
+	end
+	
+	def resolved?
+		@resolved
 	end
 end

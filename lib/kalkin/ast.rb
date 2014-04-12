@@ -104,12 +104,27 @@ module Kalkin::AST
 	
 	class Invocation < Expression
 		value :name, String
-		
+	end
+	
+	class FunctionCall < Invocatio
 		child :args, [Expression]
 	end
 	
-	class FunctionCall < Invocation; end
-	class MessageSend  < Invocation; end
+	class MessageSendBase < Invocation
+		extend Filigree::AbstractClass
+		
+		child :self_, Expression
+	end
+	
+	class MessageSend < MessageSendBase
+		child :args, [Expression]
+	end
+	
+	class SplitMessageSend < MessageSend
+		value :op, String
+	end
+	
+	class UnaryMessageSend < MessageSendBase; end
 	
 	class If < Expression
 		child :cond,  Expression

@@ -22,61 +22,68 @@ class Kalkin::Parser < RLTK::Parser
 	left  ; nonassoc        ; right :OPERATOR
 	left  ; nonassoc        ; right :DOT
 
-	p(:input, 'NEWLINE* input_prime') { |_| nil }
+	p(:input) do
+		c('NEWLINE*')             { |_|    [] }
+		c('NEWLINE* input_prime') { |_, i|  i }
+	end
 	
 	p :input_prime do
-		c('') { |_| nil }
-		c('function_def') { |_| nil }
-		c('function_def NEWLINE+ input_prime') { |_| nil }
+		c('function_def')                      { |f| [f] }
+		c('input_prime NEWLINE+ function_def') { |i, _, f| i << f }
+		
+#		c('')                                  {      [] }
+#		c('function_def NEWLINE+ input_prime') { |f, _, i| i.unshift f}
 	end
 	
 	p :arg_list do
-		c('NEWLINE*') { |_| nil }
-		c('NEWLINE* arg_list_prime') { |_| nil }
+		c('NEWLINE*')                { |_|     [] }
+		c('NEWLINE* arg_list_prime') { |_, as| as }
 	end
 	
 	p :arg_list_prime do
-		c('expr_core NEWLINE*') { |_| nil }
-		c('expr_core COMMA NEWLINE* arg_list_prime') { |_| nil }
+		c('expr_core NEWLINE*')                      { |a|                    [a] }
+		c('expr_core COMMA NEWLINE* arg_list_prime') { |a, _, _, as| as.unshift a }
 	end
 	
 	p :expr_toplevel do
-		c('expr_midlevel') { |_| nil }
-		c('if_expr') { |_| nil }
+		c('expr_midlevel') { |e| e }
+		c('if_expr')       { |e| e }
 	end
 	
 	p :expr_midlevel do
-		c('expr_core') { |_| nil }
-		c('let_expr') { |_| nil }
+		c('expr_core') { |e| e }
+		c('let_expr')  { |e| e }
 	end
 	
 	p :expr_core do
-		c('literal') { |_| nil }
-		c('LPAREN expr_core RPAREN') { |_| nil }
+		c('literal')                 { |l|       l }
+		c('LPAREN expr_core RPAREN') { |_, e, _| e }
 		
 		# Single-line if-expr
-		c('IF expr_midlevel THEN expr_core ELSE expr_core END') { |_| nil }
+		c('IF expr_midlevel THEN expr_core ELSE expr_core END') { |_, c, _, t, _ e, _| If.new nil, c, t, e }
 		
 		# Function call
-		c('IDENT LPAREN arg_list RPAREN') { |_| nil }
+		c('IDENT LPAREN arg_list RPAREN') { |i, _, a, _| FunctionCall.new nil, i, a }
 		
 		# Method call
-		c('expr_core DOT NEWLINE* IDENT LPAREN arg_list RPAREN') { |_| nil }
-		c('expr_core DOT NEWLINE* IDENT') { |_| nil }
+		c('expr_core DOT NEWLINE* IDENT LPAREN arg_list RPAREN') { |s, _, _, m, _, a, _| MessageSend.new nil, m, s,  a }
+		c('expr_core DOT NEWLINE* IDENT')                        { |s, _, _, m|          MessageSend.new nil, m, s, [] }
 		
 		# Operator call
-		c('expr_core OPERATOR NEWLINE* expr_core') { |_| nil }
-		c('OPERATOR expr_core') { |_| nil }
+		c('expr_core OPERATOR NEWLINE* expr_core') { |s, o, _, a| MessageSend.new nil, o, s, [a] }
+		c('OPERATOR expr_core')                    { |o, s|       UnaryMessageSend.new nil, o, s }
 		
 		# Method/Operator Call
-		c('expr_core DOT NEWLINE* IDENT OPERATOR NEWLINE* expr_core') { |_| nil }
+		c('expr_core DOT NEWLINE* IDENT OPERATOR NEWLINE* expr_core') do |s, _, _, m, o, _, a|
+			SplitMessageSend.new nil, m, o, s, [a]
+		end
 	end
 	
 	p(:expr_sequence, 'NEWLINE* expr_sequence_prime') { |_, es| ExprSequence.new es }
 	
 	p :expr_sequence_prime do
-		c('')                                           { |_|              [] }
-		c('expr_toplevel NEWLINE+ expr_sequence_prime') { |e, _, es| [e] + es }
+		c('')                                           {                      [] }
+		c('expr_toplevel NEWLINE+ expr_sequence_prime') { |e, _, es| es.unshift e }
 	end
 	
 	p :function_def do
@@ -109,18 +116,18 @@ class Kalkin::Parser < RLTK::Parser
 	end
 	
 	p(:if_expr_prime) do
-		c('expr_sequence END')                                          { |es, _|                                     [[nil, es]] }
-		c('expr_sequence ELSE NEWLINE+ expr_sequence END')              { |es0, _, _, es1, _|            [[nil, es0], [nil, es1]] }
-		c('expr_sequence ELSE IF expr_midlevel NEWLINE+ if_expr_prime') { |es, _, c, _, p|    [[nil, es]] + p.tap { p[0][0] = c } }
+		c('expr_sequence END')                                          { |es, _|                                          [[nil, es]] }
+		c('expr_sequence ELSE NEWLINE+ expr_sequence END')              { |es0, _, _, es1, _|                 [[nil, es0], [nil, es1]] }
+		c('expr_sequence ELSE IF expr_midlevel NEWLINE+ if_expr_prime') { |es, _, c, _, ps|   ps.tap { p[0][0] = c }.unshift [nil, es] }
 	end
 	
 	p(:let_expr, 'LET let_expr_prime') { |_, vars| Let.new vars }
 	
 	p :let_expr_prime do
-		c('IDENT COLON NSIDENT')                               { |i, _, t|                  [VarDecl.new Type.new(t), i] }
-#		c('IDENT LPAREN arg_list RPAREN COLON NSIDENT')        { |i, _, a, _, _, t| [VarDecl.new Type.new(t), i, nil, a] }
-		c('IDENT COMMA NEWLINE* let_expr_prime')               { |i, _, _, vs|       [VarDecl.new vs.first.type, i] + vs }
-		c('IDENT COLON NSIDENT COMMA NEWLINE* let_expr_prime') { |i, _, t, _, _, vs|   [VarDecl.new Type.new(t), i] + vs }
+		c('IDENT COLON NSIDENT')                               { |i, _, t|                       [VarDecl.new Type.new(t), i] }
+#		c('IDENT LPAREN arg_list RPAREN COLON NSIDENT')        { |i, _, a, _, _, t|      [VarDecl.new Type.new(t), i, nil, a] }
+		c('IDENT COMMA NEWLINE* let_expr_prime')               { |i, _, _, vs|       vs.unshift VarDecl.new(vs.first.type, i) }
+		c('IDENT COLON NSIDENT COMMA NEWLINE* let_expr_prime') { |i, _, t, _, _, vs|   vs.unshift VarDecl.new(Type.new(t), i) }
 		
 #		c('IDENT LPAREN arg_list RPAREN COMMA NEWLINE* let_expr_prime') do |i, _, a, _, _, _, vs|
 #			[VarDecl.new vs.first.type, i, nil, a] + vs
@@ -149,14 +156,14 @@ class Kalkin::Parser < RLTK::Parser
 	end
 	
 	p :param_list_sub1 do
-#		c('literal NEWLINE*')                                         { |l, _|                                           [l] }
-#		c('literal COMMA NEWLINE* param_list_sub1')                   { |l, _, _, p|                           [a[0]] + a[3] }
+#		c('literal NEWLINE*')                                         { |l, _|                                                  [l] }
+#		c('literal COMMA NEWLINE* param_list_sub1')                   { |l, _, _, ps|                                  ps.unshift l }
 		
-		c('param_ident COLON NSIDENT NEWLINE*')                       { |i, _, t, _|           [ParamDef.new Type.new(t), i] }
-		c('param_ident COLON NSIDENT COMMA NEWLINE* param_list_sub1') { |i, _, t, _, _, p| [ParamDef.new Type.new(t), i] + p }
+		c('param_ident COLON NSIDENT NEWLINE*')                       { |i, _, t, _|                  [ParamDef.new Type.new(t), i] }
+		c('param_ident COLON NSIDENT COMMA NEWLINE* param_list_sub1') { |i, _, t, _, _, ps| ps.unshift ParamDef.new(Type.new(t), i) }
 		
 		c('param_ident COMMA NEWLINE* param_list_sub1') do |i, _, _, ps|
-			[ParamDef.new ps.first.type, i] + ps
+			ps.unshift ParamDef.new(ps.first.type, i)
 		end
 		
 #		c('param_list_sub2') { |params| params }

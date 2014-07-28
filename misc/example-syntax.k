@@ -142,13 +142,13 @@ class CountingClass
 	
 	# Overload the new message.
 	let-c new : CountingClass
-		count++
+		$count++
 		CountingClass.allocate
 	end
 	
 	# Returns the number of instantiations of this class.
 	let-c count
-		count
+		$count
 	end
 end
 
@@ -166,13 +166,13 @@ class CountingClass : Class
 	
 	# Overload the new message.
 	let-i new : CountingClass
-		count++
+		$count++
 		CountingClass.allocate
 	end
 	
 	# Returns the number of instantiations of this class.
 	let-i count
-		count
+		$count
 	end
 end
 
@@ -180,4 +180,8 @@ class(CountingClass) CountedAnimals
 	#*
 	 * Define the body of the CountedAnimals class.
 	 *#
+	let-c count_as_string : String
+		# Borrowing Ruby's string interpolation syntax for now.
+		"There are #{$count} animals."
+	end
 end

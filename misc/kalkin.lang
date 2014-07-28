@@ -1,74 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<language id="kalkin" _name="Kalkin" version="1.0" _section="Sources">
+<language id="kalkin" _name="Kalkin" version="2.0" _section="Sources">
 	
 	<!--
 		Information about this language description.
 	-->
 	<metadata>
-		<property name="mimetypes">text/x-kalkin;text/x-kalkinscript</property>
+		<property name="mimetypes">text/x-kalkin</property>
 		<property name="globs">*.k;*.ks</property>
-		<property name="line-comment-start">//</property>
-		<property name="block-comment-start">/*</property>
-		<property name="block-comment-end">*/</property>
+		<property name="line-comment-start">#</property>
+		<property name="block-comment-start">#*</property>
+		<property name="block-comment-end">*#</property>
 	</metadata>
 	
 	<!--
 		Information on what the highlighting should look like.
 	-->
 	<styles>
-		<style id="boolean"	_name="Boolean"   map-to="def:boolean" />
-		<style id="comment"	_name="Comment"   map-to="def:comment" />
-		<style id="keyword"	_name="Keyword"   map-to="def:keyword" />
-		<style id="number"	_name="Number"    map-to="def:decimal" />
-		<style id="string"	_name="String"    map-to="def:string"  />
-		<style id="type"	_name="Data Type" map-to="def:type"    />
+		<style id="boolean" _name="Boolean"   map-to="def:boolean" />
+		<style id="comment" _name="Comment"   map-to="def:comment" />
+		<style id="keyword" _name="Keyword"   map-to="def:keyword"/>
+		<style id="number"  _name="Number"    map-to="def:decimal" />
+		<style id="string"  _name="String"    map-to="def:string"  />
+		<style id="type"    _name="Data Type" map-to="def:type"    />
 	</styles>
 	
 	<!--
 		The language definition proper.
 	-->
 	<definitions>
-		<!-- The main Kalkin context -->
-		<context id="kalkin" class="no-spell-check">
+		<context id="block-comment" style-ref="comment" class="comment" class-disabled="no-spell-check">
+			<start>#\*</start>
+			<end>\*#</end>
 			<include>
-				<!-- Use the default highliting for C style comments -->
-				<context ref="def:c-like-comment"/>
-				<context ref="def:c-like-comment-multiline"/>
-				<context ref="def:c-like-close-comment-outside-comment"/>
-				
-				<context ref="boolean"	/>
-				<context ref="keyword"	/>
-				<context ref="number"	/>
-				<context ref="string"	/>
-				<context ref="type"		/>
+				<context ref="block-comment"/>
+				<context ref="def:in-comment"/>
 			</include>
 		</context>
-		
+	
 		<context id="boolean" style-ref="boolean">
 			<keyword>true</keyword>
 			<keyword>false</keyword>
 		</context>
 		
-		<!-- Chapel's keywords context -->
-		<context id="keyword"  style-ref="keyword">
+		<context id="line-comment" style-ref="comment" end-at-line-end="true" class="comment" class-disabled="no-spell-check">
+			<start>#</start>
+			<include>
+				<context ref="def:in-line-comment"/>
+			</include>
+		</context>
+		
+		<context id="hyphenated-keywords" style-ref="keyword">
+			<match>(def|let)-[ci]</match>
+		</context>
+		
+		<!-- Kalkin's keywords context -->
+		<context id="keywords" style-ref="keyword">
 			<keyword>class</keyword>
+			<keyword>def</keyword>
 			<keyword>else</keyword>
-			<keyword>false</keyword>
+			<keyword>end</keyword>
 			<keyword>if</keyword>
 			<keyword>let</keyword>
-			<keyword>nil</keyword>
+			<keyword>match</keyword>
+			<keyword>namespace</keyword>
+			<keyword>new</keyword>
 			<keyword>return</keyword>
+			<keyword>self</keyword>
 			<keyword>then</keyword>
-			<keyword>true</keyword>
+			<keyword>void</keyword>
+			<keyword>when</keyword>
+			<keyword>with</keyword>
 		</context>
 		
-		<!-- Chapel's number context -->
+		<!-- Kalkin's number context -->
 		<context id="number" style-ref="number">
-			<match>[+-]?((0x[abcdef\d]+)|(([\d]*\.)?[\d]+([eE][+-]?[\d]+)?))</match>
+			<match>((0x[abcdef\d]+)|(([\d]*\.)?[\d]+([eE][+-]?[\d]+)?))</match>
 		</context>
 		
-		<!-- Chapel's string context -->
+		<!-- Kalkin's string context -->
 		<context id="string" end-at-line-end="true" style-ref="string" class="spell-check">
 			<start>"</start>
 			<end>"</end>
@@ -80,9 +90,23 @@
 			</include>
 		</context>
 		
-		<!-- Chapel's type keywords context -->
+		<!-- Kalkin's type keywords context -->
 		<context id="type"  style-ref="type">
-			<match>[A-Z][A-Za-z_]</match>
+			<match>[A-Z][A-Za-z_]*</match>
+		</context>
+		
+		<!-- The main Kalkin context -->
+		<context id="kalkin" class="no-spell-check">
+			<include>
+				<context ref="block-comment"         />
+				<context ref="boolean"               />
+				<context ref="hyphenated-keywords"   />
+				<context ref="line-comment"          />
+				<context ref="keywords"              />
+				<context ref="number"                />
+				<context ref="string"                />
+				<context ref="type"                  />
+			</include>
 		</context>
 	</definitions>
 </language>

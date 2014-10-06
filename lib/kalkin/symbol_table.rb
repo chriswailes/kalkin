@@ -13,11 +13,11 @@
 module Kalkin
 	class SymbolTableException < Exception
 		attr_reader :symbol
-		
+
 		def initialize(symbol)
 			@symbol = symbol
 		end
-	
+
 		def to_s
 			"#{@@error_string}: #{@symbol_name}"
 		end
@@ -38,7 +38,7 @@ module Kalkin
 			# Hash{String => Fixnum}
 			@symbols = Hash.new
 		end
-	
+
 		def define_symbol(symbol_name)
 			if not @symbols.key?(symbol_name)
 				@symbols[string] = [KSymbol.new(symbol_name, 0)]
@@ -47,11 +47,11 @@ module Kalkin
 			end
 		end
 		alias :'<<' :define_symbol
-		
+
 		def exists?(symbol_name)
 			@symbols.key?(symbol_name)
 		end
-		
+
 		def get_symbol(symbol_name)
 			if @symbols.key?(symbol_name)
 				@symbols[symbol_name].last
@@ -60,7 +60,7 @@ module Kalkin
 			end
 		end
 		alias :'[]' :get_symbol
-		
+
 		def increment_version(symbol)
 			if @symbol.key(symbol_name = symbol.name)
 				@symbols[symbol_name] << +symbol

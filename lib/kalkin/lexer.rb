@@ -15,17 +15,17 @@ require 'rltk/lexer'
 #######################
 
 class Kalkin::Lexer < RLTK::Lexer
-	
+
 	##################
 	# Character Sets #
 	##################
-	
+
 	OP_CHARACTERS = '[~!$%^&*+=?<>|\-]'
-	
+
 	############
 	# Keywords #
 	############
-	
+
 	rule(/class/)     { :CLASS     }
 	rule(/def/)       { :DEF       }
 	rule(/else/)      { :ELSE      }
@@ -35,18 +35,18 @@ class Kalkin::Lexer < RLTK::Lexer
 	rule(/let/)       { :LET       }
 	rule(/match/)     { :WITH      }
 	rule(/namespace/) { :NAMESPACE }
-	rule(/nil/)       { :NIL       }
 	rule(/return/)    { :RETURN    }
 	rule(/self/)      { :SELF      }
 	rule(/then/)      { :THEN      }
 	rule(/true/)      { :TRUE      }
+	rule(/void/)      { :VOID      }
 	rule(/when/)      { :WHEN      }
 	rule(/with/)      { :WITH      }
-	
+
 	###########################
 	# Punctuation and Symbols #
 	###########################
-	
+
 	rule(/->/) { :ARROW      }
 	rule(/=/)  { :ASSIGN     }
 	rule(/:/)  { :COLON      }
@@ -62,41 +62,41 @@ class Kalkin::Lexer < RLTK::Lexer
 	rule(/;/)  { :SEMICOLON  }
 	rule(/\$/) { :SIGIL      }
 	rule(/_/)  { :UNDERSCORE }
-	
+
 	rule(/#{OP_CHARACTERS}+/) { |t| [:OPERATOR, t] }
-	
+
 	###############
 	# Annotations #
 	###############
-	
+
 	rule(/@[a-z_]/)  { |t| [:ANNOTATION, [t[1..-1],   :plain]] }
 	rule(/@![a-z_]/) { |t| [:ANNOTATION, [t[1..-1],  :insist]] }
 	rule(/@?[a-z_]/) { |t| [:ANNOTATION, [t[1..-1], :inquire]] }
-	
+
 	############
 	# Literals #
 	############
-	
+
 	rule(/:[a-z_]+/)        { |t| [:ATOM,    t[1..-1]] }
 	rule(/\d+\.\d+/)        { |t| [:FLOAT,     t.to_f] }
 	rule(/\d+/)             { |t| [:INTEGER,   t.to_i] }
 	rule(/'(\\'|[^'\n])*'/) { |t| [:STRING,         t] }
-	
+
 	###############
 	# Identifiers #
 	###############
-	
+
 	rule(/[A-Z][A-Za-z]*/) { |t| [:NSIDENT, t] }
 	rule(/[a-z]\w*/)       { |t| [:IDENT,   t] }
-	
+
 	############
 	# Comments #
 	############
-	
+
 	rule(/#/)                    { push_state :line_comment }
 	rule(/\n/,    :line_comment) { pop_state }
 	rule(/[^\n]/, :line_comment)
-	
+
 	rule(/#\*/)                  { push_state :block_comment }
 	rule(/#\*/, :block_comment)  { push_state :block_comment }
 	rule(/\*#/, :block_comment)  { pop_state                 }

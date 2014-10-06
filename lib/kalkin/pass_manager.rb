@@ -12,5 +12,5 @@
 #######################
 
 class Kalkin::PassManager
-	
+
 end

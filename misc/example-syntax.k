@@ -185,3 +185,28 @@ class(CountingClass) CountedAnimals
 		"There are #{$count} animals."
 	end
 end
+
+
+# Local type inference
+let value(get_int())
+
+#*
+ * Lambdas
+ *
+ * The return type can be omitted in the case of the first three forms.
+ *#
+lambda (args):RetType { expression }
+-> (args):RetType { expression }
+λ (args):RetType { expression }
+
+lambda (args):RetType do
+	# code
+end
+
+-> (args):RetType do
+	# code
+end
+
+λ (args):RetType do
+	# code
+end

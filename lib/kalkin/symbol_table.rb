@@ -11,62 +11,35 @@
 # Classes and Modules #
 #######################
 module Kalkin
-	class SymbolTableException < Exception
-		attr_reader :symbol
-
-		def initialize(symbol)
-			@symbol = symbol
+	class UnknownVariable < Exception
+		def initialize(sym)
+			super "Unknown variable: #{sym}"
 		end
-
-		def to_s
-			"#{@@error_string}: #{@symbol_name}"
-		end
-	end
-
-	class RedefinedSymbol < SymbolTableException
-		@@error_string = 'Redefinition of symbol'
-	end
-
-	class UndefinedSymbol < SymbolTableException
-		@@error_string = 'Undefined symbol'
 	end
 
 	class SymbolTable
-		# @param [Namespace]  scope
-		def initialize(scope)
-			@scope = scope
-			# Hash{String => Fixnum}
-			@symbols = Hash.new
+		def initialize
+			# Initialize our frames with the global frame.
+			@frames = [{}]
 		end
 
-		def define_symbol(symbol_name)
-			if not @symbols.key?(symbol_name)
-				@symbols[string] = [KSymbol.new(symbol_name, 0)]
-			else
-				raise RedefinedSymbol, symbol_name
-			end
-		end
-		alias :'<<' :define_symbol
-
-		def exists?(symbol_name)
-			@symbols.key?(symbol_name)
+		def add_frame
+			@frames.unshift(Hash.new)
 		end
 
-		def get_symbol(symbol_name)
-			if @symbols.key?(symbol_name)
-				@symbols[symbol_name].last
-			else
-				raise UndefinedSymbol, symbol_name
-			end
-		end
-		alias :'[]' :get_symbol
+		def use(sym)
+			refbind =
+			@frames.inject(nil) {|_, frame| if frame.key?(sym) then break frame[sym] else nil end}
 
-		def increment_version(symbol)
-			if @symbol.key(symbol_name = symbol.name)
-				@symbols[symbol_name] << +symbol
-			else
-				raise UndefinedSymbol, symbol
-			end
+			if refbind then RefUse.new(refbind) else raise UnknownVariable.new(sym) end
+		end
+
+		def bind(sym, type = nil, init_val = nil)
+			@frames.first[sym] = RefBinding.new(sym, type, init_val)
+		end
+
+		def drop_frame
+			@frames.shift
 		end
 	end
 end

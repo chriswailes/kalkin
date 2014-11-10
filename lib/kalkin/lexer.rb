@@ -21,7 +21,7 @@ module Kalkin
 		# Character Sets #
 		##################
 
-		OP_CHARACTERS = '[~!$%^&*+=?<>|\-]'
+		OP_CHARACTERS = '[~!%^&*+=?<>|\/-]'
 
 		############
 		# Keywords #
@@ -74,6 +74,7 @@ module Kalkin
 		rule(/@[a-z_]/)  { |t| [:ANNOTATION, [t[1..-1],   :plain]] }
 		rule(/@![a-z_]/) { |t| [:ANNOTATION, [t[1..-1],  :insist]] }
 		rule(/@?[a-z_]/) { |t| [:ANNOTATION, [t[1..-1], :inquire]] }
+		rule(/@‽[a-z_]/) { |t| [:ANNOTATION, [t[1..-1],    :warn]] }
 
 		############
 		# Literals #
@@ -88,8 +89,8 @@ module Kalkin
 		# Identifiers #
 		###############
 
-		rule(/[A-Z][A-Za-z]*/) { |t| [:NSIDENT, t] }
-		rule(/[a-z]\w*/)       { |t| [:IDENT,   t] }
+		rule(/[A-Z][A-Za-z]*/)                    { |t| [:NSIDENT, t] }
+		rule(/[a-z](\w|#{OP_CHARACTERS})*/)       { |t| [:IDENT,   t] }
 
 		##############
 		# Whitespace #

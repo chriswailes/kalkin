@@ -56,7 +56,7 @@ class Kalkin::Parser < RLTK::Parser
 	end
 
 	p :expr_core do
-		c('literal')                  { |l|       l }
+		c('literal')                  { |l| l }
 		c('LPAREN .expr_core RPAREN') { |e| e }
 
 		# Single-line if-expr

@@ -18,3 +18,6 @@
   * Binary blobs
   * Hashes
   * Hex and octal numbers
+* Add support for specifying the expression to be evaluated via the command line
+* Add a verbose parsing option
+* Implement postfix unary operators

@@ -26,8 +26,34 @@ module Kalkin
 
 		include Filigree::Visitor
 
-		on FunctionCall.(n, a) do |node|
-			"#{n}(#{a.map {|n| visit n}.join(', ')})"
+		def initialize
+			@indent = 0
+		end
+
+		on FunctionCall.(n, a) do
+			"#{n}(#{visit a})"
+		end
+
+		on MessageSend.(n, s, a) do |node|
+			if s.is_a?(MessageSend) and s.operator?
+				"(#{visit s})"
+			else
+				visit s
+			end +
+
+			if node.operator?
+				"#{n} #{visit a}"
+			else
+				".#{n}" + (a.empty? ? '' : "(#{visit a})")
+			end
+		end
+
+		on UnaryMessageSend.(n, s) do
+			"#{n}#{visit s}"
+		end
+
+		on SplitMessageSend.(m, o, s, a) do
+			"#{visit s}.#{m} #{o} #{visit a.first}"
 		end
 
 		on If.(c, t, e) do
@@ -35,7 +61,7 @@ module Kalkin
 		end
 
 		on KAtom.(a) do
-			a.to_s
+			':' + a.to_s
 		end
 
 		on KFloat.(f) do
@@ -48,6 +74,14 @@ module Kalkin
 
 		on KString.(s) do
 			s
+		end
+
+		on UnresolvedSymbol.(i) do
+			i
+		end
+
+		on Array do |array|
+			array.map { |n| visit n }.join(', ')
 		end
 
 #		on _ do |obj|

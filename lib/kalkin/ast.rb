@@ -37,7 +37,7 @@ module Kalkin
 		end
 
 		class KAtom < Literal
-			value :ruby_val, Symbol
+			value :ruby_val, String
 		end
 
 		class KFloat < Literal
@@ -64,6 +64,32 @@ module Kalkin
 
 		class FunctionCall < Invocation
 			child :args, [Expression]
+		end
+
+		class MessageSendBase < Invocation
+			child :self_, Expression
+		end
+
+		class MessageSend < MessageSendBase
+			child :args, [Expression]
+
+			def operator?
+				not (name[0,1] =~ /[a-z]/)
+			end
+		end
+
+		class SplitMessageSend < MessageSend
+			value :op, String
+
+			def operator?
+				true
+			end
+		end
+
+		class UnaryMessageSend < MessageSendBase; end
+
+		class UnresolvedSymbol < Expression
+			value :name, String
 		end
 	end
 end

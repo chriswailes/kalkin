@@ -22,9 +22,15 @@ module Kalkin
 
 		include Kalkin::AST
 
+		left  ; nonassoc :IDENT ; right
+		left  ; nonassoc        ; right :OPERATOR
+		left  ; nonassoc        ; right :DOT
+
 		p :expr_core do
 			c('literal')                  { |l| l }
 			c('LPAREN .expr_core RPAREN') { |e| e }
+
+			c('IDENT') { |i| UnresolvedSymbol.new i }
 
 			# Single-line if-expr
 			c('IF .expr_core THEN .expr_core ELSE .expr_core END') { |c, t, e| If.new c, t, e }
@@ -33,17 +39,17 @@ module Kalkin
 			c('.IDENT LPAREN .arg_list RPAREN') { |i, a| FunctionCall.new i, a }
 
 			# Method call
-#			c('.expr_core DOT NEWLINE* .IDENT LPAREN .arg_list RPAREN') { |s, m, a| MessageSend.new nil, m, s,  a }
-#			c('.expr_core DOT NEWLINE* .IDENT')                         { |s, m|    MessageSend.new nil, m, s, [] }
+			c('.expr_core DOT NEWLINE* .IDENT LPAREN .arg_list RPAREN') { |s, m, a| MessageSend.new m, s,  a }
+			c('.expr_core DOT NEWLINE* .IDENT')                         { |s, m|    MessageSend.new m, s, [] }
 
 			# Operator call
-#			c('expr_core OPERATOR NEWLINE* expr_core') { |s, o, _, a| MessageSend.new nil, o, s, [a] }
-#			c('OPERATOR expr_core')                    { |o, s|       UnaryMessageSend.new nil, o, s }
+			c('.expr_core .OPERATOR NEWLINE* .expr_core') { |s, o, a| MessageSend.new o, s, [a] }
+			c('OPERATOR expr_core')                       { |o, s|    UnaryMessageSend.new  o, s }
 
 			# Method/Operator Call
-#			c('.expr_core DOT NEWLINE* .IDENT .OPERATOR NEWLINE* .expr_core') do |s, m, o, a|
-#				SplitMessageSend.new nil, m, o, s, [a]
-#			end
+			c('.expr_core DOT NEWLINE* .IDENT .OPERATOR NEWLINE* .expr_core') do |s, m, o, a|
+				SplitMessageSend.new m, o, s, [a]
+			end
 		end
 
 		p :literal do

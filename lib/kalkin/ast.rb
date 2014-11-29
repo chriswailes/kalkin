@@ -30,6 +30,46 @@ module Kalkin
 			# More later
 		end
 
+		class ArgList < RLTK::ASTNode
+			child :args, [Expression]
+
+			def each(&block)
+				self.args.each &block
+			end
+
+			def empty?
+				self.args.empty?
+			end
+
+			def first
+				self.args.first
+			end
+
+			def last
+				self.args.last
+			end
+		end
+
+		class ExprSequence < Expression
+			child :exprs, [Expression]
+
+			def each(&block)
+				self.exprs.each &block
+			end
+
+			def empty?
+				self.exprs.empty?
+			end
+
+			def first
+				self.exprs.first
+			end
+
+			def last
+				self.exprs.last
+			end
+		end
+
 		class Literal < Expression
 			def !
 				self.ruby_val
@@ -67,7 +107,7 @@ module Kalkin
 		end
 
 		class FunctionCall < Invocation
-			child :args, [Expression]
+			child :args, ArgList
 		end
 
 		class MessageSendBase < Invocation
@@ -75,7 +115,7 @@ module Kalkin
 		end
 
 		class MessageSend < MessageSendBase
-			child :args, [Expression]
+			child :args, ArgList
 
 			def operator?
 				not (name[0,1] =~ /[a-z]/)
@@ -94,6 +134,32 @@ module Kalkin
 
 		class UnresolvedSymbol < Expression
 			value :name, String
+		end
+
+		class Function < RLTK::ASTNode
+			value :name, String
+			value :type, String
+			child :body, ExprSequence
+		end
+
+		class DefList < RLTK::ASTNode
+			child :defs, [Function]
+
+			def each(&block)
+				self.defs.each &block
+			end
+
+			def empty?
+				self.defs.empty?
+			end
+
+			def first
+				self.defs.first
+			end
+
+			def last
+				self.defs.last
+			end
 		end
 	end
 end

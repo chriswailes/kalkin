@@ -96,7 +96,7 @@ module Kalkin
 		# Whitespace #
 		##############
 
-		rule(/[\s\t]+/)
+		rule(/[ \t]+/)
 
 		############
 		# Comments #

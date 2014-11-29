@@ -31,6 +31,22 @@ module Kalkin
 			@col_limit = 80
 		end
 
+		on ArgList.(array) do
+			array.map { |n| visit n }.join(', ')
+		end
+
+		on DefList.(defs) do
+			defs.map { |d| visit d }.join("\n\n")
+		end
+
+		on ExprSequence.(a) do
+			a.map { |e| visit e }.join("\n")
+		end
+
+		on Function.(n, t, b) do
+			"def #{n}() : #{t}\n#{visit b}\nend"
+		end
+
 		on FunctionCall.(n, a) do
 			"#{n}(#{visit a})"
 		end
@@ -54,7 +70,7 @@ module Kalkin
 		end
 
 		on SplitMessageSend.(m, o, s, a) do
-			"#{visit s}.#{m} #{o} #{visit a.first}"
+			"#{visit s}.#{m} #{o} #{visit a}"
 		end
 
 		on If.(c, t, e) do
@@ -73,11 +89,7 @@ module Kalkin
 			i
 		end
 
-		on Array do |array|
-			array.map { |n| visit n }.join(', ')
-		end
-
-#		on _ do |obj|
+#		on Object do |obj|
 #			pp obj
 #			pp obj.destructure(42)
 

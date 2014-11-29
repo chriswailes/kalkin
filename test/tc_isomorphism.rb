@@ -21,10 +21,10 @@ require 'kalkin/ast_writer'
 
 class IsomorphismTester < Minitest::Test
 
-	def assert_isomorphic(file_name)
+	def assert_isomorphic(file_name, verbose = false)
 		input  = File.open(File.join(File.dirname(File.expand_path(__FILE__)), 'inputs', file_name)) { |f| f.read }.chomp
 		tokens = Kalkin::Lexer::lex(input)
-		ast    = Kalkin::Parser::parse(tokens)
+		ast    = Kalkin::Parser::parse(tokens, verbose: verbose)
 		string = Kalkin::ASTWriter.new.visit(ast)
 
 		assert_equal(input, string)
@@ -39,6 +39,11 @@ class IsomorphismTester < Minitest::Test
 	def test_function_calls
 		assert_isomorphic('expr_fun_call0.k')
 		assert_isomorphic('expr_fun_call1.k')
+	end
+
+	def test_function_definitions
+		assert_isomorphic('functions0.k')
+		assert_isomorphic('functions1.k')
 	end
 
 	def test_method_calls

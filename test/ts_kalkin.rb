@@ -18,3 +18,4 @@ request_file('simplecov', 'SimpleCov is not installed.') do
 end
 
 # Test cases
+require 'tc_isomorphism.rb'

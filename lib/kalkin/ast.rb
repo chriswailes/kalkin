@@ -40,6 +40,10 @@ module Kalkin
 			value :ruby_val, String
 		end
 
+		class KBool < Literal
+			value :ruby_val, Object
+		end
+
 		class KFloat < Literal
 			value :ruby_val, Float
 		end

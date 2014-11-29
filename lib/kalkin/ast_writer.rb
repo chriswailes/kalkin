@@ -27,7 +27,8 @@ module Kalkin
 		include Filigree::Visitor
 
 		def initialize
-			@indent = 0
+			@indent    = 0
+			@col_limit = 80
 		end
 
 		on FunctionCall.(n, a) do
@@ -42,7 +43,7 @@ module Kalkin
 			end +
 
 			if node.operator?
-				"#{n} #{visit a}"
+				" #{n} #{visit a}"
 			else
 				".#{n}" + (a.empty? ? '' : "(#{visit a})")
 			end
@@ -60,20 +61,12 @@ module Kalkin
 			"if #{visit c} then #{visit t} else #{visit e} end"
 		end
 
+		on Literal.(v) do
+			v.to_s
+		end
+
 		on KAtom.(a) do
 			':' + a.to_s
-		end
-
-		on KFloat.(f) do
-			f.to_s
-		end
-
-		on KInteger.(i) do
-			i.to_s
-		end
-
-		on KString.(s) do
-			s
 		end
 
 		on UnresolvedSymbol.(i) do

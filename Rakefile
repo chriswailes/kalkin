@@ -28,9 +28,9 @@ end
 request_file('flay', 'Flay is not installed.') do
 	desc 'Analyze code for similarities with Flay'
 	task :flay do
-		flay = Flay.new
-		flay.process(*Dir['lib/**/*.rb'])
-		flay.report
+		knife = Flay.new
+		knife.process(*Dir['lib/**/*.rb'])
+		knife.report
 	end
 end
 
@@ -54,7 +54,7 @@ end
 request_file('rake/testtask', 'Minitest is not installed.') do
 	Rake::TestTask.new do |t|
 		t.libs << 'test'
-		t.test_files = FileList['test/ts_rltk.rb']
+		t.test_files = FileList['test/ts_kalkin.rb']
 	end
 end
 
@@ -90,14 +90,14 @@ end
 
 request_file('yard', 'Yard is not installed.') do
 	YARD::Rake::YardocTask.new do |t|
-		
+
 		t.options	= [
 			'--title',  'Kalkin',
 			'-m',       'markdown',
 			'-M',       'redcarpet',
 			'--private'
 		]
-		
+
 		t.files = Dir['lib/**/*.rb']
 	end
 end
@@ -112,10 +112,9 @@ task :grammar do
 		$: << File.expand_path('../lib', __FILE__)
 		require 'kalkin'
 		Kalkin::Parser
-		
+
 	rescue Exception => e
 		puts e.message
 		puts e.backtrace
 	end
 end
-

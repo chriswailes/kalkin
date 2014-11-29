@@ -26,6 +26,8 @@ module Kalkin
 		left  ; nonassoc        ; right :OPERATOR
 		left  ; nonassoc        ; right :DOT
 
+		start :expr_core
+
 		p :expr_core do
 			c('literal')                  { |l| l }
 			c('LPAREN .expr_core RPAREN') { |e| e }
@@ -57,6 +59,7 @@ module Kalkin
 			c('FLOAT')   { |f| KFloat.new   f }
 			c('INTEGER') { |i| KInteger.new i }
 			c('STRING')  { |s| KString.new  s }
+			c('BOOL')    { |b| KBool.new    b }
 		end
 
 		p :arg_list do

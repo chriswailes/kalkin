@@ -27,24 +27,24 @@ module Kalkin
 		# Keywords #
 		############
 
-		rule(/class/)     { :CLASS     }
-		rule(/def/)       { :DEF       }
-		rule(/do/)        { :DO        }
-		rule(/else/)      { :ELSE      }
-		rule(/end/)       { :END       }
-		rule(/false/)     { :FALSE     }
-		rule(/if/)        { :IF        }
-		rule(/lambda/)    { :LAMBDA    }
-		rule(/let/)       { :LET       }
-		rule(/match/)     { :WITH      }
-		rule(/namespace/) { :NAMESPACE }
-		rule(/return/)    { :RETURN    }
-		rule(/self/)      { :SELF      }
-		rule(/then/)      { :THEN      }
-		rule(/true/)      { :TRUE      }
-		rule(/void/)      { :VOID      }
-		rule(/when/)      { :WHEN      }
-		rule(/with/)      { :WITH      }
+		rule(/class/)     { :CLASS         }
+		rule(/def/)       { :DEF           }
+		rule(/do/)        { :DO            }
+		rule(/else/)      { :ELSE          }
+		rule(/end/)       { :END           }
+		rule(/false/)     { [:BOOL, false] }
+		rule(/if/)        { :IF            }
+		rule(/lambda/)    { :LAMBDA        }
+		rule(/let/)       { :LET           }
+		rule(/match/)     { :WITH          }
+		rule(/namespace/) { :NAMESPACE     }
+		rule(/return/)    { :RETURN        }
+		rule(/self/)      { :SELF          }
+		rule(/then/)      { :THEN          }
+		rule(/true/)      { [:BOOL, true]  }
+		rule(/void/)      { :VOID          }
+		rule(/when/)      { :WHEN          }
+		rule(/with/)      { :WITH          }
 
 		###########################
 		# Punctuation and Symbols #
@@ -71,7 +71,7 @@ module Kalkin
 		# Annotations #
 		###############
 
-		rule(/@[a-z_]/)  { |t| [:ANNOTATION, [t[1..-1],   :plain]] }
+		rule(/@[a-z_]/)  { |t| [:ANNOTATION, [t[1..-1],  :inform]] }
 		rule(/@![a-z_]/) { |t| [:ANNOTATION, [t[1..-1],  :insist]] }
 		rule(/@?[a-z_]/) { |t| [:ANNOTATION, [t[1..-1], :inquire]] }
 		rule(/@‽[a-z_]/) { |t| [:ANNOTATION, [t[1..-1],    :warn]] }
@@ -81,8 +81,8 @@ module Kalkin
 		############
 
 		rule(/:[a-z_]+/)                  { |t| [:ATOM,    t[1..-1]] }
-		rule(/\d+\.\d+/)                  { |t| [:FLOAT,     t.to_f] }
-		rule(/\d+/)                       { |t| [:INTEGER,   t.to_i] }
+		rule(/[+-]?\d+\.\d+/)             { |t| [:FLOAT,     t.to_f] }
+		rule(/[+-]?\d+/)                  { |t| [:INTEGER,   t.to_i] }
 		rule(/['"](\\'\\"|[^'"\n])*['"]/) { |t| [:STRING,         t] }
 
 		###############

@@ -1,7 +1,7 @@
 def hoopy() : Atom
-:frood
+	:frood
 end
 
 def answer() : Integer
-42
+	42
 end

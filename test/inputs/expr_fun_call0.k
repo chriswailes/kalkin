@@ -1,3 +1,3 @@
 def foo() : Object
-foo()
+	foo()
 end

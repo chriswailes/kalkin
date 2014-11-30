@@ -31,20 +31,40 @@ module Kalkin
 			@col_limit = 80
 		end
 
+		# Helper functions
+
+		def indent
+			@indent += 1
+
+			newline
+		end
+
+		def newline
+			"\n" + ("\t" * @indent)
+		end
+
+		def undent
+			@indent -= 1
+
+			newline
+		end
+
+		# Patterns
+
 		on ArgList.(array) do
 			array.map { |n| visit n }.join(', ')
 		end
 
 		on DefList.(defs) do
-			defs.map { |d| visit d }.join("\n\n")
+			defs.map { |d| visit d }.join("\n" + newline)
 		end
 
 		on ExprSequence.(a) do
-			a.map { |e| visit e }.join("\n")
+			a.map { |e| visit e }.join(newline)
 		end
 
 		on Function.(n, t, b) do
-			"def #{n}() : #{t}\n#{visit b}\nend"
+			"def #{n}() : #{t}#{indent}#{visit b}#{undent}end"
 		end
 
 		on FunctionCall.(n, a) do

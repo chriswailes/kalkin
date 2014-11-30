@@ -1,3 +1,3 @@
 def hoopy() : Atom
-:frood
+	:frood
 end

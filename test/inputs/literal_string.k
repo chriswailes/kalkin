@@ -1,3 +1,3 @@
 def foo() : String
-"hello world"
+	"hello world"
 end

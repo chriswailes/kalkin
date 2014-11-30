@@ -1,3 +1,3 @@
 def foo() : Integer
-(42)
+	(42)
 end

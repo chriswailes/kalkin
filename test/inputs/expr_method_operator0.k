@@ -1,3 +1,3 @@
 def baf() : Integer
-foo.bar = 42
+	foo.bar = 42
 end

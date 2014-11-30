@@ -1,3 +1,3 @@
 def foo() : Atom
-:foo
+	:foo
 end

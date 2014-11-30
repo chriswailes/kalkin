@@ -1,3 +1,3 @@
 def foo() : Boolean
-false
+	false
 end

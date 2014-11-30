@@ -1,3 +1,3 @@
 def fol() : Integer
--42.abs
+	-42.abs
 end

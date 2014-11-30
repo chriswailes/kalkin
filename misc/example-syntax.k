@@ -1,7 +1,7 @@
 # This is a line comment.
 #* This is a block comment. *#
 
-#~ This is a temporary comment.  Kalkin will refuse to merge code that has 
+#~ This is a temporary comment.  Kalkin will refuse to merge code that has
 #~ these into a project's master.
 
 # These are function definitions.
@@ -14,7 +14,7 @@ def fib(n : Integer) : Integer -> fib(n-1) + fib(n-2)
  * parameter `a` must always be provided; default values are specified for the
  * other parameters.
  *#
-def math_function(a, b(2), c(3) : Integer, d(4.0) : Float) : Integer
+def math_function(a, b(2), c(3) : Integer, d(4.0) : Float) : Float
 	a + b + c + d
 end
 
@@ -82,12 +82,12 @@ class Point
 	let-i x : Integer
 	@accessor
 	let-i y : Integer
-	
+
 	#*
 	 * Instances methods where `self` points to an instance of Point.
 	 *#
 
-	# Arguments get assigned to the instance's variables $x and $y. 
+	# Arguments get assigned to the instance's variables $x and $y.
 	def-i Point($x, $y) -> void
 
 	#*
@@ -98,7 +98,7 @@ class Point
 		$x += x
 		$y += y
 	end
-	
+
 	# Assignment messages must always return self.
 	def-i =(other : Point) : self
 		$x, $y = other.x, other.y
@@ -139,13 +139,13 @@ class CountingClass
 	 * Class; CountingClass is an instance of that anonymous subclass.
 	 *#
 	let-c count : Integer
-	
+
 	# Overload the new message.
 	def-c new : CountingClass
 		$count++
 		CountingClass.allocate
 	end
-	
+
 	# Returns the number of instantiations of this class.
 	def-c count
 		$count
@@ -163,13 +163,13 @@ CountingClass.count
 class CountingClass : Class
 	# Define the counter.
 	let-i count : Integer
-	
+
 	# Overload the new message.
 	def-i new : CountingClass
 		$count++
 		CountingClass.allocate
 	end
-	
+
 	# Returns the number of instantiations of this class.
 	def-i count
 		$count
@@ -199,14 +199,14 @@ lambda (args):RetType { expression }
 -> (args):RetType { expression }
 λ (args):RetType { expression }
 
-lambda (args):RetType do
+lambda (args):RetType
 	# code
 end
 
--> (args):RetType do
+-> (args):RetType
 	# code
 end
 
-λ (args):RetType do
+λ (args):RetType
 	# code
 end

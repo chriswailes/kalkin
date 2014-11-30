@@ -1,3 +1,3 @@
 def bar() : Object
-foo
+	foo
 end

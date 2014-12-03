@@ -7,17 +7,16 @@
 # Requires #
 ############
 
+require 'kalkin/ast'
+
 #######################
 # Classes and Modules #
 #######################
 module Kalkin
-	class UnknownVariable < Exception
-		def initialize(sym)
-			super "Unknown variable: #{sym}"
-		end
-	end
-
 	class SymbolTable
+
+		include Kalkin::AST
+
 		def initialize
 			# Initialize our frames with the global frame.
 			@frames = [{}]
@@ -31,11 +30,11 @@ module Kalkin
 			refbind =
 			@frames.inject(nil) {|_, frame| if frame.key?(sym) then break frame[sym] else nil end}
 
-			if refbind then RefUse.new(refbind) else raise UnknownVariable.new(sym) end
+			if refbind then RefUse.new(refbind) else UnresolvedSymbol.new(sym) end
 		end
 
-		def bind(sym, type = nil, init_val = nil)
-			@frames.first[sym] = RefBinding.new(sym, type, init_val)
+		def bind(sym, type)
+			@frames.first[sym] = ParamRefBind.new(sym, type)
 		end
 
 		def drop_frame

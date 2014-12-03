@@ -136,10 +136,45 @@ module Kalkin
 			value :name, String
 		end
 
-		class Function < RLTK::ASTNode
+		class RefBind < Expression
 			value :name, String
 			value :type, String
-			child :body, ExprSequence
+		end
+
+		class ParamRefBind < RefBind; end
+
+		class RefUse < Expression
+			value :bind, RefBind
+		end
+
+		class ParamList < RLTK::ASTNode
+			child :params, [ParamRefBind]
+
+			def each(&block)
+				self.defs.each &block
+			end
+
+			def empty?
+				self.defs.empty?
+			end
+
+			def first
+				self.defs.first
+			end
+
+			def last
+				self.defs.last
+			end
+		end
+
+		class Function < RLTK::ASTNode
+			value :name,       String
+			value :type,       String
+#			child :parameters, ParamList
+			child :body,       ExprSequence
+
+#			alias :params    :parameters
+#			alias :'params=' :'parameters='
 		end
 
 		class DefList < RLTK::ASTNode

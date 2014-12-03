@@ -11,3 +11,4 @@ examples/kazoo/**/*.so
 *.gem
 
 Gemfile.lock
+kalkin.automata

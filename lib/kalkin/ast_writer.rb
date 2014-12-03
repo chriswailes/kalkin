@@ -26,6 +26,8 @@ module Kalkin
 
 		include Filigree::Visitor
 
+		strict_match true
+
 		def initialize
 			@indent    = 0
 			@col_limit = 80
@@ -51,20 +53,8 @@ module Kalkin
 
 		# Patterns
 
-		on ArgList.(array) do
-			array.map { |n| visit n }.join(', ')
-		end
-
-		on DefList.(defs) do
-			defs.map { |d| visit d }.join("\n" + newline)
-		end
-
-		on ExprSequence.(a) do
-			a.map { |e| visit e }.join(newline)
-		end
-
-		on Function.(n, t, b) do
-			"def #{n}() : #{t}#{indent}#{visit b}#{undent}end"
+		on Function.(n, t, params, b) do
+			"def #{n}(#{visit params}) : #{t}#{indent}#{visit b}#{undent}end"
 		end
 
 		on FunctionCall.(n, a) do
@@ -107,6 +97,30 @@ module Kalkin
 
 		on UnresolvedSymbol.(i) do
 			i
+		end
+
+		on RefBind.(n, t) do
+			"#{n} : #{t}"
+		end
+
+		on RefUse.(b) do
+			b.name
+		end
+
+		on ArgList.(array) do
+			array.map { |n| visit n }.join(', ')
+		end
+
+		on DefList.(array) do
+			array.map { |d| visit d }.join("\n" + newline)
+		end
+
+		on ExprSequence.(array) do
+			array.map { |e| visit e }.join(newline)
+		end
+
+		on ParamList.(array) do
+			array.map { |p| visit p }.join(', ')
 		end
 
 #		on Object do |obj|

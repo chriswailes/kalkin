@@ -12,6 +12,7 @@ require 'rltk/parser'
 
 # Project
 require 'kalkin/ast'
+require 'kalkin/symbol_table'
 
 #######################
 # Classes and Modules #
@@ -50,7 +51,7 @@ module Kalkin
 			c('literal')                  { |l| l }
 			c('LPAREN .expr_core RPAREN') { |e| e }
 
-			c('IDENT') { |i| UnresolvedSymbol.new i }
+			c('IDENT') { |i| @st.use i }
 
 			# Single-line if-expr
 			c('IF .expr_core THEN .expr_core ELSE .expr_core END') { |c, t, e| If.new c, t, e }
@@ -91,14 +92,16 @@ module Kalkin
 #			end
 
 			c('.function_sig COLON .NSIDENT NEWLINE .expr_sequence END') do |sig, t, es|
+				@st.drop_frame
+
 				name, params = sig
-				Function.new name, t, es
+				Function.new(name, t, params, es)
 			end
 		end
 
 		p :function_sig do
-			c('DEF .IDENT')                           { |i|     [i, []] }
-			c('DEF .IDENT LPAREN .param_list RPAREN') { |i, ps| [i, ps] }
+			c('DEF .IDENT')                           { |i|     [i, ParamList.new([])] }
+			c('DEF .IDENT LPAREN .param_list RPAREN') { |i, ps| [i,                ps] }
 		end
 
 		p :literal do
@@ -110,23 +113,32 @@ module Kalkin
 		end
 
 #		p :param_ident do
-#			c('IDENT')      { |id| ParamDef.new nil, id }
+#			c('IDENT')      { |id| id }
 #			c('UNDERSCORE') { |_|  !Sink                }
 #		end
 
 		p :param_list do
-			c('NEWLINE*')                 { |_|             [] }
-#			c('NEWLINE* param_list_sub1') { |_, params| params }
+			c('NEWLINE*')                  { |_|      ParamList.new []     }
+#			c('NEWLINE* .param_list_sub1') { |params| ParamList.new params }
 		end
 
 #		p :param_list_sub1 do
-#			c('.param_ident COLON .NSIDENT NEWLINE*')                        { |i, t|               [ParamDef.new Type.new(t), i] }
-#			c('.param_ident COLON .NSIDENT COMMA NEWLINE* .param_list_sub1') { |i, t, ps| ps.unshift ParamDef.new(Type.new(t), i) }
+#			c('.param_ident COLON .NSIDENT NEWLINE*')                        { |i, t|               [@st.bind(i, t)] }
+#			c('.param_ident COLON .NSIDENT COMMA NEWLINE* .param_list_sub1') { |i, t, ps| ps.unshift(@st.bind(i, t)) }
 
 #			c('.param_ident COMMA NEWLINE* .param_list_sub1') do |i, ps|
 #				ps.unshift ParamDef.new(ps.first.type, i)
 #			end
 #		end
+
+		token_hook(:DEF) {@st.add_frame}
+
+		class Environment < Environment
+			def initialize
+				@errors = Array.new
+				@st     = SymbolTable.new
+			end
+		end
 
 		finalize explain: 'kalkin.automata'
 	end

@@ -151,30 +151,30 @@ module Kalkin
 			child :params, [ParamRefBind]
 
 			def each(&block)
-				self.defs.each &block
+				self.params.each &block
 			end
 
 			def empty?
-				self.defs.empty?
+				self.params.empty?
 			end
 
 			def first
-				self.defs.first
+				self.params.first
 			end
 
 			def last
-				self.defs.last
+				self.params.last
 			end
 		end
 
 		class Function < RLTK::ASTNode
 			value :name,       String
 			value :type,       String
-#			child :parameters, ParamList
+			child :parameters, ParamList
 			child :body,       ExprSequence
 
-#			alias :params    :parameters
-#			alias :'params=' :'parameters='
+			alias :params    :parameters
+			alias :'params=' :'parameters='
 		end
 
 		class DefList < RLTK::ASTNode

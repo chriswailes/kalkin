@@ -112,24 +112,24 @@ module Kalkin
 			c('BOOL')    { |b| KBool.new    b }
 		end
 
-#		p :param_ident do
-#			c('IDENT')      { |id| id }
+		p :param_ident do
+			c('IDENT')      { |id| id }
 #			c('UNDERSCORE') { |_|  !Sink                }
-#		end
+		end
 
 		p :param_list do
 			c('NEWLINE*')                  { |_|      ParamList.new []     }
-#			c('NEWLINE* .param_list_sub1') { |params| ParamList.new params }
+			c('NEWLINE* .param_list_sub1') { |params| ParamList.new params }
 		end
 
-#		p :param_list_sub1 do
-#			c('.param_ident COLON .NSIDENT NEWLINE*')                        { |i, t|               [@st.bind(i, t)] }
-#			c('.param_ident COLON .NSIDENT COMMA NEWLINE* .param_list_sub1') { |i, t, ps| ps.unshift(@st.bind(i, t)) }
+		p :param_list_sub1 do
+			c('.param_ident COLON .NSIDENT NEWLINE*')                        { |i, t|               [@st.bind(i, t)] }
+			c('.param_ident COLON .NSIDENT COMMA NEWLINE* .param_list_sub1') { |i, t, ps| ps.unshift(@st.bind(i, t)) }
 
 #			c('.param_ident COMMA NEWLINE* .param_list_sub1') do |i, ps|
 #				ps.unshift ParamDef.new(ps.first.type, i)
 #			end
-#		end
+		end
 
 		token_hook(:DEF) {@st.add_frame}
 

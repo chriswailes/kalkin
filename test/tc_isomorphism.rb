@@ -45,6 +45,7 @@ class IsomorphismTester < Minitest::Test
 		assert_isomorphic('functions0.k')
 		assert_isomorphic('functions1.k')
 		assert_isomorphic('functions2.k')
+		assert_isomorphic('functions3.k')
 	end
 
 	def test_method_calls

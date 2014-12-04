@@ -71,10 +71,10 @@ module Kalkin
 		# Annotations #
 		###############
 
-		rule(/@[a-z_]/)  { |t| [:ANNOTATION, [t[1..-1],  :inform]] }
-		rule(/@![a-z_]/) { |t| [:ANNOTATION, [t[1..-1],  :insist]] }
-		rule(/@?[a-z_]/) { |t| [:ANNOTATION, [t[1..-1], :inquire]] }
-		rule(/@‽[a-z_]/) { |t| [:ANNOTATION, [t[1..-1],    :warn]] }
+		rule(/@\w*/)   { |t| [:ANNOTATION, [t[1..-1],  :inform]] }
+		rule(/@!\w*/)  { |t| [:ANNOTATION, [t[1..-1],  :insist]] }
+		rule(/@\?\w*/) { |t| [:ANNOTATION, [t[1..-1], :inquire]] }
+		rule(/@‽\w*/)  { |t| [:ANNOTATION, [t[1..-1],    :warn]] }
 
 		############
 		# Literals #

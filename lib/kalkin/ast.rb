@@ -139,6 +139,20 @@ module Kalkin
 		class RefBind < Expression
 			value :name, String
 			value :type, String
+
+			def initialize(*args)
+				super(*args)
+
+				@elide_type = false
+			end
+
+			def elide_type
+				self.tap { @elide_type = true }
+			end
+
+			def elide_type?
+				@elide_type
+			end
 		end
 
 		class ParamRefBind < RefBind; end
@@ -195,6 +209,11 @@ module Kalkin
 			def last
 				self.defs.last
 			end
+		end
+
+		class Namespace < RLTK::ASTNode
+			value :name, String
+			child :defs, [Function]
 		end
 	end
 end

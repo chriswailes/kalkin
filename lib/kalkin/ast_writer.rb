@@ -99,8 +99,8 @@ module Kalkin
 			i
 		end
 
-		on RefBind.(n, t) do
-			"#{n} : #{t}"
+		on RefBind.(n, t) do |b|
+			b.elide_type? ? n : "#{n} : #{t}"
 		end
 
 		on RefUse.(b) do

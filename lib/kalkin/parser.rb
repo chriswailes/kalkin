@@ -126,9 +126,10 @@ module Kalkin
 			c('.param_ident COLON .NSIDENT NEWLINE*')                        { |i, t|               [@st.bind(i, t)] }
 			c('.param_ident COLON .NSIDENT COMMA NEWLINE* .param_list_sub1') { |i, t, ps| ps.unshift(@st.bind(i, t)) }
 
-#			c('.param_ident COMMA NEWLINE* .param_list_sub1') do |i, ps|
-#				ps.unshift ParamDef.new(ps.first.type, i)
-#			end
+			# Deferred types
+			c('.param_ident COMMA NEWLINE* .param_list_sub1') do |i, ps|
+				ps.unshift @st.bind(i, ps.first.type).elide_type
+			end
 		end
 
 		token_hook(:DEF) {@st.add_frame}

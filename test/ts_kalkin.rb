@@ -19,3 +19,4 @@ end
 
 # Test cases
 require 'tc_isomorphism.rb'
+require 'tc_namespace.rb'

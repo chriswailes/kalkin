@@ -214,6 +214,10 @@ module Kalkin
 		class Namespace < RLTK::ASTNode
 			value :name, String
 			child :defs, [Function]
+
+			def add_defs(new_defs)
+				self.defs += new_defs.defs
+			end
 		end
 	end
 end

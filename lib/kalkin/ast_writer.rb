@@ -107,6 +107,10 @@ module Kalkin
 			b.name
 		end
 
+		on Namespace.(_, array) do
+			array.map { |n| visit n }.join("\n" + newline)
+		end
+
 		on ArgList.(array) do
 			array.map { |n| visit n }.join(', ')
 		end

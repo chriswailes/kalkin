@@ -13,6 +13,7 @@ require 'rltk/parser'
 # Project
 require 'kalkin/ast'
 require 'kalkin/symbol_table'
+require 'kalkin/type'
 
 #######################
 # Classes and Modules #
@@ -123,8 +124,8 @@ module Kalkin
 		end
 
 		p :param_list_sub1 do
-			c('.param_ident COLON .NSIDENT NEWLINE*')                        { |i, t|               [@st.bind(i, t)] }
-			c('.param_ident COLON .NSIDENT COMMA NEWLINE* .param_list_sub1') { |i, t, ps| ps.unshift(@st.bind(i, t)) }
+			c('.param_ident COLON .NSIDENT NEWLINE*')                        { |i, t|               [@st.bind(i, UnresolvedType.new(t))] }
+			c('.param_ident COLON .NSIDENT COMMA NEWLINE* .param_list_sub1') { |i, t, ps| ps.unshift(@st.bind(i, UnresolvedType.new(t))) }
 
 			# Deferred types
 			c('.param_ident COMMA NEWLINE* .param_list_sub1') do |i, ps|

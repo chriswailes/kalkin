@@ -16,6 +16,9 @@ require 'filigree/abstract_class'
 # RLTK
 require 'rltk/ast'
 
+# Kalkin
+require 'kalkin/type'
+
 #######################
 # Classes and Modules #
 #######################
@@ -138,7 +141,7 @@ module Kalkin
 
 		class RefBind < Expression
 			value :name, String
-			value :type, String
+			value :type, Type
 
 			def initialize(*args)
 				super(*args)
@@ -218,6 +221,10 @@ module Kalkin
 			def add_defs(new_defs)
 				self.defs += new_defs.defs
 			end
+		end
+
+		class Klass < RLTK::ASTNode
+			value :name, String
 		end
 	end
 end

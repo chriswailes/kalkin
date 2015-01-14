@@ -7,52 +7,39 @@
 # Requires #
 ############
 
+# Kalkin
+require 'kalkin/ast'
+
 #######################
 # Classes and Modules #
 #######################
 
-class Kalkin::UnresolvedType < Exception
-	def to_s
-		'Type has not been resolved.'
-	end
-end
+module Kalkin
+	class Type
 
-class Kalkin::Type
-	attr_reader :name
-	attr_reader :kclass
-
-	# @param [String]  name
-	def initialize(name)
-		@name     = name
-		@kclass   = nil
-		@resolved = false
 	end
 
-	def ==(other)
-		self.class == other.class &&
-		self.name  == other.name
+	class UnresolvedType < Type
+		attr_reader :name
+
+		def initialize(name)
+			@name = name
+		end
+
+		def to_s
+			@name
+		end
 	end
 
-	def ===(other)
-		self.object_id == other.object_id
-	end
+	class ClassType < Type
+		attr_reader :klass
 
-	def kclass
-		@resolved ? @kclass : raise UnresolvedType
-	end
-	alias :'!' :kclass
+		def initialize(klass)
+			@klass = klass
+		end
 
-	def name
-		@resolved ? @kclass.name : @name
-	end
-
-	def resolve(kclass)
-		@name     = nil
-		@kclass   = kclass
-		@resolved = true
-	end
-
-	def resolved?
-		@resolved
+		def to_s
+			@klass.name
+		end
 	end
 end

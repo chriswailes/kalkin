@@ -184,14 +184,21 @@ module Kalkin
 			end
 		end
 
-		class Function < RLTK::ASTNode
+		class Invokable < RLTK::ASTNode
 			value :name,       String
 			value :type,       String
 			child :parameters, ParamList
-			child :body,       ExprSequence
 
 			alias :params    :parameters
 			alias :'params=' :'parameters='
+		end
+
+		class Function < Invokable
+			child :body, ExprSequence
+		end
+
+		class NativeFunction < Invokable
+			value :generator, Proc
 		end
 
 		class DefList < RLTK::ASTNode

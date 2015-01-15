@@ -31,7 +31,7 @@ module Kalkin
 		end
 	end
 
-	class ClassType < Type
+	class KlassType < Type
 		attr_reader :klass
 
 		def initialize(klass)

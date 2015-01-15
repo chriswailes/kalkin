@@ -37,7 +37,7 @@ class IsomorphismTester < Minitest::Test
 		spast         = Kalkin::Parser.parse(Kalkin::Lexer.lex(string))
 
 		file_contents.each do |s|
-			mpast.add_defs Kalkin::Parser.parse(Kalkin::Lexer.lex(s))
+			mpast.add_members Kalkin::Parser.parse(Kalkin::Lexer.lex(s))
 		end
 
 		assert_equal(Kalkin::ASTWriter.new.visit(spast), Kalkin::ASTWriter.new.visit(mpast))

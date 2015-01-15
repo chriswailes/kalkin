@@ -29,8 +29,8 @@ module Kalkin
 		left  ; nonassoc        ; right :DOT
 
 		p(:input) do
-			c('NEWLINE*')             { |_|    DefList.new [] }
-			c('NEWLINE* input_prime') { |_, i| DefList.new  i }
+			c('NEWLINE*')             { |_|    NodeList.new [] }
+			c('NEWLINE* input_prime') { |_, i| NodeList.new  i }
 		end
 
 		p :input_prime do

@@ -29,11 +29,13 @@ module Kalkin
 
 	module AST
 
-		class Expression < RLTK::ASTNode
+		class KNode < RLTK::ASTNode; end
+
+		class Expression < KNode
 			# More later
 		end
 
-		class ArgList < RLTK::ASTNode
+		class ArgList < KNode
 			child :args, [Expression]
 
 			def each(&block)
@@ -164,7 +166,7 @@ module Kalkin
 			value :bind, RefBind
 		end
 
-		class ParamList < RLTK::ASTNode
+		class ParamList < KNode
 			child :params, [ParamRefBind]
 
 			def each(&block)
@@ -184,7 +186,7 @@ module Kalkin
 			end
 		end
 
-		class Invokable < RLTK::ASTNode
+		class Invokable < KNode
 			value :name,       String
 			value :type,       String
 			child :parameters, ParamList
@@ -201,36 +203,46 @@ module Kalkin
 			value :generator, Proc
 		end
 
-		class DefList < RLTK::ASTNode
-			child :defs, [Function]
+		class NodeList < KNode
+			child :nodes, [KNode]
 
 			def each(&block)
-				self.defs.each &block
+				self.nodes.each &block
 			end
 
 			def empty?
-				self.defs.empty?
+				self.nodes.empty?
 			end
 
 			def first
-				self.defs.first
+				self.nodes.first
 			end
 
 			def last
-				self.defs.last
+				self.nodes.last
 			end
 		end
 
-		class Namespace < RLTK::ASTNode
+		class Namespace < KNode
 			value :name, String
-			child :defs, [Function]
+			child :members, [KNode]
 
-			def add_defs(new_defs)
-				self.defs += new_defs.defs
+			def add_members(node_list)
+				self.members += node_list.nodes
+			end
+
+			alias :default_members :members
+
+			def members(node_type = nil)
+				if node_type
+					self.members.select { |n| n.is_a? node_type }
+				else
+					self.members
+				end
 			end
 		end
 
-		class Klass < RLTK::ASTNode
+		class Klass < KNode
 			value :name, String
 		end
 	end

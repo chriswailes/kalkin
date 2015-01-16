@@ -107,6 +107,10 @@ module Kalkin
 			b.name
 		end
 
+		on Klass.(~:name) do
+			"class #{name}\nend"
+		end
+
 		on Namespace.(_, array) do
 			array.map { |n| visit n }.join("\n" + newline)
 		end

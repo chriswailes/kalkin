@@ -231,9 +231,7 @@ module Kalkin
 				self.members += node_list.nodes
 			end
 
-			alias :default_members :members
-
-			def members(node_type = nil)
+			def get_members(node_type = nil)
 				if node_type
 					self.members.select { |n| n.is_a? node_type }
 				else

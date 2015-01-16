@@ -115,7 +115,7 @@ module Kalkin
 			array.map { |n| visit n }.join(', ')
 		end
 
-		on DefList.(array) do
+		on NodeList.(array) do
 			array.map { |d| visit d }.join("\n" + newline)
 		end
 

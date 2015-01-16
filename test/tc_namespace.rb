@@ -31,15 +31,15 @@ class IsomorphismTester < Minitest::Test
 			'functions4.k',
 		]
 
-		mpast         = Kalkin::AST::Namespace.new('top_level')
+		mp_ast        = Kalkin::AST::Namespace.new('top_level')
 		file_contents = files.map { |fn| File.open(File.join(File.dirname(File.expand_path(__FILE__)), 'inputs', fn)) { |f| f.read }.chomp }
 		string        = file_contents.join("\n")
-		spast         = Kalkin::Parser.parse(Kalkin::Lexer.lex(string))
+		sp_ast        = Kalkin::Parser.parse(Kalkin::Lexer.lex(string))
 
 		file_contents.each do |s|
-			mpast.add_members Kalkin::Parser.parse(Kalkin::Lexer.lex(s))
+			mp_ast.add_members Kalkin::Parser.parse(Kalkin::Lexer.lex(s))
 		end
 
-		assert_equal(Kalkin::ASTWriter.new.visit(spast), Kalkin::ASTWriter.new.visit(mpast))
+		assert_equal(Kalkin::ASTWriter.new.visit(sp_ast), Kalkin::ASTWriter.new.visit(mp_ast))
 	end
 end

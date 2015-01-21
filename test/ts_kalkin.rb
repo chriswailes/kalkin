@@ -11,12 +11,26 @@
 # Filigree
 require 'filigree/request_file'
 
+# Kalkin
+require 'kalkin/lexer'
+require 'kalkin/parser'
+
+# Standard Library
 request_file('simplecov', 'SimpleCov is not installed.') do
 	SimpleCov.start do
 		add_filter 'tc_*'
 	end
 end
 
+# Helper function
+
+def get_ast(file_name, verbose)
+	input  = File.open(File.join(File.dirname(File.expand_path(__FILE__)), 'inputs', file_name)) { |f| f.read }.chomp
+	tokens = Kalkin::Lexer::lex(input)
+	ast    = Kalkin::Parser::parse(tokens, verbose: verbose)
+end
+
 # Test cases
 require 'tc_isomorphism.rb'
 require 'tc_namespace.rb'
+#require 'tc_types.rb'

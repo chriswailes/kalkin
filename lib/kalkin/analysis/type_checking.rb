@@ -13,9 +13,9 @@ require 'filigree/visitor'
 # Kalkin
 require 'kalkin/ast'
 
-########
-# Code #
-########
+#######################
+# Classes and Modules #
+#######################
 
 module Kalkin
 	module Analysis
@@ -25,10 +25,10 @@ module Kalkin
 			end
 
 			on RefBind.(_, unresolved_type) do |node|
-				resolved_type = @tlns.find_type(unresolved_type.name)
+				klass = @tlns.members.find { |n| n.is_a?(Klass) && n.name == unresolved_type.name }
 
 				# TODO: Add proper error handling.
-				node.type = resolved_type if resolved_type
+				node.type = KlassType.new(klass) if resolved_type
 			end
 
 			on KNode do |node|

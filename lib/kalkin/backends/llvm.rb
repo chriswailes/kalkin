@@ -9,6 +9,7 @@ module Kalkin
 			class << self
 				def populate_namespace(ns)
 					ns.add_members(Kalkin::AST::NodeList.new([
+							Kalkin::AST::Klass.new('Atom'),
 							Kalkin::AST::Klass.new('Integer'),
 							Kalkin::AST::Klass.new('Float')
 						]))

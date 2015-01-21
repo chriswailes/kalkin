@@ -19,20 +19,30 @@ require 'kalkin/ast'
 
 module Kalkin
 	module Analysis
-		class TypeChecker < Filigree::Visitor
+		class TypeChecker
+			include Kalkin::AST
+
+			include Filigree::Visitor
+
 			def initialize(tlns)
 				@tlns = tlns
+			end
+
+			on Function.(_, unresolved_type, _, _) do |node|
+				klass = @tlns.members.find { |n| n.is_a?(Klass) && n.name == unresolved_type.name }
+
+				node.type = KlassType.new(klass) if klass
 			end
 
 			on RefBind.(_, unresolved_type) do |node|
 				klass = @tlns.members.find { |n| n.is_a?(Klass) && n.name == unresolved_type.name }
 
 				# TODO: Add proper error handling.
-				node.type = KlassType.new(klass) if resolved_type
+				node.type = KlassType.new(klass) if klass
 			end
 
 			on KNode do |node|
-				node.children.each { |c| visit c }
+				node.children.flatten.each { |c| visit c }
 			end
 		end
 	end

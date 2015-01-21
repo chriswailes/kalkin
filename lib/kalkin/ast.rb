@@ -188,7 +188,7 @@ module Kalkin
 
 		class Invokable < KNode
 			value :name,       String
-			value :type,       String
+			value :type,       Type
 			child :parameters, ParamList
 
 			alias :params    :parameters

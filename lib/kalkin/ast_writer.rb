@@ -57,11 +57,11 @@ module Kalkin
 			"def #{n}(#{visit params}) : #{t}#{indent}#{visit b}#{undent}end"
 		end
 
-		on FunctionCall.(n, a) do
+		on FunctionCall.(t, n, a) do
 			"#{n}(#{visit a})"
 		end
 
-		on MessageSend.(n, s, a) do |node|
+		on MessageSend.(t, n, s, a) do |node|
 			if s.is_a?(MessageSend) and s.operator?
 				"(#{visit s})"
 			else
@@ -75,35 +75,35 @@ module Kalkin
 			end
 		end
 
-		on UnaryMessageSend.(n, s) do
+		on UnaryMessageSend.(t, n, s) do
 			"#{n}#{visit s}"
 		end
 
-		on SplitMessageSend.(m, o, s, a) do
+		on SplitMessageSend.(t, m, o, s, a) do
 			"#{visit s}.#{m} #{o} #{visit a}"
 		end
 
-		on If.(c, t, e) do
+		on If.(ty, c, t, e) do
 			"if #{visit c} then #{visit t} else #{visit e} end"
 		end
 
-		on Literal.(v) do
+		on Literal.(t, v) do
 			v.to_s
 		end
 
-		on KAtom.(a) do
+		on KAtom.(t, a) do
 			':' + a.to_s
 		end
 
-		on UnresolvedSymbol.(i) do
+		on UnresolvedSymbol.(t, i) do
 			i
 		end
 
-		on RefBind.(n, t) do |b|
+		on RefBind.(t, n) do |b|
 			b.elide_type? ? n : "#{n} : #{t}"
 		end
 
-		on RefUse.(b) do
+		on RefUse.(t, b) do
 			b.name
 		end
 

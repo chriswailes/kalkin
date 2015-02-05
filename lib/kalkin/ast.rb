@@ -30,18 +30,14 @@ module Kalkin
 	module AST
 
 		class KNode < RLTK::ASTNode
-			init_order :def
 		end
 
 		class Expression < KNode
-			value :type, Type, true
+			value :type, Type
 		end
 
 		class ArgList < KNode
 			child :args, [Expression]
-
-			# Init: args
-			# Destructure: args
 
 			def each(&block)
 				self.args.each &block
@@ -63,8 +59,7 @@ module Kalkin
 		class ExprSequence < Expression
 			child :exprs, [Expression]
 
-			# Init: exprs
-			# Destructure: exprs
+			custom_order :exprs, :type
 
 			def each(&block)
 				self.exprs.each &block
@@ -84,6 +79,8 @@ module Kalkin
 		end
 
 		class Literal < Expression
+			custom_order :ruby_val, :type
+
 			def ~
 				self.ruby_val
 			end
@@ -91,37 +88,22 @@ module Kalkin
 
 		class KAtom < Literal
 			value :ruby_val, String
-
-			# Init: ruby_val
-			# Destructure: type, ruby_val
 		end
 
 		class KBool < Literal
 			value :ruby_val, Object
-
-			# Init: ruby_val
-			# Destructure: type, ruby_val
 		end
 
 		class KFloat < Literal
 			value :ruby_val, Float
-
-			# Init: ruby_val
-			# Destructure: type, ruby_val
 		end
 
 		class KInteger < Literal
 			value :ruby_val, Fixnum
-
-			# Init: ruby_val
-			# Destructure: type, ruby_val
 		end
 
 		class KString < Literal
 			value :ruby_val, String
-
-			# Init: ruby_val
-			# Destructure: type, ruby_val
 		end
 
 		class If < Expression
@@ -129,36 +111,29 @@ module Kalkin
 			child :then_, Expression
 			child :else_, Expression
 
-			# Init: cond, then_, else_
-			# Destructure: type, cond, then_, else_
+			custom_order :cond, :then_, :else_, :type
 		end
 
 		class Invocation < Expression
 			value :name, String
-
-			# Init: name
-			# Destructure: type, name
 		end
 
 		class FunctionCall < Invocation
 			child :args, ArgList
 
-			# Init: name, args
-			# Destructure: type, name, args
+			custom_order :name, :args, :type
 		end
 
 		class MessageSendBase < Invocation
 			child :self_, Expression
 
-			# Init: name, self_
-			# Destructure: type, name, self_
+			custom_order :name, :self_, :type
 		end
 
 		class MessageSend < MessageSendBase
 			child :args, ArgList
 
-			# Init: name, self_, args
-			# Destructure: type, name, self_, args
+			custom_order :name, :self_, :args, :type
 
 			def operator?
 				not (name[0,1] =~ /[a-z]/)
@@ -168,8 +143,7 @@ module Kalkin
 		class SplitMessageSend < MessageSend
 			value :op, String
 
-			# Init: name, self_, args, op
-			# Destructure: type, name, op, self_, args
+			custom_order :name, :op, :self_, :args, :type
 
 			def operator?
 				true
@@ -181,15 +155,13 @@ module Kalkin
 		class UnresolvedSymbol < Expression
 			value :name, String
 
-			# Init: name
-			# Destructure: type, name
+			custom_order :name, :type
 		end
 
 		class RefBind < Expression
 			value :name, String
 
-			# Init: name
-			# Destructure: type, name
+			custom_order :name, :type
 
 			def initialize(name, type)
 				super(name)
@@ -213,15 +185,11 @@ module Kalkin
 		class RefUse < Expression
 			value :bind, RefBind
 
-			# Init: bind
-			# Destructure: type, bind
+			custom_order :bind, :type
 		end
 
 		class ParamList < KNode
 			child :params, [ParamRefBind]
-
-			# Init: params
-			# Destructure: params
 
 			def each(&block)
 				self.params.each &block
@@ -245,9 +213,6 @@ module Kalkin
 			value :type,       Type
 			child :parameters, ParamList
 
-			# Init: name, type, parameters
-			# Destructure: name, type, parameters
-
 			alias :params    :parameters
 			alias :'params=' :'parameters='
 		end
@@ -255,22 +220,17 @@ module Kalkin
 		class Function < Invokable
 			child :body, ExprSequence
 
-			# Init: name, type, parameters, body
-			# Destructure: name, type, parameters, body
+			custom_order :name, :parameters, :body, :type
 		end
 
 		class NativeFunction < Invokable
 			value :generator, Proc
 
-			# Init: name, type, parameters, generator
-			# Destructure: name, type, parameters, generator
+			custom_order :name, :parameters, :generator, :type
 		end
 
 		class NodeList < KNode
 			child :nodes, [KNode]
-
-			# Init: nodes
-			# Destructure: nodes
 
 			def each(&block)
 				self.nodes.each &block
@@ -293,9 +253,6 @@ module Kalkin
 			value :name, String
 			child :members, [KNode]
 
-			# Init: name, members
-			# Destructure: name, members
-
 			def add_members(node_list)
 				self.members += node_list.nodes
 			end
@@ -311,9 +268,6 @@ module Kalkin
 
 		class Klass < KNode
 			value :name, String
-
-			# Init: name
-			# Destructure: name
 		end
 	end
 end

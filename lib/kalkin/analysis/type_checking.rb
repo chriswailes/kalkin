@@ -28,7 +28,7 @@ module Kalkin
 				@tlns = tlns
 			end
 
-			on Function.(_, unresolved_type, _, _) do |node|
+			on Function.(_, _, _, unresolved_type) do |node|
 				klass = @tlns.members.find { |n| n.is_a?(Klass) && n.name == unresolved_type.name }
 
 				node.type = KlassType.new(klass) if klass

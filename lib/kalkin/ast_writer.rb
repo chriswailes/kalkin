@@ -53,15 +53,15 @@ module Kalkin
 
 		# Patterns
 
-		on Function.(n, t, params, b) do
-			"def #{n}(#{visit params}) : #{t}#{indent}#{visit b}#{undent}end"
+		on Function.(n, params, b, ty) do
+			"def #{n}(#{visit params}) : #{ty}#{indent}#{visit b}#{undent}end"
 		end
 
-		on FunctionCall.(t, n, a) do
+		on FunctionCall.(n, a, _) do
 			"#{n}(#{visit a})"
 		end
 
-		on MessageSend.(t, n, s, a) do |node|
+		on MessageSend.(n, s, a, _) do |node|
 			if s.is_a?(MessageSend) and s.operator?
 				"(#{visit s})"
 			else
@@ -75,35 +75,35 @@ module Kalkin
 			end
 		end
 
-		on UnaryMessageSend.(t, n, s) do
+		on UnaryMessageSend.(n, s, _) do
 			"#{n}#{visit s}"
 		end
 
-		on SplitMessageSend.(t, m, o, s, a) do
+		on SplitMessageSend.(m, o, s, a, _) do
 			"#{visit s}.#{m} #{o} #{visit a}"
 		end
 
-		on If.(ty, c, t, e) do
+		on If.(c, t, e, ty) do
 			"if #{visit c} then #{visit t} else #{visit e} end"
 		end
 
-		on Literal.(t, v) do
+		on Literal.(v, _) do
 			v.to_s
 		end
 
-		on KAtom.(t, a) do
+		on KAtom.(a, _) do
 			':' + a.to_s
 		end
 
-		on UnresolvedSymbol.(t, i) do
+		on UnresolvedSymbol.(i, _) do
 			i
 		end
 
-		on RefBind.(t, n) do |b|
+		on RefBind.(n, t) do |b|
 			b.elide_type? ? n : "#{n} : #{t}"
 		end
 
-		on RefUse.(t, b) do
+		on RefUse.(b, _) do
 			b.name
 		end
 
@@ -123,7 +123,7 @@ module Kalkin
 			array.map { |d| visit d }.join("\n" + newline)
 		end
 
-		on ExprSequence.(array) do
+		on ExprSequence.(array, t) do |node|
 			array.map { |e| visit e }.join(newline)
 		end
 

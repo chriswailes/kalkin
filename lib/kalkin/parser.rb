@@ -61,16 +61,16 @@ module Kalkin
 			c('.IDENT LPAREN .arg_list RPAREN') { |i, a| FunctionCall.new i, ArgList.new(a) }
 
 			# Method call
-			c('.expr_core DOT NEWLINE* .IDENT LPAREN .arg_list RPAREN') { |s, m, a| MessageSend.new m, ArgList.new(a),  s }
-			c('.expr_core DOT NEWLINE* .IDENT')                         { |s, m|    MessageSend.new m, ArgList.new([]), s }
+			c('.expr_core DOT NEWLINE* .IDENT LPAREN .arg_list RPAREN') { |s, m, a| MessageSend.new m, s, ArgList.new(a) }
+			c('.expr_core DOT NEWLINE* .IDENT')                         { |s, m|    MessageSend.new m, s, ArgList.new([]) }
 
 			# Operator call
-			c('.expr_core .OPERATOR NEWLINE* .expr_core') { |s, o, a| MessageSend.new o, ArgList.new([a]), s }
-			c('OPERATOR expr_core')                       { |o, s|    UnaryMessageSend.new  o, [], s }
+			c('.expr_core .OPERATOR NEWLINE* .expr_core') { |s, o, a| MessageSend.new o, s, ArgList.new([a]) }
+			c('OPERATOR expr_core')                       { |o, s|    UnaryMessageSend.new o, s }
 
 			# Method/Operator Call
 			c('.expr_core DOT NEWLINE* .IDENT .OPERATOR NEWLINE* .expr_core') do |s, m, o, a|
-				SplitMessageSend.new m, ArgList.new([a]), s, o
+				SplitMessageSend.new m, o, s, ArgList.new([a])
 			end
 		end
 
@@ -96,7 +96,7 @@ module Kalkin
 				@st.drop_frame
 
 				name, params = sig
-				Function.new(name, UnresolvedType.new(t), params, es)
+				Function.new(name, params, es, UnresolvedType.new(t))
 			end
 		end
 

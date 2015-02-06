@@ -106,11 +106,11 @@ module Kalkin
 		end
 
 		p :literal do
-			c('ATOM')    { |a| KAtom.new    a }
-			c('FLOAT')   { |f| KFloat.new   f }
-			c('INTEGER') { |i| KInteger.new i }
-			c('STRING')  { |s| KString.new  s }
-			c('BOOL')    { |b| KBool.new    b }
+			c('ATOM')    { |a| KAtom.new    a, UnresolvedType.new('Atom')    }
+			c('FLOAT')   { |f| KFloat.new   f, UnresolvedType.new('Float')   }
+			c('INTEGER') { |i| KInteger.new i, UnresolvedType.new('Integer') }
+			c('STRING')  { |s| KString.new  s, UnresolvedType.new('String')  }
+			c('BOOL')    { |b| KBool.new    b, UnresolvedType.new('Bool')    }
 		end
 
 		p :param_ident do

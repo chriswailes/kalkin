@@ -28,21 +28,37 @@ module Kalkin
 				@tlns = tlns
 			end
 
-			on Function.(_, _, _, unresolved_type) do |node|
-				klass = @tlns.members.find { |n| n.is_a?(Klass) && n.name == unresolved_type.name }
+			####################
+			# Helper Functions #
+			####################
 
-				node.type = KlassType.new(klass) if klass
-			end
-
-			on RefBind.(_, unresolved_type) do |node|
-				klass = @tlns.members.find { |n| n.is_a?(Klass) && n.name == unresolved_type.name }
+			# @param [UnresolvedType]  ut  Type to resolve
+			def get_type(ut)
+				klass = @tlns.find(Klass, ->(n) { n.name == ut.name })
 
 				# TODO: Add proper error handling.
-				node.type = KlassType.new(klass) if klass
+				klass ? KlassType.new(klass) : nil
 			end
 
-			on KNode do |node|
-				node.children.flatten.each { |c| visit c }
+			############
+			# Patterns #
+			############
+
+			on ExprSequence.(es, nil),
+			   -> { es.last.type.is_a?(KlassType) } do |node|
+				node.type = es.last.type
+			end
+
+			on Function.(_, _, _, UnresolvedType.as(ut)) do |node|
+				node.type = get_type(ut)
+			end
+
+			on Literal.(_, UnresolvedType.as(ut)) do |node|
+				node.type = get_type(ut)
+			end
+
+			on RefBind.(_, UnresolvedType.as(ut)) do |node|
+				node.type = get_type(ut)
 			end
 		end
 	end

@@ -7,6 +7,9 @@
 # Requires #
 ############
 
+# Filigree
+require 'filigree/match'
+
 # Kalkin
 require 'kalkin/ast'
 
@@ -16,11 +19,15 @@ require 'kalkin/ast'
 
 module Kalkin
 	class Type
-
+		include Filigree::Destructurable
 	end
 
 	class UnresolvedType < Type
 		attr_reader :name
+
+		def destructure(_)
+			[@name]
+		end
 
 		def initialize(name)
 			@name = name
@@ -33,6 +40,20 @@ module Kalkin
 
 	class KlassType < Type
 		attr_reader :klass
+
+		@instances = Hash.new
+
+		def self.new(klass)
+			if @instances.has_key?(klass)
+				@instances[klass]
+			else
+				@instances[klass] = super(klass)
+			end
+		end
+
+		def destructure(_)
+			[@klass]
+		end
 
 		def initialize(klass)
 			@klass = klass

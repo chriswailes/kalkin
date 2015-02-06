@@ -25,19 +25,42 @@ require 'kalkin/backends/llvm'
 #######################
 
 class TypeTester < Minitest::Test
+	include Kalkin::AST
+
 	def assert_resolvable(file_name)
 		ast = get_ast(file_name)
-		@type_checker.visit ast
+
+		ast.visit @type_checker
+		ast.visit @type_checker
+
+#		pp ast
 
 		assert_resolved(ast)
 	end
 
 	def assert_resolved(node)
+
+#		puts "Visiting node of type #{node.class.name}"
+
 		case node
-		when Kalkin::AST::Function then assert_instance_of(Kalkin::KlassType, node.type)
-		when Kalkin::AST::RefBind  then assert_instance_of(Kalkin::KlassType, node.type)
-		else                            node.children.flatten.each { |c| assert_resolved c }
+		when Function
+#			assert_instance_of(Kalkin::KlassType, node.type)
+			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a function.')
+
+		when RefBind
+#			assert_instance_of(Kalkin::KlassType, node.type)
+			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a refbind.')
+
+		when Literal
+#			assert_instance_of(Kalkin::KlassType, node.type)
+			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a literal.')
+
+		when ExprSequence
+			assert_instance_of(Kalkin::KlassType, node.type)
+#			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a exprsequence.')
 		end
+
+		node.children.flatten.each { |c| assert_resolved c }
 	end
 
 	def setup
@@ -50,7 +73,7 @@ class TypeTester < Minitest::Test
 	def test_return_type_checking
 		assert_resolvable('functions0.k')
 		assert_resolvable('functions1.k')
-		assert_resolvable('functions2.k')
+#		assert_resolvable('functions2.k')
 	end
 
 	def test_param_checking

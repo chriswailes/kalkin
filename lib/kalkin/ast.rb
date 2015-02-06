@@ -257,12 +257,10 @@ module Kalkin
 				self.members += node_list.nodes
 			end
 
-			def get_members(node_type = nil)
-				if node_type
-					self.members.select { |n| n.is_a? node_type }
-				else
-					self.members
-				end
+			def find(node_type = KNode, pred = nil)
+				self.members.find &(
+					pred ? ->(node) { node.is_a?(node_type) && pred.call(node) }
+					     : ->(node) { node.is_a?(node_typ) })
 			end
 		end
 

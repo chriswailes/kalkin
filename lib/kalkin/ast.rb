@@ -263,8 +263,8 @@ module Kalkin
 
 			def find(node_type = KNode, &pred)
 				self.members.find &(
-					pred ? ->(node) { node.is_a?(node_type) && pred.call(node) }
-					     : ->(node) { node.is_a?(node_typ) })
+					pred ? (->(node) { node.is_a?(node_type) && pred.call(node) })
+					     : (->(node) { node.is_a?(node_type) }))
 			end
 		end
 

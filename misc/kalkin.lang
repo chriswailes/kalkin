@@ -57,16 +57,17 @@
 		<!-- Kalkin's keywords context -->
 		<context id="keywords" style-ref="keyword">
 			<keyword>class</keyword>
+			<keyword>copy</keyword>
 			<keyword>def</keyword>
 			<keyword>do</keyword>
 			<keyword>else</keyword>
 			<keyword>end</keyword>
 			<keyword>if</keyword>
+			<keyword>in</keyword>
 			<keyword>lambda</keyword>
 			<keyword>let</keyword>
 			<keyword>match</keyword>
 			<keyword>namespace</keyword>
-			<keyword>new</keyword>
 			<keyword>return</keyword>
 			<keyword>self</keyword>
 			<keyword>then</keyword>

@@ -34,7 +34,7 @@ module Kalkin
 
 			# @param [UnresolvedType]  ut  Type to resolve
 			def get_type(ut)
-				klass = @tlns.find(Klass, ->(n) { n.name == ut.name })
+				klass = @tlns.find(Klass) { |n| n.name == ut.name }
 
 				# TODO: Add proper error handling.
 				klass ? KlassType.new(klass) : nil
@@ -49,8 +49,10 @@ module Kalkin
 				node.type = es.last.type
 			end
 
-			on Function.(_, _, _, UnresolvedType.as(ut)) do |node|
-				node.type = get_type(ut)
+			on Function.(_, ps, _, UnresolvedFunctionType.as(ut)),
+			   -> { ps.empty? || ps.first.type.is_a?(ResolvedType) } do |node|
+
+				node.type = FunctionType.new(ps.map(&:type), get_type(ut))
 			end
 
 			on Literal.(_, UnresolvedType.as(ut)) do |node|

@@ -38,7 +38,11 @@ module Kalkin
 		end
 	end
 
-	class KlassType < Type
+	class UnresolvedFunctionType < UnresolvedType; end
+
+	class ResolvedType < Type; end
+
+	class KlassType < ResolvedType
 		attr_reader :klass
 
 		@instances = Hash.new
@@ -61,6 +65,24 @@ module Kalkin
 
 		def to_s
 			@klass.name
+		end
+	end
+
+	class FunctionType < ResolvedType
+		attr_reader :param_types
+		attr_reader :ret_type
+
+		def destructure(_)
+			[@param_types, @ret_type]
+		end
+
+		def initialize(param_types, ret_type)
+			@param_types = param_types
+			@ret_type    = ret_type
+		end
+
+		def to_s
+			"(#{(@param_types + [@ret_type]).join(' -> ')})"
 		end
 	end
 end

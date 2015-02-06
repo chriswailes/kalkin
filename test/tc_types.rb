@@ -30,34 +30,29 @@ class TypeTester < Minitest::Test
 	def assert_resolvable(file_name)
 		ast = get_ast(file_name)
 
-		ast.visit @type_checker
-		ast.visit @type_checker
-
-#		pp ast
+		ast.visit @type_checker, :downup
 
 		assert_resolved(ast)
 	end
 
+	def assert_has_resolved_type(node)
+		assert(node.type.is_a?(Kalkin::ResolvedType),
+		       "Failed to type check node of type #{node.class.name}")
+	end
+
 	def assert_resolved(node)
-
-#		puts "Visiting node of type #{node.class.name}"
-
 		case node
 		when Function
-#			assert_instance_of(Kalkin::KlassType, node.type)
-			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a function.')
+			assert_has_resolved_type(node)
 
 		when RefBind
-#			assert_instance_of(Kalkin::KlassType, node.type)
-			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a refbind.')
+			assert_has_resolved_type(node)
 
 		when Literal
-#			assert_instance_of(Kalkin::KlassType, node.type)
-			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a literal.')
+			assert_has_resolved_type(node)
 
 		when ExprSequence
-			assert_instance_of(Kalkin::KlassType, node.type)
-#			assert(node.type.is_a?(Kalkin::KlassType), 'Failed to typecheck a exprsequence.')
+			assert_has_resolved_type(node)
 		end
 
 		node.children.flatten.each { |c| assert_resolved c }
@@ -70,11 +65,11 @@ class TypeTester < Minitest::Test
 		@type_checker = Kalkin::Analysis::TypeChecker.new(@tlns)
 	end
 
-	def test_return_type_checking
-		assert_resolvable('functions0.k')
-		assert_resolvable('functions1.k')
+#	def test_return_type_checking
+#		assert_resolvable('functions0.k')
+#		assert_resolvable('functions1.k')
 #		assert_resolvable('functions2.k')
-	end
+#	end
 
 	def test_param_checking
 		assert_resolvable('functions3.k')

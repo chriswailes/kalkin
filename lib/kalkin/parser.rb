@@ -96,7 +96,7 @@ module Kalkin
 				@st.drop_frame
 
 				name, params = sig
-				Function.new(name, params, es, UnresolvedType.new(t))
+				Function.new(name, params, es, UnresolvedFunctionType.new(t))
 			end
 		end
 

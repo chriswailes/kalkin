@@ -206,6 +206,10 @@ module Kalkin
 			def last
 				self.params.last
 			end
+
+			def map(*args)
+				self.params.map(*args)
+			end
 		end
 
 		class Invokable < KNode
@@ -257,7 +261,7 @@ module Kalkin
 				self.members += node_list.nodes
 			end
 
-			def find(node_type = KNode, pred = nil)
+			def find(node_type = KNode, &pred)
 				self.members.find &(
 					pred ? ->(node) { node.is_a?(node_type) && pred.call(node) }
 					     : ->(node) { node.is_a?(node_typ) })

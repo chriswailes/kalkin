@@ -14,7 +14,7 @@ def fib(n : Integer) : Integer -> fib(n-1) + fib(n-2)
  * parameter `a` must always be provided; default values are specified for the
  * other parameters.
  *#
-def math_function(a, b(2), c(3) : Integer, d(4.0) : Float) : Float
+def math_function(a, b := 2, c := 3 : Integer, d := 4.0 : Float) : Float
 	a + b + c + d
 end
 
@@ -28,29 +28,53 @@ math_function(1, c: 42, d: 100) # Valid
 
 def foo : void
 	# Captures references to two integers returned from functions.
-	let x(get_int()), y(get_int()) : Integer
+	let x := get_int(), y := get_int() : Integer
 
 	# Creates a new copy of an integer and default initializes a new integer.
-	new a(get_int()), b : Integer
+	let a := SomeClass(42), b := SomeClass()
+	let a := SomeClass(42), b : SomeClass
+
+	# Re-bind the name `a` to different values.
+	a := get_some_class()
+	a := SomeClass(100)
+
+	# You can also do this to be explicit
+	let a := SomeClass(200)
+
+	# This form of let returns the result of evaluating the expression with the
+	# new binding instead of the value of the new binding.
+	let a := SomeClass(300) in a.some_method
+
+	# After the above line `a` will have the reference it was bound to on line
+	# 42.
 end
 
 # Takes x and y by reference and b and c by value.
-def bar(x, y : Integer, new b, c : Float) : Integer
+def bar(x, y : Integer, copy b, copy c : Float) : Integer
 	# Does something
 end
 
 # Takes x and b by reference and y and c by value.
-def baf(let x, new y : Integer, let b, new c : Float) : Integer
+def baf(x, copy y : Integer, b, copy c : Float) : Integer
 	# Does something
 end
 
 # Takes an instance of SomeClass by reference.
-def bar(let x : SomeClass) : void
+def bar(x : SomeClass) : void
 	...
 end
 
+# Default values for non-trivial types
+def bar(x := SomeClass()) : Integer -> 42
+
+def baz(a : SomeClass, b := SomeClass()) : Integer -> 42
+def baz(a, b := SomeClass() : SomeClass) : Integer -> 42
+
+# I don't really like this form.  It might be disallowed.
+def baz(a, b := SomeClass()) : Integer -> 42
+
 # Calls bar with a new instance of SomeClass.
-bar(new SomeClass())
+bar(SomeClass())
 
 # Definition of a namespace
 namespace Math
@@ -130,7 +154,7 @@ end
 #*
  * Because classes are objects themselves they too can have state.  In practice
  * it is best to avoid this as it causes a bottle neck for instantiation, but
- * sometimes you just need to...
+ * sometimes you just need to (factories).
  *#
 class CountingClass
 	#*
@@ -176,7 +200,7 @@ class CountingClass : Class
 	end
 end
 
-class(CountingClass) CountedAnimals
+class[CountingClass] CountedAnimals
 	#*
 	 * Define the body of the CountedAnimals class.
 	 *#
@@ -196,14 +220,9 @@ let value(get_int())
  * The return type can be omitted in the case of the first three forms.
  *#
 lambda (args):RetType { expression }
--> (args):RetType { expression }
 λ (args):RetType { expression }
 
 lambda (args):RetType
-	# code
-end
-
--> (args):RetType
 	# code
 end
 

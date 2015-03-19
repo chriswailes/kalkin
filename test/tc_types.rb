@@ -18,6 +18,7 @@ require 'kalkin/ast'
 require 'kalkin/lexer'
 require 'kalkin/parser'
 require 'kalkin/analysis/type_checking'
+require 'kalkin/analysis/function_resolution'
 require 'kalkin/backends/llvm'
 
 #######################
@@ -31,6 +32,8 @@ class TypeTester < Minitest::Test
 		ast = get_ast(file_name)
 
 		ast.visit @type_checker, :downup
+		ast.visit @function_resolver
+		ast.visit @type_checker
 
 		assert_resolved(ast)
 	end
@@ -62,14 +65,15 @@ class TypeTester < Minitest::Test
 		@tlns = Kalkin::AST::Namespace.new
 		Kalkin::Backends::LLVM.populate_namespace(@tlns)
 
-		@type_checker = Kalkin::Analysis::TypeChecker.new(@tlns)
+		@type_checker      = Kalkin::Analysis::TypeChecker.new(@tlns)
+		@function_resolver = Kalkin::Analysis::FunctionResolver.new(@tlns)
 	end
 
-#	def test_return_type_checking
-#		assert_resolvable('functions0.k')
-#		assert_resolvable('functions1.k')
-#		assert_resolvable('functions2.k')
-#	end
+	def test_return_type_checking
+		assert_resolvable('functions0.k')
+		assert_resolvable('functions1.k')
+		assert_resolvable('functions2.k')
+	end
 
 	def test_param_checking
 		assert_resolvable('functions3.k')

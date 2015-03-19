@@ -252,6 +252,9 @@ end
 3.1415926
 2.71828
 
+# Regular Expressions
+/ab*/
+
 # Tuples
 (1, 2)
 (:hello, :world)
@@ -273,3 +276,25 @@ let one, two := (1, 2)
 let a, b, c := <|1, 17, 42|>
 
 let binary := <|a, b, c|>
+
+# Tuple and Array Deconstruction
+let a, b = (1, 2)
+let a, b = (1, 2, 3) # a == 1, b == (2, 3)
+
+let a, b = [1, 2]
+let a, b = [1, 2, 3] # a == 1, b == [2, 3]
+
+# Pattern Matching
+match object with
+	42                          -> :a
+	3.14                        -> :b
+	:c                          -> :c
+	Point(0, a)
+	Point(a, 0)                 -> :d
+	Point(a, b) where a == b
+	Point(a, a)                 -> :e
+	Point as p                  -> :f
+	[x, xs] where xs.length > 0 -> :g
+	<|42:8, x:4, y:4|>          -> :h
+	_                           -> :z
+end

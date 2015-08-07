@@ -17,14 +17,15 @@
 		Information on what the highlighting should look like.
 	-->
 	<styles>
-		<style id="annotation" _name="Annotation" map-to="def:annotation" />
-		<style id="boolean"    _name="Boolean"    map-to="def:boolean"    />
-		<style id="comment"    _name="Comment"    map-to="def:comment"    />
-		<style id="keyword"    _name="Keyword"    map-to="def:keyword"    />
-		<style id="number"     _name="Number"     map-to="def:decimal"    />
-		<style id="string"     _name="String"     map-to="def:string"     />
-		<style id="type"       _name="Data Type"  map-to="def:type"       />
-		<style id="variable"   _name="Variable"   map-to="def:identifier" />
+		<style id="annotation" _name="Annotation" map-to="def:preprocessor" />
+		<style id="boolean"    _name="Boolean"    map-to="def:boolean"      />
+		<style id="comment"    _name="Comment"    map-to="def:comment"      />
+		<style id="keyword"    _name="Keyword"    map-to="def:keyword"      />
+		<style id="number"     _name="Number"     map-to="def:decimal"      />
+		<style id="string"     _name="String"     map-to="def:string"       />
+		<style id="symbol"     _name="Symbol"     map-to="def:string"       />
+		<style id="type"       _name="Data Type"  map-to="def:type"         />
+		<style id="variable"   _name="Variable"   map-to="def:identifier"   />
 	</styles>
 
 	<!--
@@ -44,7 +45,7 @@
 			</include>
 		</context>
 
-		<context id="boolean" style-ref="boolean">
+		<context id="booleans" style-ref="boolean">
 			<keyword>true</keyword>
 			<keyword>false</keyword>
 		</context>
@@ -89,12 +90,12 @@
 		</context>
 
 		<!-- Kalkin's number context -->
-		<context id="number" style-ref="number">
+		<context id="numbers" style-ref="number">
 			<match>((0x[abcdef\d]+)|(([\d]*\.)?[\d]+([eE][+-]?[\d]+)?))</match>
 		</context>
 
 		<!-- Kalkin's string context -->
-		<context id="string" end-at-line-end="true" style-ref="string" class="spell-check">
+		<context id="strings" end-at-line-end="true" style-ref="string" class="spell-check">
 			<start>"</start>
 			<end>"</end>
 
@@ -105,22 +106,29 @@
 			</include>
 		</context>
 
+		<context id="symbols" style-ref="symbol">
+			<match>(?&lt;!:):[a-zA-Z0-9_]+</match>
+		</context>
+
 		<!-- Kalkin's type keywords context -->
-		<context id="type"  style-ref="type">
+		<context id="types"  style-ref="type">
 			<match>[A-Z][A-Za-z_]*</match>
 		</context>
 
 		<!-- The main Kalkin context -->
 		<context id="kalkin" class="no-spell-check">
 			<include>
+				<context ref="annotations"           />
 				<context ref="block-comment"         />
-				<context ref="boolean"               />
+				<context ref="booleans"              />
 				<context ref="hyphenated-keywords"   />
 				<context ref="line-comment"          />
 				<context ref="keywords"              />
-				<context ref="number"                />
-				<context ref="string"                />
-				<context ref="type"                  />
+				<context ref="numbers"               />
+				<context ref="strings"               />
+				<context ref="symbols"               />
+				<context ref="types"                 />
+				<context ref="instance-variables"    />
 			</include>
 		</context>
 	</definitions>

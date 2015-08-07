@@ -171,7 +171,7 @@ class CountingClass
 	end
 
 	# Returns the number of instantiations of this class.
-	def-c count
+	def-c count : Integer
 		$count
 	end
 end
@@ -195,7 +195,7 @@ class CountingClass : Class
 	end
 
 	# Returns the number of instantiations of this class.
-	def-i count
+	def-i count : Integer
 		$count
 	end
 end

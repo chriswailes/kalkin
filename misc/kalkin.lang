@@ -17,18 +17,24 @@
 		Information on what the highlighting should look like.
 	-->
 	<styles>
-		<style id="boolean" _name="Boolean"   map-to="def:boolean" />
-		<style id="comment" _name="Comment"   map-to="def:comment" />
-		<style id="keyword" _name="Keyword"   map-to="def:keyword"/>
-		<style id="number"  _name="Number"    map-to="def:decimal" />
-		<style id="string"  _name="String"    map-to="def:string"  />
-		<style id="type"    _name="Data Type" map-to="def:type"    />
+		<style id="annotation" _name="Annotation" map-to="def:annotation" />
+		<style id="boolean"    _name="Boolean"    map-to="def:boolean"    />
+		<style id="comment"    _name="Comment"    map-to="def:comment"    />
+		<style id="keyword"    _name="Keyword"    map-to="def:keyword"    />
+		<style id="number"     _name="Number"     map-to="def:decimal"    />
+		<style id="string"     _name="String"     map-to="def:string"     />
+		<style id="type"       _name="Data Type"  map-to="def:type"       />
+		<style id="variable"   _name="Variable"   map-to="def:identifier" />
 	</styles>
 
 	<!--
 		The language definition proper.
 	-->
 	<definitions>
+		<context id="annotations" style-ref="annotation">
+			<match>@[a-zA-Z][a-zA-Z0-9_]*</match>
+		</context>
+
 		<context id="block-comment" style-ref="comment" class="comment" class-disabled="no-spell-check">
 			<start>#\*</start>
 			<end>\*#</end>
@@ -52,6 +58,10 @@
 
 		<context id="hyphenated-keywords" style-ref="keyword">
 			<match>(def|let)-[ci]</match>
+		</context>
+
+		<context id="instance-variables" style-ref="variable">
+			<match>\$[a-z][a-zA-Z0-9_]*</match>
 		</context>
 
 		<!-- Kalkin's keywords context -->

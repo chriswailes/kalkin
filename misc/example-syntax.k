@@ -7,7 +7,7 @@
 # These are function definitions.
 def fib(1) -> 1
 def fib(2) -> 1
-def fib(n : Integer) : Integer -> fib(n-1) + fib(n-2)
+def fib(n : Integer) : Integer -> fib(n - 1) + fib(n - 2)
 
 #*
  * This function takes four arguments: three integers and a float.  The
@@ -134,7 +134,7 @@ class Point
 	*#
 
 	def origin : Point
-		new Point(0, 0)
+		Point(0, 0)
 	end
 end
 
@@ -212,15 +212,15 @@ end
 
 
 # Local type inference
-let value(get_int())
+let value := get_int()
 
 #*
  * Lambdas
  *
- * The return type can be omitted in the case of the first three forms.
+ * The return type can be omitted in the case of the first two forms.
  *#
-lambda (args):RetType { expression }
-λ (args):RetType { expression }
+lambda (args):RetType expression
+λ (args):RetType expression
 
 lambda (args):RetType
 	# code
@@ -228,4 +228,73 @@ end
 
 λ (args):RetType
 	# code
+end
+
+# Other valid lambdas
+λ (a : Integer) a + 42
+λ 42
+
+#*
+ * Literals
+ *#
+
+# Atoms
+:foo
+:bar_
+:?
+
+# Integers
+42
+100
+100,000
+
+# Floats
+3.1415926
+2.71828
+
+# Regular Expressions
+/ab*/
+
+# Tuples
+(1, 2)
+(:hello, :world)
+(1, 2.0, :three, "four")
+
+let one, two := (1, 2)
+
+# Arrays
+[1, 2, 3, 4]
+[:hello, :world]
+
+# Hashes
+{ :one => 1, :two => 2, :three => 3 }
+
+# Binaries
+<|1, 17, 42|>
+<|"abc"|>
+
+let a, b, c := <|1, 17, 42|>
+
+let binary := <|a, b, c|>
+
+# Tuple and Array Deconstruction
+let a, b = (1, 2)
+let a, b = (1, 2, 3) # a == 1, b == (2, 3)
+
+let a, b = [1, 2]
+let a, b = [1, 2, 3] # a == 1, b == [2, 3]
+
+# Pattern Matching
+match object with
+	42                          -> :a
+	3.14                        -> :b
+	:c                          -> :c
+	Point(0, a)
+	Point(a, 0)                 -> :d
+	Point(a, b) where a == b
+	Point(a, a)                 -> :e
+	Point as p                  -> :f
+	[x, xs] where xs.length > 0 -> :g
+	<|42:8, x:4, y:4|>          -> :h
+	_                           -> :z
 end

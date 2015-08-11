@@ -67,6 +67,7 @@
 
 		<!-- Kalkin's keywords context -->
 		<context id="keywords" style-ref="keyword">
+			<keyword>as</keyword>
 			<keyword>class</keyword>
 			<keyword>copy</keyword>
 			<keyword>def</keyword>

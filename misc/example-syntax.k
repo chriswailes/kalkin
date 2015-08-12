@@ -1,8 +1,8 @@
 # This is a line comment.
 #* This is a block comment. *#
 
-#~ This is a temporary comment.  Kalkin will refuse to merge code that has
-#~ these into a project's master.
+#~ This is a temporary comment.  Kalkin will refuse to merge code into a
+#~ project's master branch if it has these.
 
 # These are function definitions.
 def fib(1) -> 1
@@ -28,6 +28,7 @@ math_function(1, c: 42, d: 100) # Valid
 
 def foo : void
 	# Captures references to two integers returned from functions.
+	let x := get_int(), y := get_int() # Type inference.
 	let x := get_int(), y := get_int() : Integer
 
 	# Creates a new copy of an integer and default initializes a new integer.
@@ -219,14 +220,14 @@ let value := get_int()
  *
  * The return type can be omitted in the case of the first two forms.
  *#
-lambda (args):RetType expression
-λ (args):RetType expression
+lambda (args) : RetType expression
+λ (args) : RetType expression
 
-lambda (args):RetType
+lambda (args) : RetType
 	# code
 end
 
-λ (args):RetType
+λ (args) : RetType
 	# code
 end
 

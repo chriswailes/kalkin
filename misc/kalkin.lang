@@ -57,36 +57,46 @@
 			</include>
 		</context>
 
-		<context id="hyphenated-keywords" style-ref="keyword">
-			<match>(def|let)-[ci]</match>
-		</context>
-
 		<context id="instance-variables" style-ref="variable">
-			<match>\$[a-z][a-zA-Z0-9_]*</match>
+			<keyword>\$[a-z][a-zA-Z0-9_]*</keyword>
+			<keyword>self</keyword>
 		</context>
 
 		<!-- Kalkin's keywords context -->
 		<context id="keywords" style-ref="keyword">
+			<prefix>(?&lt;!\.)</prefix>
+			<keyword>and</keyword>
 			<keyword>as</keyword>
 			<keyword>class</keyword>
-			<keyword>copy</keyword>
-			<keyword>def</keyword>
+			<keyword>def(-([ci]))?</keyword>
 			<keyword>do</keyword>
 			<keyword>else</keyword>
 			<keyword>end</keyword>
 			<keyword>if</keyword>
+			<keyword>implements</keyword>
 			<keyword>in</keyword>
+			<keyword>include</keyword>
+			<keyword>interface</keyword>
 			<keyword>lambda</keyword>
-			<keyword>let</keyword>
+			<keyword>let(-([ci]))?</keyword>
 			<keyword>match</keyword>
+			<keyword>mixin</keyword>
 			<keyword>namespace</keyword>
+			<keyword>nor</keyword>
+			<keyword>or</keyword>
+			<keyword>private</keyword>
+			<keyword>protected</keyword>
+			<keyword>public</keyword>
+			<keyword>ref</keyword>
+			<keyword>refine</keyword>
 			<keyword>return</keyword>
-			<keyword>self</keyword>
+			<keyword>require(-([ci]))?</keyword>
 			<keyword>then</keyword>
 			<keyword>void</keyword>
 			<keyword>when</keyword>
 			<keyword>where</keyword>
 			<keyword>with</keyword>
+			<keyword>xor</keyword>
 			<keyword>λ</keyword>
 		</context>
 
@@ -108,12 +118,17 @@
 		</context>
 
 		<context id="symbols" style-ref="symbol">
-			<match>(?&lt;!:):[a-zA-Z0-9_]+</match>
+			<match>(?&lt;!:):[a-zA-Z_]+</match>
 		</context>
 
 		<!-- Kalkin's type keywords context -->
-		<context id="types"  style-ref="type">
+		<context id="types" style-ref="type">
 			<match>[A-Z][A-Za-z_]*</match>
+<!--			(?&lt;!:)-->
+		</context>
+		
+		<context id="identifiers" style-ref="identifier">
+			<match>[a-z][A-Za-z0-9_]*</match>
 		</context>
 
 		<!-- The main Kalkin context -->
@@ -122,7 +137,6 @@
 				<context ref="annotations"           />
 				<context ref="block-comment"         />
 				<context ref="booleans"              />
-				<context ref="hyphenated-keywords"   />
 				<context ref="line-comment"          />
 				<context ref="keywords"              />
 				<context ref="numbers"               />
@@ -130,6 +144,7 @@
 				<context ref="symbols"               />
 				<context ref="types"                 />
 				<context ref="instance-variables"    />
+				<context ref="identifiers"           />
 			</include>
 		</context>
 	</definitions>

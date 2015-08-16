@@ -1,13 +1,46 @@
+#*
+ * Features:
+ *  - Comments
+ *  - Function declaration ✓
+ *    - Default values ✓
+ *    - Keyword arguments ~✓
+ *  - Classes ✓
+ *    - Constructors
+ *    - Destructors
+ *    - Destructuring
+ *  - Function types ✓
+ *  - Tuple types ✓
+ *  - Block syntax
+ *  - Namespaces ✓
+ *  - Interfaces ✓
+ *  - Mixins ✓
+ *  - Parametrized types ✓
+ *    - Type parameters ✓
+ *    - Non-type parameters
+ *    - Specialization
+ *  - Generics Functions ✓
+ *    - Specialization
+ *  - Annotations ~✓
+ *  - Full binary syntax
+ *  - String interpolation
+ *  - Implementation selectors
+ *  - Exceptions
+ *  - Refinements
+ *  - Currying
+ *  - Casting
+ *#
+
 # This is a line comment.
 #* This is a block comment. *#
 
 #~ This is a temporary comment.  Kalkin will refuse to merge code into a
 #~ project's master branch if it has these.
 
-# These are function definitions.
-def fib(1) -> 1
-def fib(2) -> 1
-def fib(n : Integer) : Integer -> fib(n - 1) + fib(n - 2)
+# These are function definitions.  Return types can be infered if the body is a
+# literal.
+def fib(1) ->> 1
+def fib(2) ->> 1
+def fib(n : Integer) : Integer ->> fib(n - 1) + fib(n - 2)
 
 #*
  * This function takes four arguments: three integers and a float.  The
@@ -31,11 +64,12 @@ def foo : void
 	let x := get_int(), y := get_int() # Type inference.
 	let x := get_int(), y := get_int() : Integer
 
-	# Creates a new copy of an integer and default initializes a new integer.
+	# Creates a new copy of SomeClass and default initializes another
+	# SomeClass.
 	let a := SomeClass(42), b := SomeClass()
 	let a := SomeClass(42), b : SomeClass
 
-	# Re-bind the name `a` to different values.
+	# Re-bind the name `a` to different memory location.
 	a := get_some_class()
 	a := SomeClass(100)
 
@@ -46,33 +80,20 @@ def foo : void
 	# new binding instead of the value of the new binding.
 	let a := SomeClass(300) in a.some_method
 
-	# After the above line `a` will have the reference it was bound to on line
-	# 42.
+	# After the above line `a` will have the reference it was bound to in the
+	# previous let expression.
 end
 
-# Takes x and y by reference and b and c by value.
-def bar(x, y : Integer, copy b, copy c : Float) : Integer
+# Takes x by value and y by reference.
+def bar(x, ref y : Integer) : Integer
 	# Does something
-end
-
-# Takes x and b by reference and y and c by value.
-def baf(x, copy y : Integer, b, copy c : Float) : Integer
-	# Does something
-end
-
-# Takes an instance of SomeClass by reference.
-def bar(x : SomeClass) : void
-	...
 end
 
 # Default values for non-trivial types
-def bar(x := SomeClass()) : Integer -> 42
+def bar(x := SomeClass(1, 2, 3)) : Integer -> 42
 
-def baz(a : SomeClass, b := SomeClass()) : Integer -> 42
-def baz(a, b := SomeClass() : SomeClass) : Integer -> 42
-
-# I don't really like this form.  It might be disallowed.
-def baz(a, b := SomeClass()) : Integer -> 42
+def baz(a : SomeClass, b := SomeClass(1, 2, 3)) : Integer ->> 42
+def baz(a, b := SomeClass(1, 2, 3) : SomeClass) : Integer ->> 42
 
 # Calls bar with a new instance of SomeClass.
 bar(SomeClass())
@@ -113,7 +134,7 @@ class Point
 	 *#
 
 	# Arguments get assigned to the instance's variables $x and $y.
-	def-i Point($x, $y) -> void
+	def-i Point($x, $y) ->> void
 
 	#*
 	 * The return type of 'self' tells us that not only does this method
@@ -126,6 +147,7 @@ class Point
 
 	# Assignment messages must always return self.
 	def-i =(other : Point) : self
+		# Parallel assignment.
 		$x, $y = other.x, other.y
 	end
 
@@ -151,6 +173,132 @@ end
 
 class Cat : Animal
 end
+
+##############
+# Interfaces #
+##############
+
+#*
+ * Interfaces may not specify implementations of methods.  If you wish to
+ * provide partial implementations you can declare a mixin and then use it as
+ * an interface.
+ *#
+
+
+interface Monoid {ImplementingClass}
+	require-i ImplementingClass : -> ImplementingClass
+	require-i successor : -> ImplementingClass
+end
+
+interface Container {ImplementingClass{ElementType}}
+	# ImplementingClass must also implement the Iterable interface.
+	require Iterable
+	
+	require-i [] : Integer -> ElementType
+	require-i size : -> Integer
+end
+
+##########
+# Mixins #
+##########
+
+mixin Mappable {ImplementingClass{ElementType}}
+	# ImplementingClass must implement the Appendable and Iterable interface.
+	require Appendable, Iterable
+	
+	require-i helper_fun : Integer -> Integer
+	
+	def-i map(fun :? ElementType -> NewElementType) -> ImplementingClass{NewElementType}
+		let new_container : ImplementingClass
+		
+		self.each do (el)
+			new_container << fun(el)
+		end
+		
+		return new_container
+	end
+	
+	# Alternative map declaration:
+	def-i map{NewElementType}(fun : ElementType -> NewElementType) -> ImplementingClass{NewElementType} ->> void
+end
+
+###############################
+# Using Interfaces and Mixins #
+###############################
+
+class Foo
+	implements Monoid{successor/increment}
+	
+	def increment : self.class
+		...
+	end
+end
+
+class Bar
+	implements Appendable, Iterable
+	include Mappable{helper/my_helper}{map/other_name}
+	
+	def-i my_helper(a : Integer) : Integr ->> a
+	
+	...
+end
+
+######################
+# Parametrized Types #
+######################
+
+class Maybe {ValType}
+	@reader
+	let-i isSet : Boolean
+	@reader
+	let-i val : ValType
+	
+	def-i Maybe ->> isSet = False
+	def-i Maybe($val) ->> isSet = True
+end
+
+Maybe{Integer}(42)
+
+# Multiple type arguments
+class Graph {NodeType, EdgeType}
+	let-i nodes : Array{NodeType}
+	let-i edges : Array{EdgeType}
+end
+
+# Subclass requirement
+class Zoo {AnimalType <: Animal}
+	let-i animals : Array{AnimalType}
+end
+
+# Interface requirement
+class IntegerStore {ContainerType |: Container}
+	let-i storage : ContainerType{Integer}
+end
+
+# Multiple interface requirements
+class LoggingClass {StreamType |: Writable, Seekable}
+	let-i stream : StreamType
+end
+
+#####################
+# Generic Functions #
+#####################
+
+def min{T}(v0, v1 : T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
+def fold{ContainerType{ElementType}}(fun : ElementType -> ElementType, container : ContainerType) : ContainerType
+	...
+end
+
+# Query types
+def min(v0, v1 :? T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
+def fold(fun :? ElementType -> ElementType, container :? ContainerType{ElementType}) : ContainerType
+	...
+end
+
+# These three declarations are all equivalent:
+def log{LogType}(ref message : String, ref log : LogType |: Stream) ->> void
+def log(ref message : String, ref log :? LogType |: Stream) ->> void
+def log(ref message : String, ref log |: Stream) ->> void
 
 #*
  * Because classes are objects themselves they too can have state.  In practice
@@ -235,6 +383,17 @@ end
 λ (a : Integer) a + 42
 λ 42
 
+# Function Types
+
+def returnsConstant42 ->> λ 42
+def returnsConstant42 : -> Integer ->> λ 42
+
+def returnsAddOne : Integer -> Integer ->> λ (n) n + 1
+
+def returnsMap : (Integer -> Integer) -> Array -> Array
+	...
+end
+
 #*
  * Literals
  *#
@@ -242,7 +401,6 @@ end
 # Atoms
 :foo
 :bar_
-:?
 
 # Integers
 42
@@ -261,7 +419,12 @@ end
 (:hello, :world)
 (1, 2.0, :three, "four")
 
-let one, two := (1, 2)
+# Single element tuples are not allowed.  This simply evaluates to the
+# expression `42`: (42)
+
+# Tuple Types
+
+def foo : (Integer, Integer) ->> (7, 8)
 
 # Arrays
 [1, 2, 3, 4]
@@ -274,16 +437,17 @@ let one, two := (1, 2)
 <|1, 17, 42|>
 <|"abc"|>
 
-let a, b, c := <|1, 17, 42|>
+# Destructuring
 
-let binary := <|a, b, c|>
-
-# Tuple and Array Deconstruction
 let a, b = (1, 2)
 let a, b = (1, 2, 3) # a == 1, b == (2, 3)
 
 let a, b = [1, 2]
 let a, b = [1, 2, 3] # a == 1, b == [2, 3]
+
+let a, b, c := <|1, 17, 42|>
+
+let binary := <|a, b, c|>
 
 # Pattern Matching
 match object with

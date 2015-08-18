@@ -1,40 +1,143 @@
-#*
- * Features:
- *  - Comments
- *  - Function declaration ✓
- *    - Default values ✓
- *    - Keyword arguments ~✓
- *  - Classes ✓
- *    - Constructors
- *    - Destructors
- *    - Destructuring
- *  - Function types ✓
- *  - Tuple types ✓
- *  - Block syntax
- *  - Namespaces ✓
- *  - Interfaces ✓
- *  - Mixins ✓
- *  - Parametrized types ✓
- *    - Type parameters ✓
- *    - Non-type parameters
- *    - Specialization
- *  - Generics Functions ✓
- *    - Specialization
- *  - Annotations ~✓
- *  - Full binary syntax
- *  - String interpolation
- *  - Implementation selectors
- *  - Exceptions
- *  - Refinements
- *  - Currying
- *  - Casting
+#* Features
+ *
+ * - Comments ✓
+ * - Literals ✓
+ *   - Full binary syntax
+ * - Types ✓
+ *   - Type names ✓
+ *   - Tuple types ✓
+ *   - Function types ✓
+ *   - Parametrized types ✓
+ * - Function definition ✓
+ *   - Default values ✓
+ *   - Keyword arguments ~✓
+ *   - Splat parameters/arguments
+ * - Namespaces ✓
+ * - Classes ✓
+ *   - Constructors
+ *   - Destructors
+ *   - Destructuring
+ *   - Operator deffinition
+ *     - Prefix
+ *     - Infix
+ *     - Postfix
+ *     - Special cases
+ *     - Precedence
+ *     - Associativity
+ *   - Method + operator definitions
+ * - Interfaces ✓
+ * - Mixins ✓
+ * - Reopening
+ * - Generics Functions ✓
+ *   - Default parameters
+ *   - Specialization
+ * - Parametrized types ✓
+ *   - Type parameters ✓
+ *   - Non-type parameters
+ *   - Default parameters
+ *   - Specialization
+ * - Lambdas ✓
+ * - Block syntax ✓
+ * - Currying ✓
+ * - Exceptions
+ * - Local type inference ✓
+ * - Destructuring
+ * - Pattern matching
+ * - String interpolation ✓
+ * - Macros
+ * - Annotations ✓
+ * - Implementation selectors ✓
+ * - Semantic versioning
+ * - Debugging expressions
+ * - Documentation
  *#
+
+############
+# Comments #
+############
 
 # This is a line comment.
 #* This is a block comment. *#
 
 #~ This is a temporary comment.  Kalkin will refuse to merge code into a
 #~ project's master branch if it has these.
+
+############
+# Literals #
+############
+
+# Arrays
+[1, 2, 3, 4]
+[:hello, :world]
+
+# Atoms
+:foo
+:bar_
+
+# Binaries
+<|1, 17, 42|>
+<|"abc"|>
+
+# Hashes
+{ :one => 1, :two => 2, :three => 3 }
+
+# Integers
+42
+100
+100,000
+1E10
+
+# Floats
+3.1415926
+2.71828
+1.234E-56
+
+# Regular Expressions
+/ab*/
+
+# Strings
+"Hello world!"
+
+# Tuples
+(1, 2)
+(:hello, :world)
+(1, 2.0, :three, "four")
+
+#########
+# Types #
+#########
+
+# Type names
+Foo
+Bar
+CarClass
+
+# Tuple types
+
+# Single element tuples are not allowed.  This simply evaluates to the
+# expression `42`: (42)
+
+def foo : (Integer, Integer) ->> (7, 8)
+
+# Function Types
+
+def returnsConstant42 ->> λ 42
+def returnsConstant42 : -> Integer ->> λ 42
+
+def returnsAddOne : Integer -> Integer ->> λ (n) n + 1
+
+def returnsMap : (Integer -> Integer) -> Array -> Array
+	...
+end
+
+# Parametrized types
+
+Array{String}
+Vector{42, Float}
+
+########################
+# Function definitions #
+########################
 
 # These are function definitions.  Return types can be infered if the body is a
 # literal.
@@ -98,6 +201,10 @@ def baz(a, b := SomeClass(1, 2, 3) : SomeClass) : Integer ->> 42
 # Calls bar with a new instance of SomeClass.
 bar(SomeClass())
 
+##############
+# Namespaces #
+##############
+
 # Definition of a namespace
 namespace Math
 	def cos(x : Real) : Real
@@ -107,6 +214,10 @@ end
 
 # Calling a member of the Math namespace
 Math::cos(0.1234)
+
+###########
+# Classes #
+###########
 
 #*
  * Defining a class.  The object Point, in which the body of the class is
@@ -124,9 +235,7 @@ class Point
 	 * variables.  In the scope of an instance of the Point class the
 	 * variables may be referenced using the $ sigil.
 	 *#
-	@accessor
 	let-i x : Integer
-	@accessor
 	let-i y : Integer
 
 	#*
@@ -173,132 +282,6 @@ end
 
 class Cat : Animal
 end
-
-##############
-# Interfaces #
-##############
-
-#*
- * Interfaces may not specify implementations of methods.  If you wish to
- * provide partial implementations you can declare a mixin and then use it as
- * an interface.
- *#
-
-
-interface Monoid {ImplementingClass}
-	require-i ImplementingClass : -> ImplementingClass
-	require-i successor : -> ImplementingClass
-end
-
-interface Container {ImplementingClass{ElementType}}
-	# ImplementingClass must also implement the Iterable interface.
-	require Iterable
-	
-	require-i [] : Integer -> ElementType
-	require-i size : -> Integer
-end
-
-##########
-# Mixins #
-##########
-
-mixin Mappable {ImplementingClass{ElementType}}
-	# ImplementingClass must implement the Appendable and Iterable interface.
-	require Appendable, Iterable
-	
-	require-i helper_fun : Integer -> Integer
-	
-	def-i map(fun :? ElementType -> NewElementType) -> ImplementingClass{NewElementType}
-		let new_container : ImplementingClass
-		
-		self.each do (el)
-			new_container << fun(el)
-		end
-		
-		return new_container
-	end
-	
-	# Alternative map declaration:
-	def-i map{NewElementType}(fun : ElementType -> NewElementType) -> ImplementingClass{NewElementType} ->> void
-end
-
-###############################
-# Using Interfaces and Mixins #
-###############################
-
-class Foo
-	implements Monoid{successor/increment}
-	
-	def increment : self.class
-		...
-	end
-end
-
-class Bar
-	implements Appendable, Iterable
-	include Mappable{helper/my_helper}{map/other_name}
-	
-	def-i my_helper(a : Integer) : Integr ->> a
-	
-	...
-end
-
-######################
-# Parametrized Types #
-######################
-
-class Maybe {ValType}
-	@reader
-	let-i isSet : Boolean
-	@reader
-	let-i val : ValType
-	
-	def-i Maybe ->> isSet = False
-	def-i Maybe($val) ->> isSet = True
-end
-
-Maybe{Integer}(42)
-
-# Multiple type arguments
-class Graph {NodeType, EdgeType}
-	let-i nodes : Array{NodeType}
-	let-i edges : Array{EdgeType}
-end
-
-# Subclass requirement
-class Zoo {AnimalType <: Animal}
-	let-i animals : Array{AnimalType}
-end
-
-# Interface requirement
-class IntegerStore {ContainerType |: Container}
-	let-i storage : ContainerType{Integer}
-end
-
-# Multiple interface requirements
-class LoggingClass {StreamType |: Writable, Seekable}
-	let-i stream : StreamType
-end
-
-#####################
-# Generic Functions #
-#####################
-
-def min{T}(v0, v1 : T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
-def fold{ContainerType{ElementType}}(fun : ElementType -> ElementType, container : ContainerType) : ContainerType
-	...
-end
-
-# Query types
-def min(v0, v1 :? T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
-def fold(fun :? ElementType -> ElementType, container :? ContainerType{ElementType}) : ContainerType
-	...
-end
-
-# These three declarations are all equivalent:
-def log{LogType}(ref message : String, ref log : LogType |: Stream) ->> void
-def log(ref message : String, ref log :? LogType |: Stream) ->> void
-def log(ref message : String, ref log |: Stream) ->> void
 
 #*
  * Because classes are objects themselves they too can have state.  In practice
@@ -359,15 +342,141 @@ class[CountingClass] CountedAnimals
 	end
 end
 
-
-# Local type inference
-let value := get_int()
+##############
+# Interfaces #
+##############
 
 #*
- * Lambdas
- *
- * The return type can be omitted in the case of the first two forms.
+ * Interfaces may not specify implementations of methods.  If you wish to
+ * provide partial implementations you can declare a mixin and then use it as
+ * an interface.
  *#
+
+interface Monoid {ImplementingClass}
+	require-i ImplementingClass : -> ImplementingClass
+	require-i successor : -> ImplementingClass
+end
+
+interface Container {ImplementingClass{ElementType}}
+	# ImplementingClass must also implement the Iterable interface.
+	require Iterable
+	
+	require-i [] : Integer -> ElementType
+	require-i size : -> Integer
+end
+
+##########
+# Mixins #
+##########
+
+mixin Mappable {ImplementingClass{ElementType}}
+	# ImplementingClass must implement the Appendable and Iterable interface.
+	require Appendable, Iterable
+	
+	require-i helper_fun : Integer -> Integer
+	
+	def-i map(fun :? ElementType -> NewElementType) -> ImplementingClass{NewElementType}
+		let new_container : ImplementingClass
+		
+		self.each do (el)
+			new_container << fun(el)
+		end
+		
+		return new_container
+	end
+	
+	# Alternative map declaration:
+	def-i map{NewElementType}(fun : ElementType -> NewElementType) -> ImplementingClass{NewElementType} ->> void
+end
+
+###############################
+# Using Interfaces and Mixins #
+###############################
+
+class Foo
+	implements Monoid{successor/increment}
+	
+	def increment : self.class
+		...
+	end
+end
+
+class Bar
+	implements Appendable, Iterable
+	include Mappable{helper/my_helper}{map/other_name}
+	
+	def-i my_helper(a : Integer) : Integr ->> a
+end
+
+#############
+# Reopening #
+#############
+
+
+
+#####################
+# Generic Functions #
+#####################
+
+def min{T}(v0, v1 : T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
+def fold{ContainerType{ElementType}}(fun : ElementType -> ElementType, container : ContainerType) : ContainerType
+	...
+end
+
+# Query types
+def min(v0, v1 :? T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
+def fold(fun :? ElementType -> ElementType, container :? ContainerType{ElementType}) : ContainerType
+	...
+end
+
+# These three declarations are all equivalent:
+def log{LogType}(ref message : String, ref log : LogType |: Stream) ->> void
+def log(ref message : String, ref log :? LogType |: Stream) ->> void
+def log(ref message : String, ref log |: Stream) ->> void
+
+######################
+# Parametrized Types #
+######################
+
+class Maybe {ValType}
+	let-i isSet : Boolean
+	let-i val : ValType
+	
+	def-i Maybe ->> isSet = False
+	def-i Maybe($val) ->> isSet = True
+	
+	def-i isSet : Boolean ->> $isSet
+	def-i val : ValType ->> $val
+end
+
+Maybe{Integer}(42)
+
+# Multiple type arguments
+class Graph {NodeType, EdgeType}
+	let-i nodes : Array{NodeType}
+	let-i edges : Array{EdgeType}
+end
+
+# Subclass requirement
+class Zoo {AnimalType <: Animal}
+	let-i animals : Array{AnimalType}
+end
+
+# Interface requirement
+class IntegerStore {ContainerType |: Container}
+	let-i storage : ContainerType{Integer}
+end
+
+# Multiple interface requirements
+class LoggingClass {StreamType |: Writable, Seekable}
+	let-i stream : StreamType
+end
+
+###########
+# Lambdas #
+###########
+
+# The return type is optional for these two forms.
 lambda (args) : RetType expression
 λ (args) : RetType expression
 
@@ -383,61 +492,50 @@ end
 λ (a : Integer) a + 42
 λ 42
 
-# Function Types
+################
+# Block syntax #
+################
 
-def returnsConstant42 ->> λ 42
-def returnsConstant42 : -> Integer ->> λ 42
-
-def returnsAddOne : Integer -> Integer ->> λ (n) n + 1
-
-def returnsMap : (Integer -> Integer) -> Array -> Array
+class Array{ElType}
 	...
+	
+	def-i each(block :? ElType -> _) : self
+		...
+	end
 end
 
-#*
- * Literals
- *#
+[1, 2, 3, 4].each do (el : Integer) : void
+	log_number(el)
+end
 
-# Atoms
-:foo
-:bar_
+############
+# Currying #
+############
 
-# Integers
-42
-100
-100,000
+def foo(a, b, c : Integer) : Integer ->> 42
 
-# Floats
-3.1415926
-2.71828
+let my_foo := `foo(1, 2) : Integer -> Integer
 
-# Regular Expressions
-/ab*/
+def bar (a, b : Integer) : Integer ->> 100
+def bar (a : Integer) : Integer ->> 200
 
-# Tuples
-(1, 2)
-(:hello, :world)
-(1, 2.0, :three, "four")
+let my_bar := `bar(1) : -> Integer
 
-# Single element tuples are not allowed.  This simply evaluates to the
-# expression `42`: (42)
+#############
+# Exception #
+#############
 
-# Tuple Types
+########################
+# Local type inference #
+########################
 
-def foo : (Integer, Integer) ->> (7, 8)
+let value := get_int()
 
-# Arrays
-[1, 2, 3, 4]
-[:hello, :world]
+[1, 2, 3, 4].each do (x) x + 1
 
-# Hashes
-{ :one => 1, :two => 2, :three => 3 }
-
-# Binaries
-<|1, 17, 42|>
-<|"abc"|>
-
-# Destructuring
+#################
+# Destructuring #
+#################
 
 let a, b = (1, 2)
 let a, b = (1, 2, 3) # a == 1, b == (2, 3)
@@ -449,7 +547,10 @@ let a, b, c := <|1, 17, 42|>
 
 let binary := <|a, b, c|>
 
-# Pattern Matching
+####################
+# Pattern matching #
+####################
+
 match object with
 	42                          -> :a
 	3.14                        -> :b
@@ -463,3 +564,74 @@ match object with
 	<|42:8, x:4, y:4|>          -> :h
 	_                           -> :z
 end
+
+########################
+# String interpolation #
+########################
+
+def great(p : Person) : String
+	"Hello #{p.name}!"
+end
+
+##########
+# Macros #
+##########
+
+###############
+# Annotations #
+###############
+
+@O(arr.size)
+def my_algorithm(arr :? Array{DataType}) : Integer
+	...
+end
+
+class Maybe {ValType}
+	@reader
+	let-i isSet : Boolean
+	@reader
+	let-i val : ValType
+	
+	def-i Maybe ->> isSet = False
+	def-i Maybe($val) ->> isSet = True
+end
+
+class Point
+	@reader
+	let-i x, y : Integer
+	
+	@commutative
+	def-i + (ref other : Point) : self
+		...
+	end
+end
+
+############################
+# Implementation selectors #
+############################
+
+def shortest_path[:Dijkstra](ref g : Graph{NodeData, EdgeData}) : NodeData
+	...
+end
+
+def shortest_path[:BellmanFord](ref g : Graph{NodeData, EdgeData}) : NodeData
+	...
+end
+
+# The compiler is free to select whichever version of the function it wishes.
+shortest_path(my_graph)
+
+# Selecting a specific implementation:
+shortest_path[:Dijkstra](my_graph)
+
+#######################
+# Semantic versioning #
+#######################
+
+#########################
+# Debugging expressions #
+#########################
+
+#################
+# Documentation #
+#################

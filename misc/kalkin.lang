@@ -65,7 +65,7 @@
 		<!-- Kalkin's keywords context -->
 		<context id="keywords" style-ref="keyword">
 			<prefix>(?&lt;!\.)</prefix>
-			<keywrod>alias</keyword>
+			<keyword>alias</keyword>
 			<keyword>and</keyword>
 			<keyword>as</keyword>
 			<keyword>class</keyword>
@@ -94,6 +94,7 @@
 			<keyword>reopen</keyword>
 			<keyword>return</keyword>
 			<keyword>require(-([ci]))?</keyword>
+			<keyword>splat</keyword>
 			<keyword>then</keyword>
 			<keyword>void</keyword>
 			<keyword>when</keyword>

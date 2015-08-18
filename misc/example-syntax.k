@@ -12,7 +12,7 @@
  * - Function definition ✓
  *   - Default values ✓
  *   - Keyword arguments ~✓
- *   - Splat parameters/arguments
+ *   - Splat parameters/arguments ✓
  * - Namespaces ✓
  * - Classes ✓
  *   - Constructors
@@ -26,6 +26,7 @@
  *     - Precedence
  *     - Associativity
  *   - Method + operator definitions
+ *   - ADTs
  * - Interfaces ✓
  * - Mixins ✓
  * - Reopening ✓
@@ -42,10 +43,12 @@
  * - Aliasing ✓
  * - Currying ✓
  * - Exceptions
+ * - Message ordering patterns
  * - Local type inference ✓
  * - Destructuring
  * - Pattern matching
  * - String interpolation ✓
+ * - Return type overloading
  * - Macros
  * - Annotations ✓
  * - Implementation selectors ✓
@@ -202,7 +205,7 @@ def math_function(a, b := 2, c := 3 : Integer, d := 4.0 : Float) : Float
 end
 
 # Once you start using keyword arguments, you can't switch back.
-math_function(1, c: 42, d: 100) # Valid
+math_function(1, c := 42, d := 100) # Valid
 
 #*
  * Invalid:
@@ -249,28 +252,27 @@ def baz(a, b := SomeClass(1, 2, 3) : SomeClass) : Integer ->> 42
 bar(SomeClass())
 
 # Splat parameters
-def avg(*nums : Integer) : Integer ->> ...
-def avg(nums* : Integer) : Integer ->> ...
-
-def avg(*ref nums : Integer) : Integer ->> ...
-def avg(ref *nums : Integer) : Integer ->> ...
-def avg(ref nums* : Integer) : Integer ->> ...
+def avg(splat nums : Integer) : Integer ->> ...
+def avg(splat ref nums : Integer) : Integer ->> ...
 
 # Splat arguments
 let args := (1, :two, "three") : (Integer, Atom, String)
 def helper(a : Integer, b : Atom, c : String) : void ->> ...
 
-helper(*args)
+helper(splat args)
 
 def min(a, b : Integer) : Integer ->> if a <= b then a else b end
 
 # This is fine because the size of the array is known statically
-min(*[12, 5])
+min(splat [12, 5])
 
 # This will result in a dynamic check and could produce an exception
 min(*get_array())
 
-# Mixed splat usage
+# Mixed splat usage (both work)
+
+avg([1, 2, 3, 4])
+avg(splat [1, 2, 3, 4])
 
 ##############
 # Namespaces #
@@ -613,9 +615,15 @@ def bar (a : Integer) : Integer ->> 200
 
 let my_bar := `bar(1) : -> Integer
 
-#############
-# Exception #
-#############
+##############
+# Exceptions #
+##############
+
+#############################
+# Message ordering patterns #
+#############################
+
+
 
 ########################
 # Local type inference #

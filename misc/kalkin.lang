@@ -65,6 +65,7 @@
 		<!-- Kalkin's keywords context -->
 		<context id="keywords" style-ref="keyword">
 			<prefix>(?&lt;!\.)</prefix>
+			<keywrod>alias</keyword>
 			<keyword>and</keyword>
 			<keyword>as</keyword>
 			<keyword>class</keyword>
@@ -83,12 +84,14 @@
 			<keyword>mixin</keyword>
 			<keyword>namespace</keyword>
 			<keyword>nor</keyword>
+			<keyword>not</keyword>
 			<keyword>or</keyword>
 			<keyword>private</keyword>
 			<keyword>protected</keyword>
 			<keyword>public</keyword>
 			<keyword>ref</keyword>
 			<keyword>refine</keyword>
+			<keyword>reopen</keyword>
 			<keyword>return</keyword>
 			<keyword>require(-([ci]))?</keyword>
 			<keyword>then</keyword>

@@ -3,6 +3,7 @@
  * - Comments ✓
  * - Literals ✓
  *   - Full binary syntax
+ * - Basic expressions ✓
  * - Types ✓
  *   - Type names ✓
  *   - Tuple types ✓
@@ -27,7 +28,7 @@
  *   - Method + operator definitions
  * - Interfaces ✓
  * - Mixins ✓
- * - Reopening
+ * - Reopening ✓
  * - Generics Functions ✓
  *   - Default parameters
  *   - Specialization
@@ -38,6 +39,7 @@
  *   - Specialization
  * - Lambdas ✓
  * - Block syntax ✓
+ * - Aliasing ✓
  * - Currying ✓
  * - Exceptions
  * - Local type inference ✓
@@ -50,6 +52,9 @@
  * - Semantic versioning
  * - Debugging expressions
  * - Documentation
+ *
+ * NOTE: ... is most often used here to indicate elided code.  The only
+ *       exception is for integer range literals.
  *#
 
 ############
@@ -102,6 +107,48 @@
 (1, 2)
 (:hello, :world)
 (1, 2.0, :three, "four")
+
+# Integer ranges
+0..5  # 0, 1, 2, 3, 4
+0...5 # 0, 1, 2, 3, 4, 5
+
+#####################
+# Basic expressions #
+#####################
+
+# Operator usage
+1 + 2
+my_array << 42
+
+# Function calls
+fib(6)
+
+# Method calls
+my_array.size()
+my_array.size
+my_array.append(42)
+
+# Conditionals
+if val % 2 then :odd else :even end
+val % 2 ? :odd : :even
+
+if val == 0
+	:zero
+else if val == 1
+	:one
+else
+	:number
+end
+
+# Logical keywords
+not bool_val0
+bool_val0 or bool_val1
+bool_val0 and bool_val1
+bool_val0 nor bool_val1
+bool_val0 xor bool_val1
+
+# Sequencing
+1 + 2; my_array << 42; fib(6)
 
 #########
 # Types #
@@ -200,6 +247,30 @@ def baz(a, b := SomeClass(1, 2, 3) : SomeClass) : Integer ->> 42
 
 # Calls bar with a new instance of SomeClass.
 bar(SomeClass())
+
+# Splat parameters
+def avg(*nums : Integer) : Integer ->> ...
+def avg(nums* : Integer) : Integer ->> ...
+
+def avg(*ref nums : Integer) : Integer ->> ...
+def avg(ref *nums : Integer) : Integer ->> ...
+def avg(ref nums* : Integer) : Integer ->> ...
+
+# Splat arguments
+let args := (1, :two, "three") : (Integer, Atom, String)
+def helper(a : Integer, b : Atom, c : String) : void ->> ...
+
+helper(*args)
+
+def min(a, b : Integer) : Integer ->> if a <= b then a else b end
+
+# This is fine because the size of the array is known statically
+min(*[12, 5])
+
+# This will result in a dynamic check and could produce an exception
+min(*get_array())
+
+# Mixed splat usage
 
 ##############
 # Namespaces #
@@ -412,7 +483,21 @@ end
 # Reopening #
 #############
 
+namespace Outer
+	class Foo
+		def bar(x : Integer) : Integer ->> x
+	end
 
+	namespace Inner
+		reopen Foo
+			def bar(x : Integer) : Integer ->> x + 100
+		end
+		
+		Foo().bar(42) # Evaluates to 142
+	end
+	
+	Foo().bar(42) # Evaluates to 42
+end
 
 #####################
 # Generic Functions #
@@ -507,6 +592,13 @@ end
 [1, 2, 3, 4].each do (el : Integer) : void
 	log_number(el)
 end
+
+############
+# Aliasing #
+############
+
+def a_long_descriptive_function_name ->> void
+alias a_long_descriptive_function_name short_name
 
 ############
 # Currying #

@@ -12,3 +12,8 @@ examples/kazoo/**/*.so
 
 Gemfile.lock
 kalkin.automata
+
+semantics/builddate.tex
+semantics/kalkin-semantics.aux
+semantics/kalkin-semantics.log
+semantics/kalkin-semantics.pdf

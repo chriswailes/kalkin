@@ -9,23 +9,24 @@
  *   - Tuple types ✓
  *   - Function types ✓
  *   - Parametrized types ✓
+ *   - Self types
  * - Function definition ✓
  *   - Default values ✓
- *   - Keyword arguments ~✓
+ *   - Keyword arguments ✓
  *   - Splat parameters/arguments ✓
  * - Namespaces ✓
  * - Classes ✓
- *   - Constructors
- *   - Destructors
- *   - Destructuring
- *   - Operator deffinition
- *     - Prefix
- *     - Infix
- *     - Postfix
- *     - Special cases
- *     - Precedence
- *     - Associativity
- *   - Method + operator definitions
+ *   - Constructors ✓
+ *   - Destructors ✓
+ *   - Destructuring ✓
+ *   - Operator deffinition ✓
+ *     - Prefix ✓
+ *     - Infix ✓
+ *     - Postfix ✓
+ *     - Special cases ✓
+ *     - Precedence ✓
+ *     - Associativity ✓
+ *   - Method + operator definitions ✓
  *   - ADTs
  * - Interfaces ✓
  * - Mixins ✓
@@ -274,6 +275,11 @@ min(*get_array())
 avg([1, 2, 3, 4])
 avg(splat [1, 2, 3, 4])
 
+# Forwarding of an arbitrary number of arguments is done thusly:
+def wrapper_fun(splat args :? splat ArgTypes) : RetType
+	unwrapped_fun(splat args)
+end
+
 ##############
 # Namespaces #
 ##############
@@ -315,7 +321,8 @@ class Point
 	 * Instances methods where `self` points to an instance of Point.
 	 *#
 
-	# Arguments get assigned to the instance's variables $x and $y.
+	# This is a constructor for the Point class.  Arguments get assigned to the
+	# instance's variables $x and $y.
 	def-i Point($x, $y) ->> void
 
 	#*
@@ -332,6 +339,26 @@ class Point
 		# Parallel assignment.
 		$x, $y = other.x, other.y
 	end
+
+	# Definition of a (not very usefull) postfix operator.
+	def-i ! : self ->> $x, $y = 0, 0
+
+	# Definition of the prefix negation operator.
+	def-i - self : Point
+		Point(-$x, -$y)
+	end
+
+	# Definition of an infix operator.
+	@assoc(:left) @prec(0)
+	def-i + (ref other : Point) ->> Point($x + other.x, $y + other.y)
+
+	@assoc(:right) @prec(1)
+	def-i * (scale : Integer) ->> Point($x * scale, $y * scale)
+
+	# How to declare ways to destructure a Point object.
+	def-i Point~ : (Integer, Integer) ->> ($x, $y)
+	# Now with type inference...
+	def-i Point~ ->> ($x, $y, 0)
 
 	#*
 	* Functions in the Point namespace.  The self variable is not in scope for
@@ -350,10 +377,10 @@ Point::origin()
 class Animal
 end
 
-class Dog : Animal
+class Dog <: Animal
 end
 
-class Cat : Animal
+class Cat <: Animal
 end
 
 #*
@@ -370,15 +397,13 @@ class CountingClass
 	let-c count : Integer
 
 	# Overload the new message.
-	def-c new : CountingClass
+	def-c CountingClass(splat args :? splat ArgTypes)
 		$count++
-		CountingClass.allocate
+		let space := CountingClass.allocate in CountingClass[space](splat args)
 	end
 
 	# Returns the number of instantiations of this class.
-	def-c count : Integer
-		$count
-	end
+	def-c count : Integer ->> $count
 end
 
 # Sending a message to the object CountingClass.
@@ -410,10 +435,67 @@ class[CountingClass] CountedAnimals
 	 * Define the body of the CountedAnimals class.
 	 *#
 	def-c count_as_string : String
-		# Borrowing Ruby's string interpolation syntax for now.
 		"There are #{$count} animals."
 	end
 end
+
+class LoggedClass
+	let-i id : Integer
+	let-i log : Stream
+
+	# Called when an object's reference count reaches zero, before the class
+	# level destroy callback.
+	def-i destroy : void
+		$log.write("Destroying an instance of LoggedClass")
+	end
+
+	def-c destroy(obj : LoggedClass)
+		# FIXME: Figure out Kalkin syntax for writting to the command line.
+		puts "Destorying LoggeClass instance #{obj.id}"
+	end
+end
+
+class ExampleClass
+	let-i a0, a1 : Array{Integer}
+
+	def-i ExampleClass($a0, $a1) ->> void
+
+	# Defining the two special case operators.
+	def-i ()(x, y : Integer) : Integer ->> $a0[x] + $a1[y]
+
+	def-i [](x, y : Integer) : (Integer, Integer) ->> ($a0[x], $a1[y])
+end
+
+let example := ExampleClass([1, 2, 3], [4, 5, 6])
+
+example(0, 0) # Evaluates to 5
+example[1, 2] # Evaluates to (2, 6)
+
+class AnotherExample
+	let-i $x : Integer
+
+	def-i AnotherExample($x) ->> void
+
+	# Accessor for the x member.
+	def-i x ->> $x
+
+	# Assignment for the x member.
+	def-i x= (new_x : Integer)
+		log("Changing x to #{new_x} from #{$x}")
+		$x = new_x
+	end
+end
+
+let ae := AnotherExample(42)
+
+ae.x # Evalutes to 42
+ae.x = 100 # Calles the method x=
+
+let x_val = ae.x in x_val = 100 # Does not call the x= method
+
+# Syntactic sugar for ADTs
+
+
 
 ##############
 # Interfaces #
@@ -433,7 +515,7 @@ end
 interface Container {ImplementingClass{ElementType}}
 	# ImplementingClass must also implement the Iterable interface.
 	require Iterable
-	
+
 	require-i [] : Integer -> ElementType
 	require-i size : -> Integer
 end
@@ -445,19 +527,19 @@ end
 mixin Mappable {ImplementingClass{ElementType}}
 	# ImplementingClass must implement the Appendable and Iterable interface.
 	require Appendable, Iterable
-	
+
 	require-i helper_fun : Integer -> Integer
-	
+
 	def-i map(fun :? ElementType -> NewElementType) -> ImplementingClass{NewElementType}
 		let new_container : ImplementingClass
-		
+
 		self.each do (el)
 			new_container << fun(el)
 		end
-		
+
 		return new_container
 	end
-	
+
 	# Alternative map declaration:
 	def-i map{NewElementType}(fun : ElementType -> NewElementType) -> ImplementingClass{NewElementType} ->> void
 end
@@ -468,7 +550,7 @@ end
 
 class Foo
 	implements Monoid{successor/increment}
-	
+
 	def increment : self.class
 		...
 	end
@@ -477,7 +559,7 @@ end
 class Bar
 	implements Appendable, Iterable
 	include Mappable{helper/my_helper}{map/other_name}
-	
+
 	def-i my_helper(a : Integer) : Integr ->> a
 end
 
@@ -494,10 +576,10 @@ namespace Outer
 		reopen Foo
 			def bar(x : Integer) : Integer ->> x + 100
 		end
-		
+
 		Foo().bar(42) # Evaluates to 142
 	end
-	
+
 	Foo().bar(42) # Evaluates to 42
 end
 
@@ -528,10 +610,10 @@ def log(ref message : String, ref log |: Stream) ->> void
 class Maybe {ValType}
 	let-i isSet : Boolean
 	let-i val : ValType
-	
+
 	def-i Maybe ->> isSet = False
 	def-i Maybe($val) ->> isSet = True
-	
+
 	def-i isSet : Boolean ->> $isSet
 	def-i val : ValType ->> $val
 end
@@ -585,7 +667,7 @@ end
 
 class Array{ElType}
 	...
-	
+
 	def-i each(block :? ElType -> _) : self
 		...
 	end
@@ -691,7 +773,7 @@ class Maybe {ValType}
 	let-i isSet : Boolean
 	@reader
 	let-i val : ValType
-	
+
 	def-i Maybe ->> isSet = False
 	def-i Maybe($val) ->> isSet = True
 end
@@ -699,7 +781,7 @@ end
 class Point
 	@reader
 	let-i x, y : Integer
-	
+
 	@commutative
 	def-i + (ref other : Point) : self
 		...

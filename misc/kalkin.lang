@@ -65,6 +65,7 @@
 		<!-- Kalkin's keywords context -->
 		<context id="keywords" style-ref="keyword">
 			<prefix>(?&lt;!\.)</prefix>
+			<keyword>adt</keyword>
 			<keyword>alias</keyword>
 			<keyword>and</keyword>
 			<keyword>as</keyword>

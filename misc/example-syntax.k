@@ -27,17 +27,17 @@
  *     - Precedence ✓
  *     - Associativity ✓
  *   - Method + operator definitions ✓
- *   - ADTs
+ *   - ADTs ✓
  * - Interfaces ✓
  * - Mixins ✓
  * - Reopening ✓
  * - Generics Functions ✓
- *   - Default parameters
+ *   - Default parameters ✓
  *   - Specialization
  * - Parametrized types ✓
  *   - Type parameters ✓
  *   - Non-type parameters
- *   - Default parameters
+ *   - Default parameters ✓
  *   - Specialization
  * - Lambdas ✓
  * - Block syntax ✓
@@ -495,7 +495,15 @@ let x_val = ae.x in x_val = 100 # Does not call the x= method
 
 # Syntactic sugar for ADTs
 
+adt Expr {NumberType} := IfExpr(Expr, Expr, Expr) | BinExpr(Expr, Expr) | Number(NumberType)
 
+# or...
+
+adt Expr {Number Type}
+	IfExpr(Expr, Expr, Expr)
+	BinExpr(Expr, Expr)
+	Number(NumberType)
+end
 
 ##############
 # Interfaces #
@@ -603,6 +611,11 @@ def log{LogType}(ref message : String, ref log : LogType |: Stream) ->> void
 def log(ref message : String, ref log :? LogType |: Stream) ->> void
 def log(ref message : String, ref log |: Stream) ->> void
 
+# Default value for generic function:
+def my_algorithm{ContainerType := List}(ref data : Stream) : Integer ->> void
+
+# Generic function specialization:
+
 ######################
 # Parametrized Types #
 ######################
@@ -639,6 +652,11 @@ end
 # Multiple interface requirements
 class LoggingClass {StreamType |: Writable, Seekable}
 	let-i stream : StreamType
+end
+
+# Default type parameters:
+class Graph{NodeType := Integer, EdgeType := Integer}
+	...
 end
 
 ###########

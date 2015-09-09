@@ -422,7 +422,7 @@ CountingClass.count
  * that uses the counting behavior.
  *#
 
-class CountingClass : Class
+class CountingClass <: Class
 	# Define the counter.
 	let-i count : Integer
 
@@ -506,18 +506,18 @@ let x_val = ae.x in x_val = 100 # Does not call the x= method
 class Foo
 	let-i val : Integer
 
-	def-i Foo($val) ->> void 
-	
+	def-i Foo($val) ->> void
+
 	# Returns the very same object that the method was called on.
 	def-i bar : self
 		return self
 	end
-	
+
 	# Returns a (possibly new) object of type Foo
 	def-i baz : Foo
 		if get_condition() then Foo($val) else self end
 	end
-	
+
 	# Returns a (possibly new) object of the same type as the object it was
 	# called on.
 	def-i baf : self.class
@@ -564,7 +564,7 @@ end
  *#
 
 interface Monoid {ImplementingClass}
-	require-i ImplementingClass : -> ImplementingClass
+	require-i ImplementingClass : void
 	require-i successor : -> ImplementingClass
 end
 
@@ -837,7 +837,7 @@ let a : String, b : Integer ~= Foo()
 let a : String, b ~= Foo()
 
 # Third
-let a, b, c ~= Foo() 
+let a, b, c ~= Foo()
 
 ####################
 # Pattern matching #
@@ -922,13 +922,13 @@ end
 
 do
 	dangerous_operation()
-	
+
 handle Exception1(v) as e
 	...
-	
+
 handle Exception2(v0, v1) as e
 	...
-	
+
 end
 
 ########################
@@ -947,7 +947,7 @@ class Simulation
 	def-i run : void
 		# Execute simulation without collecting statistics
 	end
-	
+
 	def-i reun : Report
 		# Execute simulation and collect statistics
 	end

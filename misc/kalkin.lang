@@ -74,6 +74,7 @@
 			<keyword>do</keyword>
 			<keyword>else</keyword>
 			<keyword>end</keyword>
+			<keyword>handle</keyword>
 			<keyword>if</keyword>
 			<keyword>implements</keyword>
 			<keyword>in</keyword>
@@ -90,8 +91,8 @@
 			<keyword>private</keyword>
 			<keyword>protected</keyword>
 			<keyword>public</keyword>
+			<keyword>raise</keyword>
 			<keyword>ref</keyword>
-			<keyword>refine</keyword>
 			<keyword>reopen</keyword>
 			<keyword>return</keyword>
 			<keyword>require(-([ci]))?</keyword>

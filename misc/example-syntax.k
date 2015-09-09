@@ -9,7 +9,7 @@
  *   - Tuple types ✓
  *   - Function types ✓
  *   - Parametrized types ✓
- *   - Self types
+ * - Variable definitions ✓
  * - Function definition ✓
  *   - Default values ✓
  *   - Keyword arguments ✓
@@ -27,29 +27,30 @@
  *     - Precedence ✓
  *     - Associativity ✓
  *   - Method + operator definitions ✓
+ *   - Self types ✓
  *   - ADTs ✓
  * - Interfaces ✓
  * - Mixins ✓
  * - Reopening ✓
- * - Generics Functions ✓
+ * - Generic Functions ✓
  *   - Default parameters ✓
- *   - Specialization
+ *   - Specialization ✓
  * - Parametrized types ✓
  *   - Type parameters ✓
- *   - Non-type parameters
+ *   - Non-type parameters ✓
  *   - Default parameters ✓
- *   - Specialization
+ *   - Specialization ✓
  * - Lambdas ✓
  * - Block syntax ✓
  * - Aliasing ✓
  * - Currying ✓
- * - Exceptions
- * - Message ordering patterns
  * - Local type inference ✓
- * - Destructuring
- * - Pattern matching
+ * - Destructuring ✓
+ * - Pattern matching ✓
+ * - Exceptions ✓
  * - String interpolation ✓
- * - Return type overloading
+ * - Return type overloading ✓
+ * - Message ordering patterns
  * - Macros
  * - Annotations ✓
  * - Implementation selectors ✓
@@ -187,10 +188,42 @@ Array{String}
 Vector{42, Float}
 
 ########################
+# Variable definitions #
+########################
+
+# Declare a new integer variable 'x' that will be default initialized.
+let x : Integer
+
+# Declare a new integer variable 'y' and give it a value.  Its type is inferred.
+let y := 42
+
+# Declare two default initialized strings called 'a', and 'b'.
+let foo, bar : String
+
+# Creates a new copy of SomeClass and default initializes another
+# SomeClass.
+let a := SomeClass(42), b := SomeClass()
+let a := SomeClass(42), b : SomeClass
+
+# Re-bind the name `a` to different memory location.
+a := get_some_class()
+a := SomeClass(100)
+
+# You can also do this to be explicit
+let a := SomeClass(200)
+
+# This form of let returns the result of evaluating the expression with the
+# new binding instead of the value of the new binding.
+let a := SomeClass(300) in a.some_method
+
+# After the above line `a` will have the reference it was bound to in the
+# previous let expression.
+
+########################
 # Function definitions #
 ########################
 
-# These are function definitions.  Return types can be infered if the body is a
+# These are function definitions.  Return types can be inferred if the body is a
 # literal.
 def fib(1) ->> 1
 def fib(2) ->> 1
@@ -212,31 +245,6 @@ math_function(1, c := 42, d := 100) # Valid
  * Invalid:
  * math_function(1, c: 42, 100)
  *#
-
-def foo : void
-	# Captures references to two integers returned from functions.
-	let x := get_int(), y := get_int() # Type inference.
-	let x := get_int(), y := get_int() : Integer
-
-	# Creates a new copy of SomeClass and default initializes another
-	# SomeClass.
-	let a := SomeClass(42), b := SomeClass()
-	let a := SomeClass(42), b : SomeClass
-
-	# Re-bind the name `a` to different memory location.
-	a := get_some_class()
-	a := SomeClass(100)
-
-	# You can also do this to be explicit
-	let a := SomeClass(200)
-
-	# This form of let returns the result of evaluating the expression with the
-	# new binding instead of the value of the new binding.
-	let a := SomeClass(300) in a.some_method
-
-	# After the above line `a` will have the reference it was bound to in the
-	# previous let expression.
-end
 
 # Takes x by value and y by reference.
 def bar(x, ref y : Integer) : Integer
@@ -493,13 +501,53 @@ ae.x = 100 # Calles the method x=
 
 let x_val = ae.x in x_val = 100 # Does not call the x= method
 
+# Self types
+
+class Foo
+	let-i val : Integer
+
+	def-i Foo($val) ->> void 
+	
+	# Returns the very same object that the method was called on.
+	def-i bar : self
+		return self
+	end
+	
+	# Returns a (possibly new) object of type Foo
+	def-i baz : Foo
+		if get_condition() then Foo($val) else self end
+	end
+	
+	# Returns a (possibly new) object of the same type as the object it was
+	# called on.
+	def-i baf : self.class
+		if get_condition() then self.class($val) else self end
+	end
+end
+
+class Fud <: Foo
+end
+
+let var := Fud(42)
+
+# Returns the object that `var` points to.
+var.bar
+
+# Could return either the object that `var` points to or a new object.  The
+# type of this expression is Foo.
+var.baz
+
+# Could return either the object that `var` points to or a new object.  The
+# type of this expression is Fud.
+var.baf
+
 # Syntactic sugar for ADTs
 
 adt Expr {NumberType} := IfExpr(Expr, Expr, Expr) | BinExpr(Expr, Expr) | Number(NumberType)
 
 # or...
 
-adt Expr {Number Type}
+adt Expr {NumberType}
 	IfExpr(Expr, Expr, Expr)
 	BinExpr(Expr, Expr)
 	Number(NumberType)
@@ -614,7 +662,12 @@ def log(ref message : String, ref log |: Stream) ->> void
 # Default value for generic function:
 def my_algorithm{ContainerType := List}(ref data : Stream) : Integer ->> void
 
-# Generic function specialization:
+# Generic function with a single specialization:
+def other_algorithm(ref nums :| Container{DataType}) : DataType ->> void
+def other_algorithm(ref nums :? !BinaryTree{DataType}) : DataType ->> void
+
+# The BinaryTree name is already bound, so when the compiler reaches this line
+# only DataType will be a free type variable.
 
 ######################
 # Parametrized Types #
@@ -654,9 +707,28 @@ class LoggingClass {StreamType |: Writable, Seekable}
 	let-i stream : StreamType
 end
 
+# Non-type parameters.
+class Vector{n : Integer, ElementType}
+end
+
+let vec0 := [1, 2, 3] : Vector{3, Integer}
+
+let num := getNumElements()
+let vec1 := Vector{num, Integer}(getElements())
+
 # Default type parameters:
 class Graph{NodeType := Integer, EdgeType := Integer}
 	...
+end
+
+# Type specialization:
+class Foo
+end
+
+class MyContainer{ElementType}
+end
+
+class MyContainer{!Foo}
 end
 
 ###########
@@ -715,16 +787,6 @@ def bar (a : Integer) : Integer ->> 200
 
 let my_bar := `bar(1) : -> Integer
 
-##############
-# Exceptions #
-##############
-
-#############################
-# Message ordering patterns #
-#############################
-
-
-
 ########################
 # Local type inference #
 ########################
@@ -737,32 +799,136 @@ let value := get_int()
 # Destructuring #
 #################
 
-let a, b = (1, 2)
-let a, b = (1, 2, 3) # a == 1, b == (2, 3)
+# Tuples
+let a, b ~= (1, 2)
+let a, b ~= (1, 2, 3) # a == 1, b == (2, 3)
 
-let a, b = [1, 2]
-let a, b = [1, 2, 3] # a == 1, b == [2, 3]
+let a, b : Integer
+a, b ~= (1, 2) # Fine
+a, b ~= (1, 2, 3) # Type error
 
-let a, b, c := <|1, 17, 42|>
+# Arrays
+let a, b ~= [1, 2]
+let a, b ~= [1, 2, 3] # a == 1, b == [2, 3]
 
-let binary := <|a, b, c|>
+let a, b : Integer
+a, b ~= [1, 2] # Fine
+a, b ~= [1, 2, 3] # Type error
+
+# Binaries
+let a, b, c ~= <|1, 17, 42|>
+
+# Other objects
+class Foo
+	def-i Foo~ ->> (42, "world")
+	def-i Foo~ ->> ("hello", 42)
+	def-i Foo~ ->> (1, 2.3, :four)
+end
+
+# Ambiguous
+let a, b ~= Foo()
+
+# First
+let a : Integer, b : String ~= Foo()
+let a : Integer, b ~= Foo()
+
+# Second
+let a : String, b : Integer ~= Foo()
+let a : String, b ~= Foo()
+
+# Third
+let a, b, c ~= Foo() 
 
 ####################
 # Pattern matching #
 ####################
 
-match object with
-	42                          -> :a
-	3.14                        -> :b
-	:c                          -> :c
-	Point(0, a)
-	Point(a, 0)                 -> :d
-	Point(a, b) where a == b
-	Point(a, a)                 -> :e
-	Point as p                  -> :f
-	[x, xs] where xs.length > 0 -> :g
-	<|42:8, x:4, y:4|>          -> :h
-	_                           -> :z
+def number_function(n : Integer) : Symbol
+	match n with
+		n where n < 0 ->> :neg
+		0             ->> :zero
+		1             ->> :one
+		_             ->> :other
+	end
+end
+
+def binornot(n : Integer) : Symbol
+	match n with
+		0 or 1 ->> :binary
+		_      ->> :not_binary
+	end
+end
+
+def point_function(p : Point) : Symbol
+	match p with
+		Point(0, 0) ->> :origin
+		Point(0, _) ->> :vertical
+		Point(_, 0) ->> :horizontal
+		Point(a, a) ->> :diagonal
+		_           ->> :other
+	end
+end
+
+def handle_request(r : Request) : Response
+	match r with
+		Request(:simple, data) ->> handle_simple_request(data)
+		Request(:complex, data) do
+			# Do something complicated.
+		end
+	end
+end
+
+match get_animal() with
+	Cat as c ->> "cat"
+	Dog(breed) ->> "dog - #{breed}"
+	Animal as a ->> p.class.name
+end
+
+def string_function(str : String) : Symbol
+	match str with
+		/cat/ ->> :cat
+		/\d+/ ->> :number
+		/(\d+):num bottles of beer/ ->> Symbol(num + "bb")
+	end
+end
+
+def tuple_function(tup : (Integer, Integer, String)) : Symbol
+	match tup with
+		0, 0, "zero" ->> :zero
+		1, 1, "one" ->> :one
+		n, n, w where w == n.to(String) ->> :other_same
+		_ ->> :not_same
+	end
+end
+
+def sum(arr : Array{NumType |: Numeric}, acc := NumType()) : NumType
+	match arr with
+		[] ->> acc
+		x, xs ->> sum(xs, acc + x)
+	end
+end
+
+##############
+# Exceptions #
+##############
+
+def dangerous_operation() : void :! Exception1, Exception2
+	match rand() % 3 with
+		0 ->> 42
+		1 ->> Exception1(42)
+		2 ->> Exception2(42, 42)
+	end
+end
+
+do
+	dangerous_operation()
+	
+handle Exception1(v) as e
+	...
+	
+handle Exception2(v0, v1) as e
+	...
+	
 end
 
 ########################
@@ -772,6 +938,24 @@ end
 def great(p : Person) : String
 	"Hello #{p.name}!"
 end
+
+###########################
+# Return type overloading #
+###########################
+
+class Simulation
+	def-i run : void
+		# Execute simulation without collecting statistics
+	end
+	
+	def-i reun : Report
+		# Execute simulation and collect statistics
+	end
+end
+
+#############################
+# Message ordering patterns #
+#############################
 
 ##########
 # Macros #

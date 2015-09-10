@@ -34,12 +34,10 @@
  * - Reopening ✓
  * - Generic Functions ✓
  *   - Default parameters ✓
- *   - Specialization ✓
  * - Parametrized types ✓
  *   - Type parameters ✓
  *   - Non-type parameters ✓
  *   - Default parameters ✓
- *   - Specialization ✓
  * - Lambdas ✓
  * - Block syntax ✓
  * - Aliasing ✓
@@ -643,31 +641,17 @@ end
 # Generic Functions #
 #####################
 
-def min{T}(v0, v1 : T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
+def min{T |: Comparable}(v0, v1 : T) : T ->> if v0 < v1 then v0 else v1 end
 def fold{ContainerType{ElementType}}(fun : ElementType -> ElementType, container : ContainerType) : ContainerType
 	...
 end
 
-# Query types
-def min(v0, v1 :? T |: Comparable) : T ->> if v0 < v1 then v0 else v1 end
-def fold(fun :? ElementType -> ElementType, container :? ContainerType{ElementType}) : ContainerType
-	...
-end
-
-# These three declarations are all equivalent:
+# These two declarations are all equivalent:
 def log{LogType}(ref message : String, ref log : LogType |: Stream) ->> void
-def log(ref message : String, ref log :? LogType |: Stream) ->> void
 def log(ref message : String, ref log |: Stream) ->> void
 
 # Default value for generic function:
 def my_algorithm{ContainerType := List}(ref data : Stream) : Integer ->> void
-
-# Generic function with a single specialization:
-def other_algorithm(ref nums :| Container{DataType}) : DataType ->> void
-def other_algorithm(ref nums :? !BinaryTree{DataType}) : DataType ->> void
-
-# The BinaryTree name is already bound, so when the compiler reaches this line
-# only DataType will be a free type variable.
 
 ######################
 # Parametrized Types #
@@ -719,16 +703,6 @@ let vec1 := Vector{num, Integer}(getElements())
 # Default type parameters:
 class Graph{NodeType := Integer, EdgeType := Integer}
 	...
-end
-
-# Type specialization:
-class Foo
-end
-
-class MyContainer{ElementType}
-end
-
-class MyContainer{!Foo}
 end
 
 ###########

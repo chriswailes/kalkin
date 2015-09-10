@@ -65,12 +65,14 @@
 		<!-- Kalkin's keywords context -->
 		<context id="keywords" style-ref="keyword">
 			<prefix>(?&lt;!\.)</prefix>
+			<keyword>accept</keyword>
 			<keyword>adt</keyword>
 			<keyword>alias</keyword>
 			<keyword>and</keyword>
 			<keyword>as</keyword>
 			<keyword>class</keyword>
 			<keyword>def(-([ci]))?</keyword>
+			<keyword>default</keyword>
 			<keyword>do</keyword>
 			<keyword>else</keyword>
 			<keyword>end</keyword>
@@ -87,16 +89,21 @@
 			<keyword>namespace</keyword>
 			<keyword>nor</keyword>
 			<keyword>not</keyword>
+			<keyword>on</keyword>
 			<keyword>or</keyword>
 			<keyword>private</keyword>
 			<keyword>protected</keyword>
 			<keyword>public</keyword>
 			<keyword>raise</keyword>
 			<keyword>ref</keyword>
+			<keyword>receive</keyword>
+			<keyword>reject</keyword>
 			<keyword>reopen</keyword>
 			<keyword>return</keyword>
 			<keyword>require(-([ci]))?</keyword>
 			<keyword>splat</keyword>
+			<keyword>synchronizer</keyword>
+			<keyword>sync</keyword>
 			<keyword>then</keyword>
 			<keyword>void</keyword>
 			<keyword>when</keyword>
@@ -130,9 +137,8 @@
 		<!-- Kalkin's type keywords context -->
 		<context id="types" style-ref="type">
 			<match>[A-Z][A-Za-z_]*</match>
-<!--			(?&lt;!:)-->
 		</context>
-		
+
 		<context id="identifiers" style-ref="identifier">
 			<match>[a-z][A-Za-z0-9_]*</match>
 		</context>

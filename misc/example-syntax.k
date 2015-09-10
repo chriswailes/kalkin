@@ -931,9 +931,52 @@ end
 # Message ordering patterns #
 #############################
 
+mixin Lockable
+	let-i lock_holder : Maybe{ref Object}
+
+	require-i lock : void
+	require-i unlock : void
+
+	default synchronizer Unlocked
+		on lock do
+			$lock_holder = Maybe(sender)
+			sync Locked
+			accept
+		end
+
+		default ->> accept
+
+		receive := FIFO
+	end
+
+	synchronizer Locked
+		on unlock do
+			if sender == $lock_holder
+				$lock_holder = Maybe{Object}
+				sync Unlocked
+				accept
+			else
+				reject
+			end
+		end
+
+		default do
+			if sender == $lock_holder
+				accept
+			else
+				reject
+			end
+		end
+
+		receive ->> $lock_holder
+	end
+end
+
 ##########
 # Macros #
 ##########
+
+# TODO
 
 ###############
 # Annotations #

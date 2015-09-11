@@ -2,7 +2,7 @@
  *
  * - Comments ✓
  * - Literals ✓
- *   - Full binary syntax
+ *   - Binary syntax ✓
  * - Basic expressions ✓
  * - Types ✓
  *   - Type names ✓
@@ -48,13 +48,10 @@
  * - Exceptions ✓
  * - String interpolation ✓
  * - Return type overloading ✓
- * - Message ordering patterns
- * - Macros
+ * - Synchronizers ✓
  * - Annotations ✓
  * - Implementation selectors ✓
- * - Semantic versioning
- * - Debugging expressions
- * - Documentation
+ * - Semantic versioning ✓
  *
  * NOTE: ... is most often used here to indicate elided code.  The only
  *       exception is for integer range literals.
@@ -74,26 +71,40 @@
 # Literals #
 ############
 
-# Arrays
-[1, 2, 3, 4]
-[:hello, :world]
-
-# Atoms
-:foo
-:bar_
-
-# Binaries
-<|1, 17, 42|>
-<|"abc"|>
-
-# Hashes
-{ :one => 1, :two => 2, :three => 3 }
-
 # Integers
 42
 100
 100,000
 1E10
+
+# Atoms
+:foo
+:bar_
+
+# Arrays
+[1, 2, 3, 4]
+[:hello, :world]
+
+# Binaries
+
+# Constructs three byte binaries.
+[|42, 100, 87|]
+[|"cat"|]
+let a := 42, b := 100, c := 87
+[|a, b, c|]
+
+# Constructs four byte binaries.
+[|42, 100, 87{16}]
+[|42, 100, 550|]
+
+# Store an Integer in a specific representation:
+[|100{8;:signed}, 200{;:unsigned}, -20{;:signed}|] # The last signedness specification was redundant.
+
+# Specify the endianness:
+[|600{16;:unsigned;:big}, 700{;:signed;:little}, 800{;;:native}|]
+
+# Hashes
+{ :one => 1, :two => 2, :three => 3 }
 
 # Floats
 3.1415926
@@ -402,10 +413,10 @@ class CountingClass
 	 *#
 	let-c count : Integer
 
-	# Overload the new message.
-	def-c CountingClass(splat args :? splat ArgTypes)
+	# Overload the class constructor.
+	def-c CountingClass{splat ArgTypes}(splat args : ArgTypes)
 		$count++
-		let space := CountingClass.allocate in CountingClass[space](splat args)
+		let space := CountingClass.allocate in space.CountingClass(splat args)
 	end
 
 	# Returns the number of instantiations of this class.
@@ -425,15 +436,13 @@ class CountingClass <: Class
 	let-i count : Integer
 
 	# Overload the new message.
-	def-i new : CountingClass
+	def-i CountingClass{splat ArgTypes}(splat args : ArgTypes)
 		$count++
-		CountingClass.allocate
+		let space := CountingClass.allocate in space.CountingClass(splat args)
 	end
 
 	# Returns the number of instantiations of this class.
-	def-i count : Integer
-		$count
-	end
+	def-i count : Integer ->> $count
 end
 
 class[CountingClass] CountedAnimals
@@ -441,7 +450,7 @@ class[CountingClass] CountedAnimals
 	 * Define the body of the CountedAnimals class.
 	 *#
 	def-c count_as_string : String
-		"There are #{$count} animals."
+		"There are #{self.count} animals."
 	end
 end
 
@@ -456,7 +465,7 @@ class LoggedClass
 	end
 
 	def-c destroy(obj : LoggedClass)
-		# FIXME: Figure out Kalkin syntax for writting to the command line.
+		# TODO: Figure out Kalkin syntax for writting to the output channel.
 		puts "Destorying LoggeClass instance #{obj.id}"
 	end
 end
@@ -541,7 +550,9 @@ var.baf
 
 # Syntactic sugar for ADTs
 
-adt Expr {NumberType} := IfExpr(Expr, Expr, Expr) | BinExpr(Expr, Expr) | Number(NumberType)
+adt Maybe {ValType} := None or Some(ValType)
+
+adt Expr {NumberType} := IfExpr(Expr, Expr, Expr) or BinExpr(Expr, Expr) or Number(NumberType)
 
 # or...
 
@@ -652,6 +663,14 @@ def log(ref message : String, ref log |: Stream) ->> void
 
 # Default value for generic function:
 def my_algorithm{ContainerType := List}(ref data : Stream) : Integer ->> void
+
+# If you use a name that is already taken in the current namespace the compiler
+# will generate a warning.
+
+class Foo; end
+
+# Generates a compiler warning that the name Foo is already used in this namespace.
+def generic_function{Foo}(f : ref Foo) ->> void
 
 ######################
 # Parametrized Types #
@@ -790,7 +809,16 @@ a, b ~= [1, 2] # Fine
 a, b ~= [1, 2, 3] # Type error
 
 # Binaries
-let a, b, c ~= <|1, 17, 42|>
+let bin := [|1, 17, 42|]
+let [|a{8}, b, c|} ~= bin
+
+def bin_func(bin : Binary) : Maybe{(Integer, Integer, Integer)}
+	if (bin.length == 32)
+		let [|a{16;:signed;:big}, b{12;:unsigned;:little}, c{4}|] := bin in Maybe((a, b, c))
+	else
+		None{(Integer, Integer, Integer)}
+	end
+end
 
 # Other objects
 class Foo
@@ -875,7 +903,7 @@ def tuple_function(tup : (Integer, Integer, String)) : Symbol
 	end
 end
 
-def sum(arr : Array{NumType |: Numeric}, acc := NumType()) : NumType
+def sum{NumType |: Numeric}(arr : Array{NumType}, acc := NumType()) : NumType
 	match arr with
 		[] ->> acc
 		x, xs ->> sum(xs, acc + x)
@@ -902,7 +930,6 @@ handle Exception1(v) as e
 
 handle Exception2(v0, v1) as e
 	...
-
 end
 
 ########################
@@ -922,35 +949,50 @@ class Simulation
 		# Execute simulation without collecting statistics
 	end
 
-	def-i reun : Report
+	def-i run : Report
 		# Execute simulation and collect statistics
 	end
 end
 
-#############################
-# Message ordering patterns #
-#############################
+#################
+# Synchronizers #
+#################
 
+# This synchronizer will process messages in the order they are received.
+synchronizer FIFO
+	receive ->> (messages : Mailbox, mailboxes : PostOffice) messages
+end
+
+# This synchronizer will select one message from each sender in turn.
+synchronizer RoundRobin
+	require-i last_sender : Object
+	
+	receive do (messages : Mailbox, mailboxes : Postoffice)
+		$last_sender = mailboxes.next($last_sender)
+	end
+end
+
+# Implements two synchronizers that work together to lock access to an object.
 mixin Lockable
 	let-i lock_holder : Maybe{ref Object}
 
 	require-i lock : void
 	require-i unlock : void
-
+	
 	default synchronizer Unlocked
-		on lock do
+		on lock : void do (sender : Object)
 			$lock_holder = Maybe(sender)
 			sync Locked
 			accept
 		end
-
+	
 		default ->> accept
 
 		receive := FIFO
 	end
 
 	synchronizer Locked
-		on unlock do
+		on unlock : void do (sender : Object)
 			if sender == $lock_holder
 				$lock_holder = Maybe{Object}
 				sync Unlocked
@@ -960,41 +1002,21 @@ mixin Lockable
 			end
 		end
 
-		default do
-			if sender == $lock_holder
-				accept
-			else
-				reject
-			end
+		default do (sender : Object)
+			if sender == $lock_holder then accept else reject end
 		end
 
-		receive ->> $lock_holder
+		receive ->> (messages : Mailbox, mailboxes : PostOffice) mailboxes[$lock_holder]
 	end
 end
-
-##########
-# Macros #
-##########
-
-# TODO
 
 ###############
 # Annotations #
 ###############
 
 @O(arr.size)
-def my_algorithm(arr :? Array{DataType}) : Integer
+def my_algorithm{DataType}(arr : Array{DataType}) : DataType
 	...
-end
-
-class Maybe {ValType}
-	@reader
-	let-i isSet : Boolean
-	@reader
-	let-i val : ValType
-
-	def-i Maybe ->> isSet = False
-	def-i Maybe($val) ->> isSet = True
 end
 
 class Point
@@ -1029,10 +1051,13 @@ shortest_path[:Dijkstra](my_graph)
 # Semantic versioning #
 #######################
 
-#########################
-# Debugging expressions #
-#########################
+namespace LinearAlgebra
+	@version(1, 2, 3)
+end
 
-#################
-# Documentation #
-#################
+namespace MyApplication
+	@require(LinearAlgebra, :>=, 1, 2, 4) # Failure - generates a compiler warning.
+	@require(LinearAlgebra, :>=, 1, 2, 2) # Success
+	@require(LinearAlgebra, :>=, 1, 2) # Success
+	@require(LinearAlgebra, :>=, 1) # Success
+end

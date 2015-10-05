@@ -1,0 +1,29 @@
+% Author:      Chris Wailes <chris.wailes@gmail.com>
+% Project:     Kalkin
+% Date:        2015/10/05
+% Description: Definitions for terms int he Kalkin semantics.
+
+\usepackage{amsmath, listings, bcprules, amsthm, amssymb, xspace, stmaryd}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% DEFINITION HELPERS %%
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\alt}{~~|~~}
+\newcommand{\comp}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\inlinexp}[1]{
+{\footnotesize
+ \[\begin{array}{l}
+ #1
+ \end{array}\]}}
+
+\newcommand{\inlinexpa}[2]{
+{\footnotesize
+ \[\begin{array}{#1}
+ #2
+ \end{array}\]}}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Expression Macros %%
+%%%%%%%%%%%%%%%%%%%%%%%

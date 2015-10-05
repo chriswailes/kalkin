@@ -595,7 +595,7 @@ mixin Mappable {ImplementingClass{ElementType}}
 
 	require-i helper_fun : Integer -> Integer
 
-	def-i map(fun :? ElementType -> NewElementType) -> ImplementingClass{NewElementType}
+	def-i map{NewElementType}(fun : ElementType -> NewElementType) -> ImplementingClass{NewElementType}
 		let new_container : ImplementingClass
 
 		self.each do (el)
@@ -604,9 +604,6 @@ mixin Mappable {ImplementingClass{ElementType}}
 
 		return new_container
 	end
-
-	# Alternative map declaration:
-	def-i map{NewElementType}(fun : ElementType -> NewElementType) -> ImplementingClass{NewElementType} ->> void
 end
 
 ###############################
@@ -966,7 +963,7 @@ end
 # This synchronizer will select one message from each sender in turn.
 synchronizer RoundRobin
 	require-i last_sender : Object
-	
+
 	receive do (messages : Mailbox, mailboxes : Postoffice)
 		$last_sender = mailboxes.next($last_sender)
 	end
@@ -978,23 +975,23 @@ mixin Lockable
 
 	require-i lock : void
 	require-i unlock : void
-	
+
 	default synchronizer Unlocked
-		on lock : void do (sender : Object)
+		on lock : void do (sender : ref Object)
 			$lock_holder = Maybe(sender)
 			sync Locked
 			accept
 		end
-	
+
 		default ->> accept
 
 		receive := FIFO
 	end
 
 	synchronizer Locked
-		on unlock : void do (sender : Object)
+		on unlock : void do (sender : ref Object)
 			if sender == $lock_holder
-				$lock_holder = Maybe{Object}
+				$lock_holder = Maybe{ref Object}()
 				sync Unlocked
 				accept
 			else

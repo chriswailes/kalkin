@@ -73,9 +73,12 @@
 
 # Integers
 42
-100
-100,000
 1E10
+
+# Floats
+3.1415926
+2.71828
+1.234E-56
 
 # Atoms
 :foo
@@ -98,18 +101,13 @@ let a := 42, b := 100, c := 87
 [|42, 100, 550|]
 
 # Store an Integer in a specific representation:
-[|100{8;:signed}, 200{;:unsigned}, -20{;:signed}|] # The last signedness specification was redundant.
+[|100{8, signed}, 200{unsigned}, -20{signed}|] # The last signedness specification is redundant.
 
 # Specify the endianness:
-[|600{16;:unsigned;:big}, 700{;:signed;:little}, 800{;;:native}|]
+[|600{16, unsigned, big}, 700{signed, little}, 800{native}|]
 
 # Hashes
 { :one => 1, :two => 2, :three => 3 }
-
-# Floats
-3.1415926
-2.71828
-1.234E-56
 
 # Regular Expressions
 /ab*/
@@ -966,7 +964,7 @@ end
 # This synchronizer will select one message from each sender in turn.
 synchronizer RoundRobin
 	require-i last_sender : Object
-	
+
 	receive do (messages : Mailbox, mailboxes : Postoffice)
 		$last_sender = mailboxes.next($last_sender)
 	end
@@ -978,14 +976,14 @@ mixin Lockable
 
 	require-i lock : void
 	require-i unlock : void
-	
+
 	default synchronizer Unlocked
 		on lock : void do (sender : Object)
 			$lock_holder = Maybe(sender)
 			sync Locked
 			accept
 		end
-	
+
 		default ->> accept
 
 		receive := FIFO

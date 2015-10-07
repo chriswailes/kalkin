@@ -1017,11 +1017,6 @@ end
 class Point
 	@reader
 	let-i x, y : Integer
-
-	@commutative
-	def-i + (ref other : Point) : self
-		...
-	end
 end
 
 ############################
@@ -1041,6 +1036,16 @@ shortest_path(my_graph)
 
 # Selecting a specific implementation:
 shortest_path[:Dijkstra](my_graph)
+
+# Implementation selectors can also be used to describe other properties.
+def sort[:stable](array : Array{Integer}) : Array{Integer} ->> void
+
+class Point
+	@reader
+	let-i x, y : Integer
+
+	def-i +[:commutative, :associative](other : ref Point) ->> Point($x + other.x, $y + other.y)
+end
 
 #######################
 # Semantic versioning #

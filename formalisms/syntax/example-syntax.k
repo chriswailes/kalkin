@@ -647,6 +647,7 @@ end
 # Generic Functions #
 #####################
 
+def eq(v0, v1 |: Comparable) : Boolean ->> v0 == v1
 def min{T |: Comparable}(v0, v1 : T) : T ->> if v0 < v1 then v0 else v1 end
 def fold{ContainerType{ElementType}}(fun : ElementType -> ElementType, container : ContainerType) : ContainerType
 	...
@@ -736,6 +737,7 @@ end
 end
 
 # Other valid lambdas
+λ (a : Integer) : Integer ->> a + 42
 λ (a : Integer) a + 42
 λ 42
 
@@ -754,6 +756,11 @@ end
 [1, 2, 3, 4].each do (el : Integer) : void
 	log_number(el)
 end
+
+[1, 2, 3, 4].each λ (el : Integer) : void ->> log_number(el)
+[1, 2, 3, 4].each λ (el : Integer) ->> log_number(el)
+[1, 2, 3, 4].each λ (el : Integer) log_number(el)
+[1, 2, 3, 4].each λ (el) log_number(el)
 
 ############
 # Aliasing #

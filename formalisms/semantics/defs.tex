@@ -3,7 +3,7 @@
 % Date:        2015/10/05
 % Description: Definitions for terms int he Kalkin semantics.
 
-\usepackage{amsmath, listings, bcprules, amsthm, amssymb, xspace, stmaryd}
+\usepackage{amsmath, listings, amsthm, amssymb, xspace}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% DEFINITION HELPERS %%
@@ -27,3 +27,34 @@
 %%%%%%%%%%%%%%%%%%%%%%%
 %% Expression Macros %%
 %%%%%%%%%%%%%%%%%%%%%%%
+
+%% let
+
+\newcommand{\letbinde}  [2] {\mathsf{let}~\binde{#1}{#2}}
+\newcommand{\binde}     [2] {#1:=#2}
+
+%% if
+\newcommand{\ife}       [3] {\ifop~#1~#2~#3}
+\newcommand{\ifop}          {\mathsf{if}}
+
+%% callables
+\newcommand{\fundef}        {\mathsf{fundef}}
+
+\newcommand{\lambdae}   [2] {\lambda~x_0 \ldots x_#1~#2}
+\newcommand{\fundefo}   [2] {\ident~x_0 \ldots x_#1~#2}
+
+%% function call
+\newcommand{\funcalle}  [2] {#1~a_0 \ldots a_#2}
+
+%% values
+\newcommand{\truev}        {\mathsf{true}}
+\newcommand{\falsev}       {\mathsf{false}}
+
+%% identifiers
+\newcommand{\ident}        {\mathsf{ident}}
+\newcommand{\address}      {\mathsf{address}}
+
+%% environments
+\newcommand{\stackenv}     {\sigma}
+\newcommand{\heapenv}      {\eta}
+\newcommand{\namespace}    {\nu}

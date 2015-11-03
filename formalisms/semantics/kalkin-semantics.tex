@@ -12,6 +12,28 @@
 
 \begin{document}
 
+\section{Langauge Definitions}
 
+\[
+	\begin{array}{rcl}
+	v &:=& \truev \alt \falsev\\
+	\\
+	x &:=& \ident\\
+	\\
+	a &:=& \address\\
+	\\
+	e &:=& x \alt v \alt e~e \alt \letbinde{x}{e} \alt \ife{e}{e}{e}\\
+	        &\alt& \lambdae{n} \alt \funcalle{\ident}{n}\\
+	\\
+	\fundef &:=& \fundefo{n}{e}\\
+	\\
+	\stackenv &:=& \ident \rightarrow \address\\
+	\\
+	\heapenv &:=& \address \rightarrow v\\
+	\\
+	\namespace &:=& \ident \rightarrow \fundef\\
+	\\
+	\end{array}
+\]
 
 \end{document}

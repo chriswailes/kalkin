@@ -16,22 +16,22 @@
 
 \[
 	\begin{array}{rcl}
-	v &:=& \truev \alt \falsev\\
+	\objt &:=& \truev \alt \falsev\\
 	\\
-	x &:=& \ident\\
+	\namet &:=& \mathsf{variable~identifiers}\\
 	\\
-	a &:=& \address\\
+	\addrt &:=& \mathsf{heap~addresses}\\
 	\\
-	e &:=& x \alt v \alt e~e \alt \letbinde{x}{e} \alt \ife{e}{e}{e}\\
-	        &\alt& \lambdae{n} \alt \funcalle{\ident}{n}\\
+	\exprt &:=& \namet \alt \objt \alt \exprt~\exprt \alt \letbinde{\namet}{\exprt} \alt \ife{\exprt}{\exprt}{\exprt}\\
+	  &\alt& \lambdae{n}{\exprt} \alt \calle{\namet}{n}\\
 	\\
-	\fundef &:=& \fundefo{n}{e}\\
+	\funt &:=& \fundefo{n}{\exprt}\\
 	\\
-	\stackenv &:=& \ident \rightarrow \address\\
+	\stackenv &:=& \namet \rightarrow \addrt\\
 	\\
-	\heapenv &:=& \address \rightarrow v\\
+	\heapenv &:=& \addrt \rightarrow \objt\\
 	\\
-	\namespace &:=& \ident \rightarrow \fundef\\
+	\namespace &:=& \namet \rightarrow \funt\\
 	\\
 	\end{array}
 \]

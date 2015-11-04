@@ -232,8 +232,8 @@ let a := SomeClass(300) in a.some_method
 
 # These are function definitions.  Return types can be inferred if the body is a
 # literal.
-def fib(1) ->> 1
-def fib(2) ->> 1
+def fib(1) 1
+def fib(2) 1
 def fib(n : Integer) : Integer ->> fib(n - 1) + fib(n - 2)
 
 #*

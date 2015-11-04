@@ -18,20 +18,20 @@
 	\begin{array}{rcl}
 	\objt &:=& \truev \alt \falsev\\
 	\\
-	\namet &:=& \mathsf{variable~identifiers}\\
+	\namet &\in& \mathsf{variable~identifiers}\\
 	\\
-	\addrt &:=& \mathsf{heap~addresses}\\
+	\addrt &\in& \mathsf{heap~addresses}\\
 	\\
-	\exprt &:=& \namet \alt \objt \alt \exprt~\exprt \alt \letbinde{\namet}{\exprt} \alt \ife{\exprt}{\exprt}{\exprt}\\
-	  &\alt& \lambdae{n}{\exprt} \alt \calle{\namet}{n}\\
+	\exprt &:=& \namet \alt \objt \alt \exprt~;~\exprt \alt \letbinde{\namet}{\exprt} \alt \ife{\exprt}{\exprt}{\exprt}\\
+	       &\alt& \lambdae{n}{\exprt} \alt \calle{\namet}{n}\\
 	\\
 	\funt &:=& \fundefo{n}{\exprt}\\
 	\\
-	\stackenv &:=& \namet \rightarrow \addrt\\
+	\stackenv &:=& \namet \mapsto \addrt\\
 	\\
-	\heapenv &:=& \addrt \rightarrow \objt\\
+	\heapenv &:=& \addrt \mapsto \objt\\
 	\\
-	\namespace &:=& \namet \rightarrow \funt\\
+	\namespace &:=& \namet \mapsto \funt\\
 	\\
 	\end{array}
 \]

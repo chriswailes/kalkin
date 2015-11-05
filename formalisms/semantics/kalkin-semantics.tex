@@ -16,22 +16,24 @@
 
 \[
 	\begin{array}{rcl}
-	\objt &:=& \truev \alt \falsev\\
+	\reft &\in& \mathsf{reference}\\
 	\\
-	\namet &\in& \mathsf{variable~identifiers}\\
+	\addrt &\in& \mathsf{address}\\
 	\\
-	\addrt &\in& \mathsf{heap~addresses}\\
+	\namet &\in& \mathsf{name}\\
 	\\
-	\exprt &:=& \namet \alt \objt \alt \exprt~;~\exprt \alt \letbinde{\namet}{\exprt} \alt \ife{\exprt}{\exprt}{\exprt}\\
-	       &\alt& \lambdae{n}{\exprt} \alt \calle{\namet}{n}\\
+	\objt &:=& \truev \alt \falsev \alt \obje\\
 	\\
-	\funt &:=& \fundefo{n}{\exprt}\\
+	\exprt &:=& \reft \alt \objt \alt \letbinde{\reft}{\exprt_0}{\exprt_1} \alt \ife{\exprt}{\exprt}{\exprt} \alt\\
+	       && \calle{\namet}{n} \alt \calle{\reft}{n}\\
 	\\
-	\stackenv &:=& \namet \mapsto \addrt\\
+	\refenv &:=& \reft \mapsto \addrt\\
 	\\
 	\heapenv &:=& \addrt \mapsto \objt\\
 	\\
-	\namespace &:=& \namet \mapsto \funt\\
+	\namespace &:=& \namet \mapsto \tbd\\
+	\\
+	\tbd &:=& \namespace \alt \function{n}{\exprt} \alt \class{n}\\
 	\\
 	\end{array}
 \]

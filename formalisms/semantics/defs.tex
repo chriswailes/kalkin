@@ -44,23 +44,18 @@
 \newcommand{\truev}         {\mathsf{true}}
 \newcommand{\falsev}        {\mathsf{false}}
 
-%% namespaces
-\newcommand{\namespace}     {\rho}
-\newcommand{\subject}       {\nu}
-\newcommand{\function}  [2] {<\subject,~\reft_0 \ldots \reft_#1,~#2>}
-\newcommand{\class}     [1] {<\subject_i,~\subject_m,~\reft_0 \ldots \reft_#1>}
-
-%% objects
-\newcommand{\obje}          {<\name, \refenv>}
-
 %% environments
 \newcommand{\refenv}        {\sigma}
-\newcommand{\heapenv}       {\mu}
+\newcommand{\namespace}     {\Pi}
+\newcommand{\objspace}      {\theta}
 
-%% terms
-\newcommand{\addrt}        {a}
+%% terms}
 \newcommand{\exprt}        {e}
 \newcommand{\funt}         {f}
 \newcommand{\namet}        {\eta}
+\newcommand{\objidt}       {\iota}
 \newcommand{\objt}         {o}
 \newcommand{\reft}         {x}
+
+%% objects
+\newcommand{\obje}         {<\refenv, \namespace>}

@@ -10,30 +10,68 @@
 \setlength{\abovedisplayskip}{2pt}
 \setlength{\belowdisplayskip}{2pt}
 
+% Helper Commands
+
+\newcommand{\genref}  [1] {\reft(\mathsf{#1})}
+\newcommand{\genname} [1] {\namet(\mathsf{#1})}
+
 \begin{document}
 
 \section{Langauge Definitions}
+
+\subsection{Terms}
 
 \[
 	\begin{array}{rcl}
 	\reft &\in& \mathsf{reference}\\
 	\\
-	\addrt &\in& \mathsf{address}\\
+	\objidt &\in& \mathsf{object~identifier}\\
 	\\
-	\namet &\in& \mathsf{name}\\
+	\namet &\in& \mathsf{name} \alt \namet~\namet_0 \ldots \namet_n\\
 	\\
-	\objt &:=& \truev \alt \falsev \alt \obje\\
+	\objt &:=& \obje\\
 	\\
-	\exprt &:=& \reft \alt \objt \alt \letbinde{\reft}{\exprt_0}{\exprt_1} \alt \ife{\exprt}{\exprt}{\exprt} \alt\\
-	       && \calle{\namet}{n} \alt \calle{\reft}{n}\\
+	\exprt &:=& \reft \alt \namet \alt \letbinde{\reft}{\exprt_0}{\exprt_1} \alt \ife{\exprt}{\exprt}{\exprt} \alt\\
+	       && \calle{\exprt}{n}\\
 	\\
-	\refenv &:=& \reft \mapsto \addrt\\
+	\refenv &:=& \reft \mapsto \objidt\\
 	\\
-	\heapenv &:=& \addrt \mapsto \objt\\
+	\namespace &:=& \namet \mapsto \objidt\\
 	\\
-	\namespace &:=& \namet \mapsto \tbd\\
+	\objspace &:=& \objidt \mapsto \objt\\
 	\\
-	\tbd &:=& \namespace \alt \function{n}{\exprt} \alt \class{n}\\
+	\end{array}
+\]
+
+\subsection{Garden of Eden}
+
+\[
+	\begin{array}{rcl}
+	\mathsf{Object} &:=& <
+		\lbrace
+			\begin{array}{lcl}
+			\genref{instance\_members} &\mapsto& \genname{tbd},\\
+			\genref{type} &\mapsto& \genname{Class},\\
+			\genref{supertype} &\mapsto& \genname{Void}
+			\end{array}
+		\rbrace,
+		\lbrace
+%			\begin{array}{lcl}
+%			\end{array}
+		\rbrace>\\
+	\\
+	\mathsf{Class} &:=& <
+		\lbrace
+			\begin{array}{lcl}
+			\genref{instance\_members} &\mapsto& \genname{List}\lbrace \genname{Tuple} \lbrace \genname{Symbol}, \genname{Type} \rbrace \rbrace,\\
+			\genref{type} &\mapsto& \genname{Class},\\
+			\genref{supertype} &\mapsto& \genname{Type}
+			\end{array}
+		\rbrace,
+		\lbrace
+%			\begin{array}{lcl}
+%			\end{array}
+		\rbrace>\\
 	\\
 	\end{array}
 \]

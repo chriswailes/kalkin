@@ -13,7 +13,7 @@ examples/kazoo/**/*.so
 Gemfile.lock
 kalkin.automata
 
-semantics/builddate.tex
-semantics/kalkin-semantics.aux
-semantics/kalkin-semantics.log
-semantics/kalkin-semantics.pdf
+formalisms/semantics/builddate.tex
+formalisms/semantics/kalkin-semantics.aux
+formalisms/semantics/kalkin-semantics.log
+formalisms/semantics/kalkin-semantics.pdf

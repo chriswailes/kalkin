@@ -283,7 +283,7 @@ def min(a, b : Integer) : Integer ->> if a <= b then a else b end
 min(splat [12, 5])
 
 # This will result in a dynamic check and could produce an exception
-min(*get_array())
+min(splat get_array())
 
 # Mixed splat usage (both work)
 
@@ -504,7 +504,7 @@ let ae := AnotherExample(42)
 ae.x # Evalutes to 42
 ae.x = 100 # Calles the method x=
 
-let x_val = ae.x in x_val = 100 # Does not call the x= method
+let x_val := ae.x in x_val = 100 # Does not call the ae.x= method
 
 # Self types
 
@@ -513,7 +513,7 @@ class Foo
 
 	def-i Foo($val) ->> void
 
-	# Returns the very same object that the method was called on.
+	# Returns the same object that the method was called on.
 	def-i bar : self
 		return self
 	end
@@ -673,14 +673,19 @@ def generic_function{Foo}(f : ref Foo) ->> void
 ######################
 
 class Maybe {ValType}
-	let-i isSet : Boolean
-	let-i val : ValType
+	class Some
+		let-i val : ValType
+		
+		def-i Some($val) ->> void
+		def-i val : ValType ->> $val
+	end
+	
+	class None
+		def-i None ->> void
+	end
 
-	def-i Maybe ->> isSet = False
-	def-i Maybe($val) ->> isSet = True
-
-	def-i isSet : Boolean ->> $isSet
-	def-i val : ValType ->> $val
+	def-i Maybe ->> None()
+	def-i Maybe(val : ValType) ->> Some(val)
 end
 
 Maybe{Integer}(42)
@@ -818,7 +823,7 @@ def bin_func(bin : Binary) : Maybe{(Integer, Integer, Integer)}
 	if (bin.length == 32)
 		let [|a{16;:signed;:big}, b{12;:unsigned;:little}, c{4}|] := bin in Maybe((a, b, c))
 	else
-		None{(Integer, Integer, Integer)}
+		None
 	end
 end
 
@@ -969,7 +974,7 @@ end
 synchronizer RoundRobin
 	require-i last_sender : Object
 
-	receive do (messages : Mailbox, mailboxes : Postoffice)
+	receive do (messages : Mailbox, mailboxes : PostOffice)
 		$last_sender = mailboxes.next($last_sender)
 	end
 end
@@ -1011,6 +1016,15 @@ mixin Lockable
 		receive ->> (messages : Mailbox, mailboxes : PostOffice) mailboxes[$lock_holder]
 	end
 end
+
+#*
+ * TODO: Current design does not allow for hygienic composition of
+ *       synchronizers.  Fix this by adding a notion of protocols that binds
+ *       multiple synchronizers together.  New rules will be needed to describe
+ *       the interaction between multiple protocols/syncronizers that know
+ *       nothing about each other (e.g. all current syncronizers must accept a
+ *       message for it to be handled).
+ *#
 
 ###############
 # Annotations #

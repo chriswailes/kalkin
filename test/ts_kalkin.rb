@@ -29,13 +29,16 @@ end
 def get_ast(file_name, verbose = false)
 	input  = File.open(File.join(File.dirname(File.expand_path(__FILE__)), 'inputs', file_name)) { |f| f.read }.chomp
 	tokens = Kalkin::Lexer::lex(input)
-	ast    = Kalkin::Parser::parse(tokens, verbose: verbose)
+	
+	Kalkin::Parser::parse(tokens, verbose: verbose)
 end
 
 ##############
 # Test Cases #
 ##############
 
-require 'tc_isomorphism.rb'
-require 'tc_namespace.rb'
-require 'tc_types.rb'
+#require 'tc_isomorphism.rb'
+#require 'tc_namespace.rb'
+#require 'tc_types.rb'
+
+require 'tc_interp.rb'

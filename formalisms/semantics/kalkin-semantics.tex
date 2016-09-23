@@ -27,14 +27,16 @@
 	\\
 	\objidt &\in& \mathsf{object~identifier}\\
 	\\
-	\namet &\in& \mathsf{name} \alt \namet~\namet_0 \ldots \namet_n\\
+	\namet &\in& \mathsf{name}\\
 	\\
 	\objt &:=& \obje\\
+	\\
+	\funt &:=& \fune\\
 	\\
 	\exprt &:=& \reft \alt \namet \alt \letbinde{\reft}{\exprt_0}{\exprt_1} \alt \ife{\exprt}{\exprt}{\exprt} \alt\\
 	       && \calle{\exprt}{n}\\
 	\\
-	\refenv &:=& \reft \mapsto \objidt\\
+	\env &:=& \reft \mapsto \objidt\\
 	\\
 	\namespace &:=& \namet \mapsto \objidt\\
 	\\
@@ -43,37 +45,37 @@
 	\end{array}
 \]
 
-\subsection{Garden of Eden}
+%\subsection{Garden of Eden}
 
-\[
-	\begin{array}{rcl}
-	\mathsf{Object} &:=& <
-		\lbrace
-			\begin{array}{lcl}
-			\genref{instance\_members} &\mapsto& \genname{tbd},\\
-			\genref{type} &\mapsto& \genname{Class},\\
-			\genref{supertype} &\mapsto& \genname{Void}
-			\end{array}
-		\rbrace,
-		\lbrace
+%\[
+%	\begin{array}{rcl}
+%	\mathsf{Object} &:=& <
+%		\lbrace
 %			\begin{array}{lcl}
+%			\genref{instance\_members} &\mapsto& \genname{tbd},\\
+%			\genref{type} &\mapsto& \genname{Class},\\
+%			\genref{supertype} &\mapsto& \genname{Void}
 %			\end{array}
-		\rbrace>\\
-	\\
-	\mathsf{Class} &:=& <
-		\lbrace
-			\begin{array}{lcl}
-			\genref{instance\_members} &\mapsto& \genname{List}\lbrace \genname{Tuple} \lbrace \genname{Symbol}, \genname{Type} \rbrace \rbrace,\\
-			\genref{type} &\mapsto& \genname{Class},\\
-			\genref{supertype} &\mapsto& \genname{Type}
-			\end{array}
-		\rbrace,
-		\lbrace
+%		\rbrace,
+%		\lbrace
+%%			\begin{array}{lcl}
+%%			\end{array}
+%		\rbrace>\\
+%	\\
+%	\mathsf{Class} &:=& <
+%		\lbrace
 %			\begin{array}{lcl}
+%			\genref{instance\_members} &\mapsto& \genname{List}\lbrace \genname{Tuple} \lbrace \genname{Symbol}, \genname{Type} \rbrace \rbrace,\\
+%			\genref{type} &\mapsto& \genname{Class},\\
+%			\genref{supertype} &\mapsto& \genname{Type}
 %			\end{array}
-		\rbrace>\\
-	\\
-	\end{array}
-\]
+%		\rbrace,
+%		\lbrace
+%%			\begin{array}{lcl}
+%%			\end{array}
+%		\rbrace>\\
+%	\\
+%	\end{array}
+%\]
 
 \end{document}

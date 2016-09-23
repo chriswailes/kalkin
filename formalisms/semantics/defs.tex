@@ -44,18 +44,19 @@
 \newcommand{\truev}         {\mathsf{true}}
 \newcommand{\falsev}        {\mathsf{false}}
 
-%% environments
-\newcommand{\refenv}        {\sigma}
+%% mappings
+\newcommand{\env}           {\rho}
 \newcommand{\namespace}     {\Pi}
-\newcommand{\objspace}      {\theta}
+\newcommand{\objspace}      {\Phi}
 
 %% terms}
 \newcommand{\exprt}        {e}
 \newcommand{\funt}         {f}
 \newcommand{\namet}        {\eta}
 \newcommand{\objidt}       {\iota}
-\newcommand{\objt}         {o}
+\newcommand{\objt}         {\theta}
 \newcommand{\reft}         {x}
 
 %% objects
-\newcommand{\obje}         {<\refenv, \namespace>}
+\newcommand{\obje}         {<\env_{\mathsf{members}}, \env_{\mathsf{methods}}>}
+\newcommand{\fune}         {<\env_{\mathsf{members}}, \env_{\mathsf{methods}}, \exprt_{\mathsf{body}}>}

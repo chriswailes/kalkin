@@ -17,32 +17,39 @@ require 'filigree/types'
 module Kalkin; module Backends; module Interpreter
 
 class ObjectID
+	# Existential value
+	attr_reader :id
+
 	def initialize(id)
 		@id = id
 	end
-	
+
 	def to_i
 		@id
 	end
-	
+
 	def to_s
 		@id.to_s
 	end
 end
 
 class Reference
+	# Existential value
 	attr_reader :name
 
 	def initialize(name)
 		@name = name
 	end
-	
+
 	def to_s
 		@name
 	end
 end
 
 class Name
+	# Existential value
+	attr_reader :name
+
 	def initialize(name)
 		@name = name
 	end
@@ -61,61 +68,67 @@ class Environment
 		@versions = Hash.new { |h, k| h[k] = -1}
 		@mapping  = Hash.new
 	end
-	
+
 	def add_reference(objID, name = '')
 		version = (@versions[name] += 1)
 		ref     = Reference.new(name + "!#{version}")
-		
-		@mapping[ref] = objID
-		
+
+		@mapping[ref] = check_type(objID, ObjectID, 'objID')
+
 		return ref
 	end
-	
+
 	alias add_ref add_reference
-	
+
 	def get_objID(ref)
 		@mapping[ref]
 	end
-	
+
 	def to_s
 		'{' + @mapping.to_a.map {|k, v| "#{k} => #{v}"}.join(', ') + '}'
 	end
 end
 
 class KObject
-	attr_reader :kmembers
-	attr_reader :kmethods
+	attr_reader :env
 
 	def initialize
-		@kmembers = Environment.new
-		@kmethods = Environment.new
+		@env = Environment.new
 	end
-	
+
 	def to_s
-		"<members := #{@kmembers.to_s} ; methods := #{@kmethods.to_s}>"
+		"<Obj: env := #{@env.to_s}>"
 	end
 end
 
 class KFunction < KObject
-	def initialize
+	attr_reader :body
+
+	def initialize(body = nil)
 		# Expression
-		@kbody = nil
-		
+		@body = body
+
 		super
+	end
+
+	def to_s
+		"<Func: env := #{@env.to_s} ; body := #{@body}>"
 	end
 end
 
-class KString < KObject
+class KBox < KObject
+
+	# Existential values
+	attr_reader :tag
 	attr_reader :val
-	
-	def initialize(val)
+
+	def initialize(tag, val)
+		@tag = tag
 		@val = val
-		
-		super()
 	end
-	
+
 	def to_s
-		"<members := #{@kmembers.to_s} ; methods := #{@kmethods.to_s} ; value := '#{@val}'>"
+		"<Box: env := #{@env.to_s} ; tag := `#{@tag} ; val := `#{@val}>"
 	end
 end
 
@@ -125,14 +138,14 @@ class ObjectSpace
 		@objects = Array.new
 		@name    = name
 	end
-	
+
 	def add_object(obj)
 		ObjectID.new(@objects.size).tap {@objects << check_type(obj, KObject, 'obj')}
 	end
-	
+
 	alias add add_object
 	alias :<< add_object
-	
+
 	def get_object(objID)
 		if (objID.to_i < @objects.size)
 			@objects[objID.to_i]
@@ -140,22 +153,22 @@ class ObjectSpace
 			nil
 		end
 	end
-	
+
 	alias get get_object
-	
+
 	def to_s
 		str = ''
-		
+
 		if @name
 			str += "Object Space : #{@name}\n\n"
 		end
-		
+
 		@objects.each_with_index do |obj, index|
 			str += "[#{index}] => #{obj.to_s}\n"
 		end
-		
+
 		str += "\n"
-		
+
 		return str
 	end
 end

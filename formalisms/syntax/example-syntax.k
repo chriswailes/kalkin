@@ -29,16 +29,19 @@
  *   - Method + operator definitions ✓
  *   - Self types ✓
  *   - ADTs ✓
+ * - Polymorphic Objects
+ *   - Syntax
+ *     - Type parameters
+ *     - Non-type parameters
+ *     - Default parameters
+ *   - Namespaces
+ *   - Functions
+ *   - Types
  * - Interfaces ✓
  * - Mixins ✓
+ * - Composits
  * - Reopening ✓
- * - Generic Functions ✓
- *   - Default parameters ✓
- * - Parametrized types ✓
- *   - Type parameters ✓
- *   - Non-type parameters ✓
- *   - Default parameters ✓
- * - Lambdas ✓
+ * - Lambdas
  * - Block syntax ✓
  * - Aliasing ✓
  * - Currying ✓
@@ -178,21 +181,21 @@ CarClass
 
 def foo : (Integer, Integer) ->> (7, 8)
 
-# Function Types
-
-def returnsConstant42 ->> λ 42
-def returnsConstant42 : -> Integer ->> λ 42
-
-def returnsAddOne : Integer -> Integer ->> λ (n) n + 1
-
-def returnsMap : (Integer -> Integer) -> Array -> Array
-	...
-end
-
 # Parametrized types
 
 Array{String}
 Vector{42, Float}
+
+# Function Types
+
+def returnsConstant42 ->> ->> 42
+def returnsConstant42 : void -> Integer ->> ->> 42
+
+def returnsAddOne : Integer -> Integer ->> ->> (n) n + 1
+
+def returnsIntegerArrayMap : (Integer -> Integer) -> Array{Integer} -> Array{Integer}
+	...
+end
 
 ########################
 # Variable definitions #
@@ -291,7 +294,7 @@ avg([1, 2, 3, 4])
 avg(splat [1, 2, 3, 4])
 
 # Forwarding of an arbitrary number of arguments is done thusly:
-def wrapper_fun(splat args :? splat ArgTypes) : RetType
+def wrapper_fun(splat args :? ArgTypes) : RetType
 	unwrapped_fun(splat args)
 end
 
@@ -308,6 +311,37 @@ end
 
 # Calling a member of the Math namespace
 Math::cos(0.1234)
+
+# Re-naming a namespace
+alias ShortName := SomeNamespace::InnerNamespace::FinalNamespace
+
+# Re-naming a single function from a namespace
+alias local_name := SomeNamespace::nested_name
+
+# Union a specified namespace with the current one
+using SomeNamespace::InnerNamespace
+using SomeNamespace::InnerNamespace::[*]
+
+# Union in a subset of a namespace
+using SomeNamespace::InnerNamespace::[function1, function2, Class1, Class2]
+
+# Re-name a single function/type during the import.
+using SomeNamespace::InnerNamespace::[old_name/new_name, *]
+using SomeNamespace::InnerNamespace::[OldType/NewType, *]
+
+# Hiding a single function/type during the import
+using SomeNamespace::InnerNamespace::![function_name]
+using SomeNamespace::InnerNamespace::![UndesiredType]
+
+using SomeNamespace::InnerNamespace::[*]![function_name]
+using SomeNamespace::InnerNamespace::[*]![UndesiredType]
+
+# Block form imports
+
+using SomeNamespace::InnerNamespace with
+	alias new_function_name := old_function_name
+	hiding UndesiredType
+end
 
 ###########
 # Classes #
@@ -338,7 +372,7 @@ class Point
 
 	# This is a constructor for the Point class.  Arguments get assigned to the
 	# instance's variables $x and $y.
-	def-i Point($x, $y) ->> void
+	def-i self($x, $y) ->> void
 
 	#*
 	 * The return type of 'self' tells us that not only does this method
@@ -403,18 +437,18 @@ end
  * it is best to avoid this as it causes a bottle neck for instantiation, but
  * sometimes you just need to (factories).
  *#
-class CountingClass
+class CountedClass
 	#*
-	 * Defines an instance variable for the CountingClass.  This is an
+	 * Defines an instance variable for the CountedClass.  This is an
 	 * instantiated variable of an anonymous subclass of the class named
-	 * Class; CountingClass is an instance of that anonymous subclass.
+	 * Class; CountedClass is an instance of that anonymous subclass.
 	 *#
 	let-c count : Integer
 
 	# Overload the class constructor.
-	def-c CountingClass{splat ArgTypes}(splat args : ArgTypes)
+	def-c CountedClass(splat args :? ArgTypes)
 		$count++
-		let space := CountingClass.allocate in space.CountingClass(splat args)
+		super(splat args)
 	end
 
 	# Returns the number of instantiations of this class.
@@ -422,7 +456,7 @@ class CountingClass
 end
 
 # Sending a message to the object CountingClass.
-CountingClass.count
+CountedClass.count
 
 #*
  * This factors out the counting behavior above and then creates a new class
@@ -434,13 +468,14 @@ class CountingClass <: Class
 	let-i count : Integer
 
 	# Overload the new message.
-	def-i CountingClass{splat ArgTypes}(splat args : ArgTypes)
+	def-i CountingClass(splat args :? ArgTypes)
 		$count++
-		let space := CountingClass.allocate in space.CountingClass(splat args)
+		super(splat args)
 	end
 
 	# Returns the number of instantiations of this class.
 	def-i count : Integer ->> $count
+	def-i () ->> $count
 end
 
 class[CountingClass] CountedAnimals
@@ -451,6 +486,9 @@ class[CountingClass] CountedAnimals
 		"There are #{self.count} animals."
 	end
 end
+
+# Calling a class's () operator.
+CountedAnimals.()
 
 class LoggedClass
 	let-i id : Integer
@@ -489,7 +527,7 @@ class AnotherExample
 
 	def-i AnotherExample($x) ->> void
 
-	# Accessor for the x member.
+	# Accessor (by value) for the x member.
 	def-i x ->> $x
 
 	# Assignment for the x member.
@@ -503,8 +541,6 @@ let ae := AnotherExample(42)
 
 ae.x # Evalutes to 42
 ae.x = 100 # Calles the method x=
-
-let x_val := ae.x in x_val = 100 # Does not call the ae.x= method
 
 # Self types
 
@@ -570,9 +606,9 @@ end
  * an interface.
  *#
 
-interface Monoid {ImplementingClass}
-	require-i ImplementingClass : void
-	require-i successor : -> ImplementingClass
+interface Monoid
+	require-i self.class : void -> self.class
+	require-i successor : void -> self
 end
 
 interface Container {ImplementingClass{ElementType}}
@@ -675,11 +711,11 @@ def generic_function{Foo}(f : ref Foo) ->> void
 class Maybe {ValType}
 	class Some
 		let-i val : ValType
-		
+
 		def-i Some($val) ->> void
 		def-i val : ValType ->> $val
 	end
-	
+
 	class None
 		def-i None ->> void
 	end

@@ -77,6 +77,7 @@
 			<keyword>else</keyword>
 			<keyword>end</keyword>
 			<keyword>handle</keyword>
+			<keyword>hiding</keyword>
 			<keyword>if</keyword>
 			<keyword>implements</keyword>
 			<keyword>in</keyword>
@@ -91,6 +92,7 @@
 			<keyword>not</keyword>
 			<keyword>on</keyword>
 			<keyword>or</keyword>
+			<keyword>polyform</keyword>
 			<keyword>private</keyword>
 			<keyword>protected</keyword>
 			<keyword>public</keyword>
@@ -102,15 +104,16 @@
 			<keyword>return</keyword>
 			<keyword>require(-([ci]))?</keyword>
 			<keyword>splat</keyword>
+			<keyword>super</keyword>
 			<keyword>synchronizer</keyword>
 			<keyword>sync</keyword>
 			<keyword>then</keyword>
+			<keyword>using</keyword>
 			<keyword>void</keyword>
 			<keyword>when</keyword>
 			<keyword>where</keyword>
 			<keyword>with</keyword>
 			<keyword>xor</keyword>
-			<keyword>λ</keyword>
 		</context>
 
 		<!-- Kalkin's number context -->

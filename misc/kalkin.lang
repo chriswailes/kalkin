@@ -7,7 +7,7 @@
 	-->
 	<metadata>
 		<property name="mimetypes">text/x-kalkin</property>
-		<property name="globs">*.k;*.ks</property>
+		<property name="globs">*.k;*.ks;*.kalkin</property>
 		<property name="line-comment-start">#</property>
 		<property name="block-comment-start">#*</property>
 		<property name="block-comment-end">*#</property>
@@ -67,9 +67,10 @@
 			<prefix>(?&lt;!\.)</prefix>
 			<keyword>accept</keyword>
 			<keyword>adt</keyword>
-			<keyword>alias</keyword>
+			<keyword>alias(-([ci]))?</keyword>
 			<keyword>and</keyword>
 			<keyword>as</keyword>
+			<keyword>big</keyword>
 			<keyword>class</keyword>
 			<keyword>def(-([ci]))?</keyword>
 			<keyword>default</keyword>
@@ -77,7 +78,7 @@
 			<keyword>else</keyword>
 			<keyword>end</keyword>
 			<keyword>handle</keyword>
-			<keyword>hiding</keyword>
+			<keyword>hide(-([ci]))?</keyword>
 			<keyword>if</keyword>
 			<keyword>implements</keyword>
 			<keyword>in</keyword>
@@ -85,14 +86,18 @@
 			<keyword>interface</keyword>
 			<keyword>lambda</keyword>
 			<keyword>let(-([ci]))?</keyword>
+			<keyword>little</keyword>
 			<keyword>match</keyword>
-			<keyword>mixin</keyword>
+			<keyword>meet(-([ci]))?</keyword>
+			<keyword>module</keyword>
 			<keyword>namespace</keyword>
+			<keyword>native</keyword>
 			<keyword>nor</keyword>
 			<keyword>not</keyword>
 			<keyword>on</keyword>
 			<keyword>or</keyword>
-			<keyword>polyform</keyword>
+			<keyword>poly</keyword>
+			<keyword>polymorphic</keyword>
 			<keyword>private</keyword>
 			<keyword>protected</keyword>
 			<keyword>public</keyword>
@@ -100,15 +105,18 @@
 			<keyword>ref</keyword>
 			<keyword>receive</keyword>
 			<keyword>reject</keyword>
+			<keyword>rename(-([ci]))?</keyword>
 			<keyword>reopen</keyword>
 			<keyword>return</keyword>
 			<keyword>require(-([ci]))?</keyword>
+			<keyword>signed</keyword>
 			<keyword>splat</keyword>
 			<keyword>super</keyword>
 			<keyword>synchronizer</keyword>
 			<keyword>sync</keyword>
 			<keyword>then</keyword>
-			<keyword>using</keyword>
+			<keyword>unsigned</keyword>
+			<keyword>use</keyword>
 			<keyword>void</keyword>
 			<keyword>when</keyword>
 			<keyword>where</keyword>
@@ -139,7 +147,7 @@
 
 		<!-- Kalkin's type keywords context -->
 		<context id="types" style-ref="type">
-			<match>[A-Z][A-Za-z_]*</match>
+			<match>[A-Z][A-Za-z0-9_]*</match>
 		</context>
 
 		<context id="identifiers" style-ref="identifier">

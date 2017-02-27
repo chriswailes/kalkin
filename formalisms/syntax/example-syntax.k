@@ -708,20 +708,8 @@ def generic_function{Foo}(f : ref Foo) ->> void
 # Parametrized Types #
 ######################
 
-class Maybe {ValType}
-	class Some
-		let-i val : ValType
-
-		def-i Some($val) ->> void
-		def-i val : ValType ->> $val
-	end
-
-	class None
-		def-i None ->> void
-	end
-
-	def-i Maybe ->> None()
-	def-i Maybe(val : ValType) ->> Some(val)
+class LinkedList {ElType}
+	# FIXME: Do linked list example
 end
 
 Maybe{Integer}(42)
@@ -808,7 +796,7 @@ end
 ############
 
 def a_long_descriptive_function_name ->> void
-alias a_long_descriptive_function_name short_name
+alias a_long_descriptive_function_name as short_name
 
 ############
 # Currying #

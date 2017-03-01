@@ -72,8 +72,10 @@
 			<keyword>as</keyword>
 			<keyword>big</keyword>
 			<keyword>class</keyword>
+			<keyword>constructor</keyword>
 			<keyword>def(-([ci]))?</keyword>
 			<keyword>default</keyword>
+			<keyword>destructor</keyword>
 			<keyword>do</keyword>
 			<keyword>else</keyword>
 			<keyword>end</keyword>

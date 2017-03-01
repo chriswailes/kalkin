@@ -139,9 +139,3 @@ end
 lambda 42
 lambda (x : Integer) : Integer ->> x + 42
 lambda (x : Integer) ->> x + 42
-
-#*
- * Object Creation
- *#
-
-;

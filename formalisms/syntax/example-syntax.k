@@ -88,29 +88,29 @@
 :bar_
 
 # Arrays
-[1, 2, 3, 4]
-[:hello, :world]
+[|1, 2, 3, 4|]
+[|:hello, :world|]
 
 # Binaries
 
 # Constructs three byte binaries.
-[|42, 100, 87|]
-[|"cat"|]
+<|42, 100, 87|>
+<|"cat"|>
 let a := 42, b := 100, c := 87
-[|a, b, c|]
+<|a, b, c|>
 
 # Constructs four byte binaries.
-[|42, 100, 87{16}]
-[|42, 100, 550|]
+<|42, 100, 87{16}|>
+<|42, 100, 550|>
 
 # Store an Integer in a specific representation:
-[|100{8, signed}, 200{unsigned}, -20{signed}|] # The last signedness specification is redundant.
+<|100{8, signed}, 200{unsigned}, -20{signed}|> # The last signedness specification is redundant.
 
 # Specify the endianness:
-[|600{16, unsigned, big}, 700{signed, little}, 800{native}|]
+<|600{16, unsigned, big}, 700{signed, little}, 800{native}|>
 
 # Hashes
-{ :one => 1, :two => 2, :three => 3 }
+{| :one => 1, :two => 2, :three => 3 |}
 
 # Regular Expressions
 /ab*/
@@ -119,9 +119,9 @@ let a := 42, b := 100, c := 87
 "Hello world!"
 
 # Tuples
-(1, 2)
-(:hello, :world)
-(1, 2.0, :three, "four")
+(| 1, 2 |)
+(| :hello, :world |)
+(| 1, 2.0, :three, "four" |)
 
 # Integer ranges
 0..5  # 0, 1, 2, 3, 4
@@ -188,10 +188,10 @@ Vector{42, Float}
 
 # Function Types
 
-def returnsConstant42 ->> ->> 42
-def returnsConstant42 : void -> Integer ->> ->> 42
+def returnsConstant42 ->> lambda 42
+def returnsConstant42 : void -> Integer ->> lambda 42
 
-def returnsAddOne : Integer -> Integer ->> ->> (n) n + 1
+def returnsAddOne : Integer -> Integer ->> lambda (n : Integer) ->> n + 1
 
 def returnsIntegerArrayMap : (Integer -> Integer) -> Array{Integer} -> Array{Integer}
 	...
@@ -312,35 +312,60 @@ end
 # Calling a member of the Math namespace
 Math::cos(0.1234)
 
-# Re-naming a namespace
-alias ShortName := SomeNamespace::InnerNamespace::FinalNamespace
+# FIXME: Requires some_funame to be in scope
+alias some_funame as other_funame
+rename some_funame as other_funame
 
-# Re-naming a single function from a namespace
-alias local_name := SomeNamespace::nested_name
+# FIXME
+use SomeNamespace::InnerNamespace
 
-# Union a specified namespace with the current one
-using SomeNamespace::InnerNamespace
-using SomeNamespace::InnerNamespace::[*]
+# FIXME
+use SomeNamespace::PolymorphicNamespace{Arg1, Arg2, arg_3} as InstantiatedName
 
-# Union in a subset of a namespace
-using SomeNamespace::InnerNamespace::[function1, function2, Class1, Class2]
 
-# Re-name a single function/type during the import.
-using SomeNamespace::InnerNamespace::[old_name/new_name, *]
-using SomeNamespace::InnerNamespace::[OldType/NewType, *]
+# FIXME
+use SomeNamespace::namespace_name0
+use SomeNamespace::[namespace_name0, namespace_name1]
 
-# Hiding a single function/type during the import
-using SomeNamespace::InnerNamespace::![function_name]
-using SomeNamespace::InnerNamespace::![UndesiredType]
+# Maps a new name in the current scope to an existing name in another scope.
+use SomeNamespace::namespace_name0 as local_name0
+use SomeNamespace::[rename namespace_name0 as local_name0]
+use SomeNamespace::[rename namespace_name0 as local_name0, namespace_name1 as local_name1]
+use SomeNamespace::[rename namespace_name0 as local_name0]::[hide namespace_name1, namespace_name2]
 
-using SomeNamespace::InnerNamespace::[*]![function_name]
-using SomeNamespace::InnerNamespace::[*]![UndesiredType]
+# FIXME
+namespace SomeNamespace
+	def foo ->> void
+	def bar ->> void
+	def baz(x : Int, y : Int) ->> void
+	def baz(x : Int, y : Float) ->> void
+end
 
-# Block form imports
+# Results in importing (foo :=> fud), bar, and baz : Int -> Float -> void
+use SomeNamespace where
+	# Hide specific instance of an overloaded funciton
+	hide baz : Int -> Int -> void
+	rename foo as fud
+end
 
-using SomeNamespace::InnerNamespace with
-	alias new_function_name := old_function_name
-	hiding UndesiredType
+# Same as above: Results in importing (foo :=> fud), bar, and baz : Int -> Float -> void
+use SomeNamespace where
+	use ::
+	hide baz : Int -> Int -> void
+	rename foo as fud
+end
+
+# Results in importing (foo :=> fud) and baz
+use SomeNamespace where
+	use baz
+	rename foo as fud
+end
+
+# Same as above: Results in importing (foo :=> fud) and baz
+use SomeNamespace where
+	hide ::
+	use baz
+	rename foo as fud
 end
 
 ###########
@@ -372,7 +397,7 @@ class Point
 
 	# This is a constructor for the Point class.  Arguments get assigned to the
 	# instance's variables $x and $y.
-	def-i self($x, $y) ->> void
+	constructor ($x, $y) ->> void
 
 	#*
 	 * The return type of 'self' tells us that not only does this method

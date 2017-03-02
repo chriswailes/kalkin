@@ -28,11 +28,11 @@ let cars := Array{Car}
 
 # Params to polymorphic objects
 
-poly
+poly T : Type
 class Array
 end
 
-class Array {}
+class Array {T : Type}
 end
 
 # Binary format specifiers
@@ -62,18 +62,18 @@ let sorted_ints := sort[:stable](my_ints)
 alias some_funame as other_funame
 rename some_funame as other_funame
 
-use SomeNamespace::InnerNamespace
+import SomeNamespace::InnerNamespace
 
-use SomeNamespace::PolymorphicNamespace{Arg1, Arg2, arg_3} as InstantiatedName
+import SomeNamespace::PolymorphicNamespace{Arg1, Arg2, arg_3} as InstantiatedName
 
-use SomeNamespace::namespace_name0
-use SomeNamespace::[namespace_name0, namespace_name1]
+import SomeNamespace::namespace_name0
+import SomeNamespace::[namespace_name0, namespace_name1]
 
 # Maps a new name in the current scope to an existing name in another scope.
-use SomeNamespace::namespace_name0 as local_name0
-use SomeNamespace::[rename namespace_name0 as local_name0]
-use SomeNamespace::[rename namespace_name0 as local_name0, namespace_name1 as local_name1]
-use SomeNamespace::[rename namespace_name0 as local_name0]::[hide namespace_name1, namespace_name2]
+import SomeNamespace::namespace_name0 as local_name0
+import SomeNamespace::[rename namespace_name0 as local_name0]
+import SomeNamespace::[rename namespace_name0 as local_name0, namespace_name1 as local_name1]
+import SomeNamespace::[rename namespace_name0 as local_name0]::[hide namespace_name1, namespace_name2]
 
 namespace SomeNamespace
 	def foo ->> void
@@ -83,27 +83,27 @@ namespace SomeNamespace
 end
 
 # Results in importing (foo :=> fud), bar, and baz : Int -> Float -> void
-use SomeNamespace where
+import SomeNamespace where
 	# Hide specific instance of an overloaded funciton
 	hide baz : Int -> Int -> void
 	rename foo as fud
 end
 
 # Same as above: Results in importing (foo :=> fud), bar, and baz : Int -> Float -> void
-use SomeNamespace where
+import SomeNamespace where
 	use ::
 	hide baz : Int -> Int -> void
 	rename foo as fud
 end
 
 # Results in importing (foo :=> fud) and baz
-use SomeNamespace where
+import SomeNamespace where
 	use baz
 	rename foo as fud
 end
 
 # Same as above: Results in importing (foo :=> fud) and baz
-use SomeNamespace where
+import SomeNamespace where
 	hide ::
 	use baz
 	rename foo as fud

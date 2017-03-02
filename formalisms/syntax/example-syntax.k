@@ -88,12 +88,14 @@
 :bar_
 
 # Arrays
+# TODO: Change delimiters to [] if it doesn't cause parsing problems for the final grammar.
 [|1, 2, 3, 4|]
 [|:hello, :world|]
 
 # Binaries
 
 # Constructs three byte binaries.
+# TODO: Change delimiters to <> if it doesn't cause parsing problems for the final grammar.
 <|42, 100, 87|>
 <|"cat"|>
 let a := 42, b := 100, c := 87
@@ -110,7 +112,8 @@ let a := 42, b := 100, c := 87
 <|600{16, unsigned, big}, 700{signed, little}, 800{native}|>
 
 # Hashes
-{| :one => 1, :two => 2, :three => 3 |}
+# TODO: Change delimiters to {} if it doesn't cause parsing problems for the final grammar.
+{| :one :=> 1, :two :=> 2, :three => 3 |}
 
 # Regular Expressions
 /ab*/
@@ -119,6 +122,7 @@ let a := 42, b := 100, c := 87
 "Hello world!"
 
 # Tuples
+# TODO: Change delimiters to () if it doesn't cause parsing problems for the final grammar.
 (| 1, 2 |)
 (| :hello, :world |)
 (| 1, 2.0, :three, "four" |)
@@ -137,15 +141,20 @@ my_array << 42
 
 # Function calls
 fib(6)
+fib 6
 
 # Method calls
 my_array.size()
 my_array.size
 my_array.append(42)
+my_array.append 42
 
 # Conditionals
 if val % 2 then :odd else :even end
-val % 2 ? :odd : :even
+
+# Actually a call to the ? operator for Integers, wich converts the value to a
+# boolean and calls the ? operator on that.
+val % 2 ? :odd, :even
 
 if val == 0
 	:zero
@@ -162,7 +171,12 @@ bool_val0 and bool_val1
 bool_val0 nor bool_val1
 bool_val0 xor bool_val1
 
-# Sequencing
+# Sequencing.
+1 + 2
+my_array << 42
+fib(6)
+
+# Return value is the result of the fib(6) call.
 1 + 2; my_array << 42; fib(6)
 
 #########
@@ -179,7 +193,8 @@ CarClass
 # Single element tuples are not allowed.  This simply evaluates to the
 # expression `42`: (42)
 
-def foo : (Integer, Integer) ->> (7, 8)
+def foo : Tuple{Integer, Integer} ->> (|7, 8|)
+def foo : (|Integer, Integer|) ->> (|7, 8|)
 
 # Parametrized types
 
@@ -188,14 +203,17 @@ Vector{42, Float}
 
 # Function Types
 
-def returnsConstant42 ->> lambda 42
-def returnsConstant42 : void -> Integer ->> lambda 42
+let constant42 := lambda () -> Integer ->> 42 : void -> Integer
+let constant42 := lambda -> Integer ->> 42 : void -> Integer
+let constant42 := lambda () ->> 42 : void -> Integer
+let constant42 := lambda 42 : void -> Integer
+let constant42 := lambda 42
 
-def returnsAddOne : Integer -> Integer ->> lambda (n : Integer) ->> n + 1
+let addOne := lambda (n : Integer) -> Integer ->> n + 1 : Integer -> Integer
+let addOne := lambda (n : Integer) ->> n + 1 : Integer -> Integer
+let addOne := lambda (n : Integer) ->> n + 1
 
-def returnsIntegerArrayMap : (Integer -> Integer) -> Array{Integer} -> Array{Integer}
-	...
-end
+let integerArrayMap := (lambda ...) : (Integer -> Integer) -> Array{Integer} -> Array{Integer}
 
 ########################
 # Variable definitions #

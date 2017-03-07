@@ -1,34 +1,34 @@
 #* Features
  *
  * - Comments ✓
- * - Literals ✓
- *   - Binary syntax ✓
- * - Basic expressions ✓
- * - Types ✓
- *   - Type names ✓
- *   - Tuple types ✓
- *   - Function types ✓
- *   - Parametrized types ✓
- * - Variable definitions ✓
- * - Function definition ✓
- *   - Default values ✓
- *   - Keyword arguments ✓
- *   - Splat parameters/arguments ✓
- * - Namespaces ✓
- * - Classes ✓
- *   - Constructors ✓
- *   - Destructors ✓
- *   - Destructuring ✓
- *   - Operator deffinition ✓
- *     - Prefix ✓
- *     - Infix ✓
- *     - Postfix ✓
- *     - Special cases ✓
- *     - Precedence ✓
- *     - Associativity ✓
- *   - Method + operator definitions ✓
- *   - Self types ✓
- *   - ADTs ✓
+ * - Literals
+ *   - Binary syntax
+ * - Basic expressions
+ * - Types
+ *   - Type names
+ *   - Tuple types
+ *   - Function types
+ *   - Parametrized types
+ * - Variable definitions
+ * - Function definition
+ *   - Default values
+ *   - Keyword arguments
+ *   - Splat parameters/arguments
+ * - Namespaces
+ * - Classes
+ *   - Constructors
+ *   - Destructors
+ *   - Destructuring
+ *   - Operator deffinition
+ *     - Prefix
+ *     - Infix
+ *     - Postfix
+ *     - Special cases
+ *     - Precedence
+ *     - Associativity
+ *   - Method + operator definitions
+ *   - Self types
+ *   - ADTs
  * - Polymorphic Objects
  *   - Syntax
  *     - Type parameters
@@ -37,27 +37,30 @@
  *   - Namespaces
  *   - Functions
  *   - Types
- * - Interfaces ✓
- * - Mixins ✓
+ * - Interfaces
+ * - Mixins
  * - Composits
- * - Reopening ✓
+ * - Reopening
  * - Lambdas
- * - Block syntax ✓
- * - Aliasing ✓
- * - Currying ✓
- * - Local type inference ✓
- * - Destructuring ✓
- * - Pattern matching ✓
- * - Exceptions ✓
- * - String interpolation ✓
- * - Return type overloading ✓
- * - Synchronizers ✓
- * - Annotations ✓
- * - Implementation selectors ✓
- * - Semantic versioning ✓
+ * - Block syntax
+ * - Aliasing
+ * - Currying
+ * - Local type inference
+ * - Destructuring
+ * - Pattern matching
+ * - Exceptions
+ * - String interpolation
+ * - Return type overloading
+ * - Synchronizers
+ * - Annotations
+ * - Implementation selectors
+ * - Semantic versioning
  *
  * NOTE: ... is most often used here to indicate elided code.  The only
  *       exception is for integer range literals.
+ *
+ * TODO:
+ * - Replace the ->> token with something else.
  *#
 
 ############
@@ -190,11 +193,7 @@ CarClass
 
 # Tuple types
 
-# Single element tuples are not allowed.  This simply evaluates to the
-# expression `42`: (42)
-
 def foo : Tuple{Integer, Integer} ->> (|7, 8|)
-def foo : (|Integer, Integer|) ->> (|7, 8|)
 
 # Parametrized types
 
@@ -225,7 +224,7 @@ let x : Integer
 # Declare a new integer variable 'y' and give it a value.  Its type is inferred.
 let y := 42
 
-# Declare two default initialized strings called 'a', and 'b'.
+# Declare two default initialized strings called 'foo', and 'bar'.
 let foo, bar : String
 
 # Creates a new copy of SomeClass and default initializes another
@@ -237,8 +236,7 @@ let a := SomeClass(42), b : SomeClass
 a := get_some_class()
 a := SomeClass(100)
 
-# You can also do this to be explicit
-let a := SomeClass(200)
+let a := SomeClass(200) # Warning: Attemping to re-introduce a name that is already in scope.
 
 # This form of let returns the result of evaluating the expression with the
 # new binding instead of the value of the new binding.
@@ -253,9 +251,19 @@ let a := SomeClass(300) in a.some_method
 
 # These are function definitions.  Return types can be inferred if the body is a
 # literal.
-def fib(1) 1
-def fib(2) 1
-def fib(n : Integer) : Integer ->> fib(n - 1) + fib(n - 2)
+def fib(1) ->> 1
+def fib(2) ->> 1
+def fib(n : Integer) -> Integer ->> fib(n - 1) + fib(n - 2)
+
+# OR
+
+def fib(n : Integer)
+	if n == 0 or n == 1
+		1
+	else
+		fib(n - 1) + fib(n - 2)
+	end
+end
 
 #*
  * This function takes four arguments: three integers and a float.  The
@@ -274,31 +282,25 @@ math_function(1, c := 42, d := 100) # Valid
  * math_function(1, c: 42, 100)
  *#
 
-# Takes x by value and y by reference.
-def bar(x, ref y : Integer) : Integer
-	# Does something
-end
-
 # Default values for non-trivial types
-def bar(x := SomeClass(1, 2, 3)) : Integer -> 42
+def bar(x := SomeClass(1, 2, 3)) -> Integer ->> 42
 
-def baz(a : SomeClass, b := SomeClass(1, 2, 3)) : Integer ->> 42
-def baz(a, b := SomeClass(1, 2, 3) : SomeClass) : Integer ->> 42
+def baz(a : SomeClass, b := SomeClass(1, 2, 3)) -> Integer ->> 42
+def baz(a, b := SomeClass(1, 2, 3) : SomeClass) -> Integer ->> 42
 
 # Calls bar with a new instance of SomeClass.
 bar(SomeClass())
 
 # Splat parameters
-def avg(splat nums : Integer) : Integer ->> ...
-def avg(splat ref nums : Integer) : Integer ->> ...
+def avg(splat nums : Array{Integer}) -> Integer ->> void
 
 # Splat arguments
 let args := (1, :two, "three") : (Integer, Atom, String)
-def helper(a : Integer, b : Atom, c : String) : void ->> ...
+def helper(a : Integer, b : Atom, c : String) -> void ->> void
 
 helper(splat args)
 
-def min(a, b : Integer) : Integer ->> if a <= b then a else b end
+def min(a, b : Integer) -> Integer ->> if a <= b then a else b end
 
 # This is fine because the size of the array is known statically
 min(splat [12, 5])
@@ -310,11 +312,6 @@ min(splat get_array())
 
 avg([1, 2, 3, 4])
 avg(splat [1, 2, 3, 4])
-
-# Forwarding of an arbitrary number of arguments is done thusly:
-def wrapper_fun(splat args :? ArgTypes) : RetType
-	unwrapped_fun(splat args)
-end
 
 ##############
 # Namespaces #

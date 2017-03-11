@@ -90,6 +90,20 @@
 :foo
 :bar_
 
+#*
+ * Unicode Delimiter Alternatives
+ *
+ * - Guillemet «»
+ * - Angle Brackets 〈〉
+ * - Double Angle Bracket ⟪⟫
+ * - Tortouis Shell Bracket ⟬⟭
+ * - Angle Brackets with Dot ⦑⦒
+ * - Half Brackets ⸢⸣⸤⸥
+ * - Corner Brackets 「」
+ * - Lenticular Bracket 〖〗
+ *#
+
+
 # Arrays
 # TODO: Change delimiters to [] if it doesn't cause parsing problems for the final grammar.
 [|1, 2, 3, 4|]
@@ -174,7 +188,7 @@ bool_val0 and bool_val1
 bool_val0 nor bool_val1
 bool_val0 xor bool_val1
 
-# Sequencing.
+# Sequencing
 1 + 2
 my_array << 42
 fib(6)
@@ -191,35 +205,29 @@ Foo
 Bar
 CarClass
 
-# Tuple types
-
-def foo : Tuple{Integer, Integer} ->> (|7, 8|)
-
 # Parametrized types
 
 Array{String}
 Vector{42, Float}
+Tuple{Int, Int}
 
 # Function Types
 
-let constant42 := lambda () -> Integer ->> 42 : void -> Integer
-let constant42 := lambda -> Integer ->> 42 : void -> Integer
-let constant42 := lambda () ->> 42 : void -> Integer
-let constant42 := lambda 42 : void -> Integer
-let constant42 := lambda 42
+# Taking no argument and returning an Integer
+void -> Int
 
-let addOne := lambda (n : Integer) -> Integer ->> n + 1 : Integer -> Integer
-let addOne := lambda (n : Integer) ->> n + 1 : Integer -> Integer
-let addOne := lambda (n : Integer) ->> n + 1
+# Taking an Integer and returning an Integer
+Int -> Int
 
-let integerArrayMap := (lambda ...) : (Integer -> Integer) -> Array{Integer} -> Array{Integer}
+# The `array map` function
+(Int -> Int) -> Array{Int} -> Array{Int}
 
 ########################
 # Variable definitions #
 ########################
 
 # Declare a new integer variable 'x' that will be default initialized.
-let x : Integer
+let x : Int
 
 # Declare a new integer variable 'y' and give it a value.  Its type is inferred.
 let y := 42
@@ -229,18 +237,18 @@ let foo, bar : String
 
 # Creates a new copy of SomeClass and default initializes another
 # SomeClass.
-let a := SomeClass(42), b := SomeClass()
-let a := SomeClass(42), b : SomeClass
+let a := SomeClass(42, "hoopy"), b := SomeClass()
+let a := SomeClass(42, "hoopy"), b : SomeClass
 
 # Re-bind the name `a` to different memory location.
 a := get_some_class()
-a := SomeClass(100)
+a := SomeClass(100, "frood")
 
-let a := SomeClass(200) # Warning: Attemping to re-introduce a name that is already in scope.
+let a := SomeClass(200, "frood") # Warning: Attemping to re-introduce a name that is already in scope.
 
 # This form of let returns the result of evaluating the expression with the
 # new binding instead of the value of the new binding.
-let a := SomeClass(300) in a.some_method
+let a := SomeClass(300, "towel") in a.some_method
 
 # After the above line `a` will have the reference it was bound to in the
 # previous let expression.
@@ -249,28 +257,81 @@ let a := SomeClass(300) in a.some_method
 # Function definitions #
 ########################
 
+#*
+ * "Expression follows" operator
+ *#
+
+# Option 1 ->>
+def fib(n : Int) -> Int ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+def fib(n : Int) ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) -> Int ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+
+# Option 2 \ # Preventing newline excape
+def fib(n : Int) -> Int \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+def fib(n : Int) \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) -> Int \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+
+# Option 3 :-
+def fib(n : Int) -> Int :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+def fib(n : Int) :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) -> Int :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+
+# Option 4 :->
+def fib(n : Int) -> Int :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+def fib(n : Int) :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) -> Int :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+
+# Option 5 \-
+def fib(n : Int) -> Int \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+def fib(n : Int) \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) -> Int \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+
+# Option 6 :>
+def fib(n : Int) -> Int :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+def fib(n : Int) :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) -> Int :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+lambda (n : Int) :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+
 # These are function definitions.  Return types can be inferred if the body is a
 # literal.
 def fib(1) ->> 1
 def fib(2) ->> 1
-def fib(n : Integer) -> Integer ->> fib(n - 1) + fib(n - 2)
+def fib(n : Int) -> Int ->> fib(n - 1) + fib(n - 2)
 
 # OR
 
-def fib(n : Integer)
-	if n == 0 or n == 1
+def fib(n : Int)
+	if n <= 1 then 1 else fib(n-1) + fib(n-2) end
+end
+
+# OR
+
+def fib(n : Int)
+	if n <= 1
 		1
 	else
 		fib(n - 1) + fib(n - 2)
 	end
 end
 
+# Parameter overloading
+
+def add(a, b : Int) -> Int ->> a + b
+def add(a, b, c : Int) -> Int ->> a + b + c
+
+def add(a, b : Array{Int}) -> Array{Int} ->> a.zip(b).map lambda (a,b : Int) ->> a + b
+
 #*
  * This function takes four arguments: three integers and a float.  The
  * parameter `a` must always be provided; default values are specified for the
  * other parameters.
  *#
-def math_function(a, b := 2, c := 3 : Integer, d := 4.0 : Float) : Float
+def math_function(a, b := 2, c := 3 : Int, d := 4.0 : Float) : Float
 	a + b + c + d
 end
 
@@ -290,6 +351,8 @@ def baz(a, b := SomeClass(1, 2, 3) : SomeClass) -> Integer ->> 42
 
 # Calls bar with a new instance of SomeClass.
 bar(SomeClass())
+
+# TODO: Return type overloading
 
 # Splat parameters
 def avg(splat nums : Array{Integer}) -> Integer ->> void
@@ -312,6 +375,10 @@ min(splat get_array())
 
 avg([1, 2, 3, 4])
 avg(splat [1, 2, 3, 4])
+
+###################
+# Type conversion #
+###################
 
 ##############
 # Namespaces #

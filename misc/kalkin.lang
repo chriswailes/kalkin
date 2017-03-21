@@ -17,15 +17,16 @@
 		Information on what the highlighting should look like.
 	-->
 	<styles>
-		<style id="annotation" _name="Annotation" map-to="def:preprocessor" />
-		<style id="boolean"    _name="Boolean"    map-to="def:boolean"      />
-		<style id="comment"    _name="Comment"    map-to="def:comment"      />
-		<style id="keyword"    _name="Keyword"    map-to="def:keyword"      />
-		<style id="number"     _name="Number"     map-to="def:decimal"      />
-		<style id="string"     _name="String"     map-to="def:string"       />
-		<style id="symbol"     _name="Symbol"     map-to="def:string"       />
-		<style id="type"       _name="Data Type"  map-to="def:type"         />
-		<style id="variable"   _name="Variable"   map-to="def:identifier"   />
+		<style id="annotation" _name="Annotation"          map-to="def:preprocessor"     />
+		<style id="boolean"    _name="Boolean"             map-to="def:boolean"          />
+		<style id="comment"    _name="Comment"             map-to="def:comment"          />
+		<style id="ivar"       _name="Instance Variable"   map-to="def:special-constant" />
+		<style id="keyword"    _name="Keyword"             map-to="def:keyword"          />
+		<style id="number"     _name="Number"              map-to="def:decimal"          />
+		<style id="string"     _name="String"              map-to="def:string"           />
+		<style id="symbol"     _name="Symbol"              map-to="def:string"           />
+		<style id="type"       _name="Data Type"           map-to="def:type"             />
+		<style id="var"        _name="Variable"            map-to="def:identifier"       />
 	</styles>
 
 	<!--
@@ -57,8 +58,12 @@
 			</include>
 		</context>
 
-		<context id="instance-variables" style-ref="variable">
-			<keyword>\$[a-z][a-zA-Z0-9_]*</keyword>
+		<context id="instance-variables" style-ref="ivar">
+			<match>\$[a-z][a-zA-Z0-9_]*</match>
+		</context>
+
+		<context id="special-variables" style-ref="ivar">
+			<keyword>Implementer</keyword>
 			<keyword>self</keyword>
 		</context>
 
@@ -75,7 +80,7 @@
 			<keyword>constructor</keyword>
 			<keyword>def(-([ci]))?</keyword>
 			<keyword>default</keyword>
-			<keyword>destructor</keyword>
+			<keyword>destructure</keyword>
 			<keyword>do</keyword>
 			<keyword>else</keyword>
 			<keyword>end</keyword>
@@ -83,6 +88,7 @@
 			<keyword>hide(-([ci]))?</keyword>
 			<keyword>if</keyword>
 			<keyword>implements</keyword>
+			<keyword>import</keyword>
 			<keyword>in</keyword>
 			<keyword>include</keyword>
 			<keyword>interface</keyword>
@@ -104,7 +110,6 @@
 			<keyword>protected</keyword>
 			<keyword>public</keyword>
 			<keyword>raise</keyword>
-			<keyword>ref</keyword>
 			<keyword>receive</keyword>
 			<keyword>reject</keyword>
 			<keyword>rename(-([ci]))?</keyword>
@@ -163,12 +168,13 @@
 				<context ref="block-comment"         />
 				<context ref="booleans"              />
 				<context ref="line-comment"          />
+				<context ref="instance-variables"    />
+				<context ref="special-variables"     />
 				<context ref="keywords"              />
 				<context ref="numbers"               />
 				<context ref="strings"               />
 				<context ref="symbols"               />
 				<context ref="types"                 />
-				<context ref="instance-variables"    />
 				<context ref="identifiers"           />
 			</include>
 		</context>

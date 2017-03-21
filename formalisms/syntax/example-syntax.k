@@ -49,6 +49,7 @@
  * - Destructuring
  * - Pattern matching
  * - Exceptions
+ * - Default exception handlers
  * - String interpolation
  * - Return type overloading
  * - Synchronizers
@@ -57,10 +58,11 @@
  * - Semantic versioning
  *
  * NOTE: ... is most often used here to indicate elided code.  The only
- *       exception is for integer range literals.
+ *       exception is for Int range literals.
  *
  * TODO:
- * - Replace the ->> token with something else.
+ * - Default exception handlers
+ * - Type conversion
  *#
 
 ############
@@ -77,7 +79,7 @@
 # Literals #
 ############
 
-# Integers
+# Ints
 42
 1E10
 
@@ -89,6 +91,7 @@
 # Atoms
 :foo
 :bar_
+:foo12
 
 #*
  * Unicode Delimiter Alternatives
@@ -96,7 +99,7 @@
  * - Guillemet «»
  * - Angle Brackets 〈〉
  * - Double Angle Bracket ⟪⟫
- * - Tortouis Shell Bracket ⟬⟭
+ * - Tortoises Shell Bracket ⟬⟭
  * - Angle Brackets with Dot ⦑⦒
  * - Half Brackets ⸢⸣⸤⸥
  * - Corner Brackets 「」
@@ -122,7 +125,7 @@ let a := 42, b := 100, c := 87
 <|42, 100, 87{16}|>
 <|42, 100, 550|>
 
-# Store an Integer in a specific representation:
+# Store an Int in a specific representation:
 <|100{8, signed}, 200{unsigned}, -20{signed}|> # The last signedness specification is redundant.
 
 # Specify the endianness:
@@ -144,7 +147,7 @@ let a := 42, b := 100, c := 87
 (| :hello, :world |)
 (| 1, 2.0, :three, "four" |)
 
-# Integer ranges
+# Int ranges
 0..5  # 0, 1, 2, 3, 4
 0...5 # 0, 1, 2, 3, 4, 5
 
@@ -169,8 +172,8 @@ my_array.append 42
 # Conditionals
 if val % 2 then :odd else :even end
 
-# Actually a call to the ? operator for Integers, wich converts the value to a
-# boolean and calls the ? operator on that.
+# Actually a call to the ? operator for Ints, which converts the value to a
+# Boolean and calls the ? operator on that.
 val % 2 ? :odd, :even
 
 if val == 0
@@ -213,10 +216,10 @@ Tuple{Int, Int}
 
 # Function Types
 
-# Taking no argument and returning an Integer
+# Taking no argument and returning an Int
 void -> Int
 
-# Taking an Integer and returning an Integer
+# Taking an Int and returning an Int
 Int -> Int
 
 # The `array map` function
@@ -226,10 +229,10 @@ Int -> Int
 # Variable definitions #
 ########################
 
-# Declare a new integer variable 'x' that will be default initialized.
+# Declare a new Int variable 'x' that will be default initialized.
 let x : Int
 
-# Declare a new integer variable 'y' and give it a value.  Its type is inferred.
+# Declare a new Int variable 'y' and give it a value.  Its type is inferred.
 let y := 42
 
 # Declare two default initialized strings called 'foo', and 'bar'.
@@ -257,51 +260,11 @@ let a := SomeClass(300, "towel") in a.some_method
 # Function definitions #
 ########################
 
-#*
- * "Expression follows" operator
- *#
-
-# Option 1 ->>
-def fib(n : Int) -> Int ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-def fib(n : Int) ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) -> Int ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) ->> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-
-# Option 2 \ # Preventing newline excape
-def fib(n : Int) -> Int \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-def fib(n : Int) \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) -> Int \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) \ if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-
-# Option 3 :-
-def fib(n : Int) -> Int :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-def fib(n : Int) :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) -> Int :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) :- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-
-# Option 4 :->
-def fib(n : Int) -> Int :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-def fib(n : Int) :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) -> Int :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) :-> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-
-# Option 5 \-
-def fib(n : Int) -> Int \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-def fib(n : Int) \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) -> Int \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) \- if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-
-# Option 6 :>
-def fib(n : Int) -> Int :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-def fib(n : Int) :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) -> Int :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-lambda (n : Int) :> if n <= 1 then 1 else fib(n-1) + fib(n-2) end
-
 # These are function definitions.  Return types can be inferred if the body is a
 # literal.
-def fib(1) ->> 1
-def fib(2) ->> 1
-def fib(n : Int) -> Int ->> fib(n - 1) + fib(n - 2)
+def fib(1) :~ 1
+def fib(2) :~ 1
+def fib(n : Int) -> Int :~ fib(n - 1) + fib(n - 2)
 
 # OR
 
@@ -321,13 +284,13 @@ end
 
 # Parameter overloading
 
-def add(a, b : Int) -> Int ->> a + b
-def add(a, b, c : Int) -> Int ->> a + b + c
+def add(a, b : Int) -> Int :~ a + b
+def add(a, b, c : Int) -> Int :~ a + b + c
 
-def add(a, b : Array{Int}) -> Array{Int} ->> a.zip(b).map lambda (a,b : Int) ->> a + b
+def add(a, b : Array{Int}) -> Array{Int} :~ a.zip(b).map lambda (a,b : Int) :~ a + b
 
 #*
- * This function takes four arguments: three integers and a float.  The
+ * This function takes four arguments: three Ints and a float.  The
  * parameter `a` must always be provided; default values are specified for the
  * other parameters.
  *#
@@ -344,26 +307,24 @@ math_function(1, c := 42, d := 100) # Valid
  *#
 
 # Default values for non-trivial types
-def bar(x := SomeClass(1, 2, 3)) -> Integer ->> 42
+def bar(x := SomeClass(1, 2, 3)) -> Int :~ 42
 
-def baz(a : SomeClass, b := SomeClass(1, 2, 3)) -> Integer ->> 42
-def baz(a, b := SomeClass(1, 2, 3) : SomeClass) -> Integer ->> 42
+def baz(a : SomeClass, b := SomeClass(1, 2, 3)) -> Int :~ 42
+def baz(a, b := SomeClass(1, 2, 3) : SomeClass) -> Int :~ 42
 
 # Calls bar with a new instance of SomeClass.
 bar(SomeClass())
 
-# TODO: Return type overloading
-
 # Splat parameters
-def avg(splat nums : Array{Integer}) -> Integer ->> void
+def avg(splat nums :| Splat{Int}) -> Int :~ void
 
 # Splat arguments
-let args := (1, :two, "three") : (Integer, Atom, String)
-def helper(a : Integer, b : Atom, c : String) -> void ->> void
+let args := (1, :two, "three") : (Int, Atom, String)
+def helper(a : Int, b : Atom, c : String) -> void :~ void
 
 helper(splat args)
 
-def min(a, b : Integer) -> Integer ->> if a <= b then a else b end
+def min(a, b : Int) -> Int :~ if a <= b then a else b end
 
 # This is fine because the size of the array is known statically
 min(splat [12, 5])
@@ -371,14 +332,13 @@ min(splat [12, 5])
 # This will result in a dynamic check and could produce an exception
 min(splat get_array())
 
-# Mixed splat usage (both work)
-
-avg([1, 2, 3, 4])
-avg(splat [1, 2, 3, 4])
-
 ###################
 # Type conversion #
 ###################
+
+let x = 42 :- Float
+
+array.map(lambda (x) :~ x + 10):-List-:.each ...
 
 ##############
 # Namespaces #
@@ -394,59 +354,87 @@ end
 # Calling a member of the Math namespace
 Math::cos(0.1234)
 
-# FIXME: Requires some_funame to be in scope
+#*
+ * Namespace Scoping
+ *#
+
+# Reference a name in a namespace
+SomeNamespace::name
+SomeNamespace::InnerNamespace
+
+# Apply selector to namespace
+SomeNamespace::[#* selector syntax *#]
+
+# Chaining namespace selectors
+SomeNamespace::[#* selector syntax *#]::[#* selector syntax *#]
+
+# Select several names from a namespace
+SomeNamespace::[ns_name0, ns_name1]
+
+# SomeNamespace, but with some names changed.  This doesn't change how
+# functions inside the namespace refer to each other, nor how other namespaces
+# view the namespace.
+SomeNamespace::[rename ns_name0 as local_name1]
+
+# SomeNamespace, but with some aliases added.  This doesn't change how
+# functions inside the namespace refer to each other, nor how other namespaces
+# view the namespace.
+SomeNamespace::[alias ns_name0 as local_name1]
+
+# SomeNamespace, but with some names removed.  This doesn't change how
+# functions inside the namespace refer to each other, nor how other namespaces
+# view the namespace.
+SomeNamespace::[hide ns_name0, ns_name1]
+
+# Putting it all together
+SomeNamespace::[alias ns_name0 as local_name0]::[hide ns_name1]::[rename ns_name1 as local_name1]
+
+#*
+ * Aliasing, instantiating, and importing names
+ *#
+
+# Adds a new name `other_funame` that can be used to refer to `some_funame`
 alias some_funame as other_funame
-rename some_funame as other_funame
 
-# FIXME
-use SomeNamespace::InnerNamespace
-
-# FIXME
+# Instantiate a polymorphic namespace
 use SomeNamespace::PolymorphicNamespace{Arg1, Arg2, arg_3} as InstantiatedName
 
+# Add the names from SomeNamespace::InnerNamespace to the current namespace.
+import SomeNamespace::InnerNamespace
 
-# FIXME
-use SomeNamespace::namespace_name0
-use SomeNamespace::[namespace_name0, namespace_name1]
+# Add specific names to the current namespace
+import SomeNamespace::ns_name0
+import SomeNamespace::[ns_name0, ns_name1]
 
-# Maps a new name in the current scope to an existing name in another scope.
-use SomeNamespace::namespace_name0 as local_name0
-use SomeNamespace::[rename namespace_name0 as local_name0]
-use SomeNamespace::[rename namespace_name0 as local_name0, namespace_name1 as local_name1]
-use SomeNamespace::[rename namespace_name0 as local_name0]::[hide namespace_name1, namespace_name2]
+# Maps an existing name in SomeNamespace to a new name in the current scope.
+import SomeNamespace::ns_name0 as local_name0
 
-# FIXME
-namespace SomeNamespace
-	def foo ->> void
-	def bar ->> void
-	def baz(x : Int, y : Int) ->> void
-	def baz(x : Int, y : Float) ->> void
+# Import all names from SomeNamespace, but rename some of them.
+import SomeNamespace::[rename ns_name0 as local_name0]
+import SomeNamespace::[rename ns_name0 as local_name0, ns_name1 as local_name1]
+
+# Same as above
+import SomeNamespace::[rename namespace_name0 as local_name0]::[hide namespace_name1, namespace_name2]
+
+namespace NamespaceExample
+	def foo :~ void
+	def bar :~ void
+	def baz(x : Int, y : Int) :~ void
+	def baz(x : Int, y : Float) :~ void
 end
+
+# Each statement here acts as a filter, just like in the shorthand above.
 
 # Results in importing (foo :=> fud), bar, and baz : Int -> Float -> void
-use SomeNamespace where
-	# Hide specific instance of an overloaded funciton
-	hide baz : Int -> Int -> void
-	rename foo as fud
-end
-
-# Same as above: Results in importing (foo :=> fud), bar, and baz : Int -> Float -> void
-use SomeNamespace where
-	use ::
+import NamespaceExample where
+	# Hide specific instance of an overloaded function
 	hide baz : Int -> Int -> void
 	rename foo as fud
 end
 
 # Results in importing (foo :=> fud) and baz
-use SomeNamespace where
-	use baz
-	rename foo as fud
-end
-
-# Same as above: Results in importing (foo :=> fud) and baz
-use SomeNamespace where
-	hide ::
-	use baz
+import NamespaceExample where
+	import foo, baz
 	rename foo as fud
 end
 
@@ -470,22 +458,42 @@ class Point
 	 * variables.  In the scope of an instance of the Point class the
 	 * variables may be referenced using the $ sigil.
 	 *#
-	let-i x : Integer
-	let-i y : Integer
+	let-i x : Int
+	let-i y : Int
 
 	#*
 	 * Instances methods where `self` points to an instance of Point.
 	 *#
 
-	# This is a constructor for the Point class.  Arguments get assigned to the
-	# instance's variables $x and $y.
-	constructor ($x, $y) ->> void
+	# A default constructor
+	constructor :~ $x = $y = 0
+
+	# A constructor where arguments get assigned to the instance's variables $x
+	# and $y.
+	constructor ($x, $y) :~ void
+
+	# A constructor with an initialization list.
+	constructor with $x := 0, $y := 0 :~ void
+
+
+	constructor with $x := 0, $y := 0 do
+		# Other code goes here
+	end
+
+	constructor with
+		$x := 0
+		$y := 0
+
+		# The normal ; sequencing operator can be used here.
+	do
+		# Other code goes here.
+	end
 
 	#*
 	 * The return type of 'self' tells us that not only does this method
 	 * return an object of type Point, it returns the object it was called on.
 	 *#
-	def-i move(x : Integer, y : Integer) : self
+	def-i move(x : Int, y : Int) : self
 		$x += x
 		$y += y
 	end
@@ -496,8 +504,8 @@ class Point
 		$x, $y = other.x, other.y
 	end
 
-	# Definition of a (not very usefull) postfix operator.
-	def-i ! : self ->> $x, $y = 0, 0
+	# Definition of a (not very useful) postfix operator.
+	def-i ! : self :~ $x, $y = 0, 0
 
 	# Definition of the prefix negation operator.
 	def-i - self : Point
@@ -506,15 +514,15 @@ class Point
 
 	# Definition of an infix operator.
 	@assoc(:left) @prec(0)
-	def-i + (ref other : Point) ->> Point($x + other.x, $y + other.y)
+	def-i + (ref other : Point) :~ Point($x + other.x, $y + other.y)
 
 	@assoc(:right) @prec(1)
-	def-i * (scale : Integer) ->> Point($x * scale, $y * scale)
+	def-i * (scale : Int) :~ Point($x * scale, $y * scale)
 
 	# How to declare ways to destructure a Point object.
-	def-i Point~ : (Integer, Integer) ->> ($x, $y)
+	destructure : (Int, Int) :~ ($x, $y)
 	# Now with type inference...
-	def-i Point~ ->> ($x, $y, 0)
+	destructure :~ ($x, $y, 0)
 
 	#*
 	* Functions in the Point namespace.  The self variable is not in scope for
@@ -550,7 +558,7 @@ class CountedClass
 	 * instantiated variable of an anonymous subclass of the class named
 	 * Class; CountedClass is an instance of that anonymous subclass.
 	 *#
-	let-c count : Integer
+	let-c count : Int
 
 	# Overload the class constructor.
 	def-c CountedClass(splat args :? ArgTypes)
@@ -559,7 +567,7 @@ class CountedClass
 	end
 
 	# Returns the number of instantiations of this class.
-	def-c count : Integer ->> $count
+	def-c count : Int :~ $count
 end
 
 # Sending a message to the object CountingClass.
@@ -572,7 +580,7 @@ CountedClass.count
 
 class CountingClass <: Class
 	# Define the counter.
-	let-i count : Integer
+	let-i count : Int
 
 	# Overload the new message.
 	def-i CountingClass(splat args :? ArgTypes)
@@ -581,8 +589,8 @@ class CountingClass <: Class
 	end
 
 	# Returns the number of instantiations of this class.
-	def-i count : Integer ->> $count
-	def-i () ->> $count
+	def-i count : Int :~ $count
+	def-i () :~ $count
 end
 
 class[CountingClass] CountedAnimals
@@ -594,34 +602,25 @@ class[CountingClass] CountedAnimals
 	end
 end
 
-# Calling a class's () operator.
-CountedAnimals.()
-
 class LoggedClass
-	let-i id : Integer
+	let-i id : Int
 	let-i log : Stream
 
-	# Called when an object's reference count reaches zero, before the class
-	# level destroy callback.
+	# Called when an object's reference count reaches zero.
 	def-i destroy : void
 		$log.write("Destroying an instance of LoggedClass")
-	end
-
-	def-c destroy(obj : LoggedClass)
-		# TODO: Figure out Kalkin syntax for writting to the output channel.
-		puts "Destorying LoggeClass instance #{obj.id}"
 	end
 end
 
 class ExampleClass
-	let-i a0, a1 : Array{Integer}
+	let-i a0, a1 : Array{Int}
 
-	def-i ExampleClass($a0, $a1) ->> void
+	def-i ExampleClass($a0, $a1) :~ void
 
 	# Defining the two special case operators.
-	def-i ()(x, y : Integer) : Integer ->> $a0[x] + $a1[y]
+	def-i ()(x, y : Int) : Int :~ $a0[x] + $a1[y]
 
-	def-i [](x, y : Integer) : (Integer, Integer) ->> ($a0[x], $a1[y])
+	def-i [](x, y : Int) : (Int, Int) :~ ($a0[x], $a1[y])
 end
 
 let example := ExampleClass([1, 2, 3], [4, 5, 6])
@@ -630,15 +629,15 @@ example(0, 0) # Evaluates to 5
 example[1, 2] # Evaluates to (2, 6)
 
 class AnotherExample
-	let-i $x : Integer
+	let-i $x : Int
 
-	def-i AnotherExample($x) ->> void
+	def-i AnotherExample($x) :~ void
 
 	# Accessor (by value) for the x member.
-	def-i x ->> $x
+	def-i x :~ $x
 
 	# Assignment for the x member.
-	def-i x= (new_x : Integer)
+	def-i x= (new_x : Int)
 		log("Changing x to #{new_x} from #{$x}")
 		$x = new_x
 	end
@@ -646,15 +645,15 @@ end
 
 let ae := AnotherExample(42)
 
-ae.x # Evalutes to 42
-ae.x = 100 # Calles the method x=
+ae.x # Evaluates to 42
+ae.x = 100 # Calls the method x=
 
 # Self types
 
 class Foo
-	let-i val : Integer
+	let-i val : Int
 
-	def-i Foo($val) ->> void
+	def-i Foo($val) :~ void
 
 	# Returns the same object that the method was called on.
 	def-i bar : self
@@ -708,36 +707,95 @@ end
 ##############
 
 #*
+ * Full Syntax
+ *#
+
+# 1. Ensure that the implementing namespace/interface/module/class provides namespace/class/instance names
+
+require InnerName
+# OR ???
+require namespace InnerNamespace
+require interface InnerInterface
+require module InnerModule
+require class InnerClass
+
+# Require the implementing namespace provide a function.
+require helper : String -> Int
+
+# Require the implementing class to provide an instance method.
+require-i foo : void -> Int
+require-i constructor (void)
+
+# Require the implementing class to provide a class method.
+require-c bar : Int -> Int -> String
+
+# 2. Ensure that the implementing namespace/interface/module/class implements a specific interface
+
+require $: implements SomeInterface
+require Implementer implements SomeInterface
+
+# 3. Ensure that a namespace/interface/module/class inside the implementing namespace/interface/module/class implements a specific interface
+
+require $::InnerNamespace implements HelperInterface
+require $::InnerInterface implements Collection
+require $::InnerModule implements Loggable
+require $::InnerClass implements DefaultConstructable
+
+require Implementer::InnerNamespace implements HelperInterface
+
+# 4. Ensure that a polymorphic variable, if it is a namespace/interface/module/class, implements a specific interface.
+
+require PolyVarName implements SomeInterface
+
+# 5. Declare that this interface subsumes another
+
+implements Collection
+
+#*
  * Interfaces may not specify implementations of methods.  If you wish to
- * provide partial implementations you can declare a mixin and then use it as
+ * provide partial implementations you can declare a module and then use it as
  * an interface.
  *#
 
 interface Monoid
-	require-i self.class : void -> self.class
-	require-i successor : void -> self
+	require-i constructor (void)
+	require-i successor : void -> self.class
+	# or
+	require-i successor : void -> $:
 end
 
-interface Container {ImplementingClass{ElementType}}
+
+interface Container
 	# ImplementingClass must also implement the Iterable interface.
-	require Iterable
+	implements Iterable
 
-	require-i [] : Integer -> ElementType
-	require-i size : -> Integer
+	require-i [] : Int -> ElementType
+	require-i size : -> Int
 end
 
-##########
-# Mixins #
-##########
+interface Fooable
+	# A class function that takes two instances of itself and returns an
+	# instance of itself.
+	require-c foo(a, b : self) -> self
+	# or
+	require-c foo(a, b : $:) -> $:
+end
 
-mixin Mappable {ImplementingClass{ElementType}}
+###########
+# Modules #
+###########
+
+# Same syntax from Interfaces works in Mappable
+
+module Mappable
+	# The implementing class must have an element type
+	require class ElType
+
 	# ImplementingClass must implement the Appendable and Iterable interface.
-	require Appendable, Iterable
+	require $: implements Appendable, Iterable
 
-	require-i helper_fun : Integer -> Integer
-
-	def-i map{NewElementType}(fun : ElementType -> NewElementType) -> ImplementingClass{NewElementType}
-		let new_container : ImplementingClass
+	def-i map(fun : ElType -> ElType) -> $:
+		let new_container : Implementer
 
 		self.each do (el)
 			new_container << fun(el)
@@ -747,23 +805,28 @@ mixin Mappable {ImplementingClass{ElementType}}
 	end
 end
 
-###############################
-# Using Interfaces and Mixins #
-###############################
+################################
+# Using Interfaces and Modules #
+################################
 
 class Foo
-	implements Monoid{successor/increment}
+	implements Monoid::[meet successor with increment]
 
-	def increment : self.class
+	def-i increment : self.class
 		...
 	end
 end
 
 class Bar
 	implements Appendable, Iterable
-	include Mappable{helper/my_helper}{map/other_name}
+	include Mappable::[meet helper with my_helper]::[rename map as other_name]
 
-	def-i my_helper(a : Integer) : Integr ->> a
+	include Mappable where
+		meet helper with my_helper
+		rename map as other_name
+	end
+
+	def-i my_helper(a : Int) : Integr :~ a
 end
 
 #############
@@ -771,152 +834,94 @@ end
 #############
 
 namespace Outer
-	class Foo
-		def bar(x : Integer) : Integer ->> x
+	namespace Foo
+		def bar(x : Int) : Int :~ x
 	end
 
 	namespace Inner
 		reopen Foo
-			def bar(x : Integer) : Integer ->> x + 100
+			def bar(x : Int) : Int :~ x + 100
 		end
 
-		Foo().bar(42) # Evaluates to 142
+		Foo::bar(42) # Evaluates to 142
 	end
 
-	Foo().bar(42) # Evaluates to 42
-end
-
-#####################
-# Generic Functions #
-#####################
-
-def eq(v0, v1 |: Comparable) : Boolean ->> v0 == v1
-def min{T |: Comparable}(v0, v1 : T) : T ->> if v0 < v1 then v0 else v1 end
-def fold{ContainerType{ElementType}}(fun : ElementType -> ElementType, container : ContainerType) : ContainerType
-	...
-end
-
-# These two declarations are all equivalent:
-def log{LogType}(ref message : String, ref log : LogType |: Stream) ->> void
-def log(ref message : String, ref log |: Stream) ->> void
-
-# Default value for generic function:
-def my_algorithm{ContainerType := List}(ref data : Stream) : Integer ->> void
-
-# If you use a name that is already taken in the current namespace the compiler
-# will generate a warning.
-
-class Foo; end
-
-# Generates a compiler warning that the name Foo is already used in this namespace.
-def generic_function{Foo}(f : ref Foo) ->> void
-
-######################
-# Parametrized Types #
-######################
-
-class LinkedList {ElType}
-	# FIXME: Do linked list example
-end
-
-Maybe{Integer}(42)
-
-# Multiple type arguments
-class Graph {NodeType, EdgeType}
-	let-i nodes : Array{NodeType}
-	let-i edges : Array{EdgeType}
-end
-
-# Subclass requirement
-class Zoo {AnimalType <: Animal}
-	let-i animals : Array{AnimalType}
-end
-
-# Interface requirement
-class IntegerStore {ContainerType |: Container}
-	let-i storage : ContainerType{Integer}
-end
-
-# Multiple interface requirements
-class LoggingClass {StreamType |: Writable, Seekable}
-	let-i stream : StreamType
-end
-
-# Non-type parameters.
-class Vector{n : Integer, ElementType}
-end
-
-let vec0 := [1, 2, 3] : Vector{3, Integer}
-
-let num := getNumElements()
-let vec1 := Vector{num, Integer}(getElements())
-
-# Default type parameters:
-class Graph{NodeType := Integer, EdgeType := Integer}
-	...
+	Foo::bar(42) # Evaluates to 42
 end
 
 ###########
 # Lambdas #
 ###########
 
-# The return type is optional for these two forms.
-lambda (args) : RetType expression
-λ (args) : RetType expression
+# The return type is optional for this forms.
+lambda (x, y : ArgType) -> RetType :~ expression
+lambda (x, y : ArgType) :~ expression
+lambda :~ expresssion
 
-lambda (args) : RetType
+# ??
+lambda (x, y : ArgType) expression
+lambda expresssion
+
+# Return type is required
+lambda (x, y : ArgType) -> RetType
 	# code
 end
 
-λ (args) : RetType
+# No-argument long-form lambda
+lambda -> RetType
 	# code
 end
-
-# Other valid lambdas
-λ (a : Integer) : Integer ->> a + 42
-λ (a : Integer) a + 42
-λ 42
 
 ################
 # Block syntax #
 ################
 
-class Array{ElType}
+class IntArray
 	...
 
-	def-i each(block :? ElType -> _) : self
+	def-i each(block : Int -> void) : self
 		...
 	end
 end
 
-[1, 2, 3, 4].each do (el : Integer) : void
+# Without type inference
+[1, 2, 3, 4].each do (el : Int) -> void
 	log_number(el)
 end
 
-[1, 2, 3, 4].each λ (el : Integer) : void ->> log_number(el)
-[1, 2, 3, 4].each λ (el : Integer) ->> log_number(el)
-[1, 2, 3, 4].each λ (el : Integer) log_number(el)
-[1, 2, 3, 4].each λ (el) log_number(el)
+# With type inference
+[1, 2, 3, 4].each do (el)
+	log_number(el)
+end
+
+# Also works
+[1, 2, 3, 4].each lambda (el : Int) -> void
+	log_number(el)
+end
+
+[1, 2, 3, 4].each lambda (el : Int) -> void :~ log_number(el)
+[1, 2, 3, 4].each lambda (el : Int) :~ log_number(el)
+[1, 2, 3, 4].each lambda (el) :~ log_number(el)
 
 ############
 # Aliasing #
 ############
 
-def a_long_descriptive_function_name ->> void
+def a_long_descriptive_function_name :~ void
 alias a_long_descriptive_function_name as short_name
 
 ############
 # Currying #
 ############
 
-def foo(a, b, c : Integer) : Integer ->> 42
+def foo(a, b, c : Int) -> Int :~ 42
 
-let my_foo := `foo(1, 2) : Integer -> Integer
+let my_foo := `foo(1, 2) : Int -> Int
 
-def bar (a, b : Integer) : Integer ->> 100
-def bar (a : Integer) : Integer ->> 200
+def bar (a, b : Int) -> Int :~ 100
+def bar (a : Int) -> Int :~ 200
 
-let my_bar := `bar(1) : -> Integer
+let my_bar := `bar(1) : -> Int
 
 ########################
 # Local type inference #
@@ -931,28 +936,28 @@ let value := get_int()
 #################
 
 # Tuples
-let a, b ~= (1, 2)
-let a, b ~= (1, 2, 3) # a == 1, b == (2, 3)
+let a, b <~ (|1, 2|)
+let a, b <~ (|1, 2, 3|) # a == 1, b == (2, 3)
 
-let a, b : Integer
-a, b ~= (1, 2) # Fine
-a, b ~= (1, 2, 3) # Type error
+let a, b : Int
+a, b <~ (|1, 2|) # Fine
+a, b <~ (|1, 2, 3|) # Type error
 
 # Arrays
-let a, b ~= [1, 2]
-let a, b ~= [1, 2, 3] # a == 1, b == [2, 3]
+let a, b <~ [|1, 2|]
+let a, b <~ [|1, 2, 3|] # a == 1, b == [2, 3]
 
-let a, b : Integer
-a, b ~= [1, 2] # Fine
-a, b ~= [1, 2, 3] # Type error
+let a, b : Int
+a, b <~ [|1, 2|] # Fine
+a, b <~ [|1, 2, 3|] # Type error
 
 # Binaries
 let bin := [|1, 17, 42|]
-let [|a{8}, b, c|} ~= bin
+let [|a{8}, b, c|} <~ bin
 
-def bin_func(bin : Binary) : Maybe{(Integer, Integer, Integer)}
+def bin_func(bin : Binary) : Maybe{(Int, Int, Int)}
 	if (bin.length == 32)
-		let [|a{16;:signed;:big}, b{12;:unsigned;:little}, c{4}|] := bin in Maybe((a, b, c))
+		let [|a{16;:signed;:big}, b{12;:unsigned;:little}, c{4}|] <~ bin in Maybe((a, b, c))
 	else
 		None
 	end
@@ -960,91 +965,125 @@ end
 
 # Other objects
 class Foo
-	def-i Foo~ ->> (42, "world")
-	def-i Foo~ ->> ("hello", 42)
-	def-i Foo~ ->> (1, 2.3, :four)
+	destructure :~ (42, "world")
+	destructure :~ ("hello", 42)
+	destructure :~ (1, 2.3, :four)
 end
 
 # Ambiguous
-let a, b ~= Foo()
+let a, b <~ Foo()
 
 # First
-let a : Integer, b : String ~= Foo()
-let a : Integer, b ~= Foo()
+let a : Int, b : String <~ Foo()
+let a : Int, b <~ Foo()
 
 # Second
-let a : String, b : Integer ~= Foo()
-let a : String, b ~= Foo()
+let a : String, b : Int <~ Foo()
+let a : String, b <~ Foo()
 
 # Third
-let a, b, c ~= Foo()
+let a, b, c <~ Foo()
 
 ####################
 # Pattern matching #
 ####################
 
-def number_function(n : Integer) : Symbol
-	match n with
-		n where n < 0 ->> :neg
-		0             ->> :zero
-		1             ->> :one
-		_             ->> :other
+# TODO: MARKER
+
+# Pattern matching options
+
+def foo(node : BinOp) : void
+	match node with
+		Add~>(IntLiteral as l0, Add~>(IntLiteral as l1, r1) as r0) :~ Add(l0 + l1, r0)
+
+		# Option #1
+		Add~>(l0 : IntLiteral, r0 : Add)
+
+		                   # This : implies more than just a type relation.
+		Add~>(l0 : IntLiteral, r0 : Add~>(l1 : IntLiteral, r1))
+		Add~>(l0 : IntLiteral, r0 : Add~>(l1 : IntLiteral, r1))
+
+		# Option #2
+		Add~>(IntLiteral as l0, Add as r0)
+		Add~>(IntLiteral as l0, Add~>(IntLiteral as l1, r1) as r0)
+
+		# Mixed (Strong dislike)
+		Add~>(l0 : IntLiteral, Add~>(l1 : IntLiteral, r1) as r0) :~ Add(l0 + l1, r0)
 	end
 end
 
-def binornot(n : Integer) : Symbol
+
+def number_function(n : Int) : Symbol
 	match n with
-		0 or 1 ->> :binary
-		_      ->> :not_binary
+		n where n < 0 :~ :neg
+		0             :~ :zero
+		1             :~ :one
+		_             :~ :other
 	end
 end
 
+def binornot(n : Int) : Symbol
+	match n with
+		0 or 1 :~ :binary
+		_      :~ :not_binary
+	end
+end
 def point_function(p : Point) : Symbol
+	# Longhand
 	match p with
-		Point(0, 0) ->> :origin
-		Point(0, _) ->> :vertical
-		Point(_, 0) ->> :horizontal
-		Point(a, a) ->> :diagonal
-		_           ->> :other
+		Point~>(0, 0) :~ :origin
+		Point~>(0, _) :~ :vertical
+		Point~>(_, 0) :~ :horizontal
+		Point~>(a, a) :~ :diagonal
+		_             :~ :other
+	end
+
+	# Shorthand
+	match p with
+		0, 0 :~ :origin
+		0, _ :~ :vertical
+		_, 0 :~ :horizontal
+		a, a :~ :diagonal
+		_             :~ :other
 	end
 end
 
-def handle_request(r : Request) : Response
+def handle_request(r : Request) -> Response
 	match r with
-		Request(:simple, data) ->> handle_simple_request(data)
-		Request(:complex, data) do
+		Request~>(:simple, data) :~ handle_simple_request(data)
+		Request~>(:complex, data) do
 			# Do something complicated.
 		end
 	end
 end
 
 match get_animal() with
-	Cat as c ->> "cat"
-	Dog(breed) ->> "dog - #{breed}"
-	Animal as a ->> p.class.name
+	Cat as c     :~ "cat"
+	Dog~>(breed) :~ "dog - #{breed}"
+	Animal as a  :~ p.class.name
 end
 
-def string_function(str : String) : Symbol
+def string_function(str : String) -> Symbol
 	match str with
-		/cat/ ->> :cat
-		/\d+/ ->> :number
-		/(\d+):num bottles of beer/ ->> Symbol(num + "bb")
+		/cat/ :~ :cat
+		/\d+/ :~ :number
+		/(\d+):num bottles of beer/ :~ Symbol(num + "bb")
 	end
 end
 
-def tuple_function(tup : (Integer, Integer, String)) : Symbol
+def tuple_function(tup : Tuple{Int, Int, String}) -> Symbol
 	match tup with
-		0, 0, "zero" ->> :zero
-		1, 1, "one" ->> :one
-		n, n, w where w == n.to(String) ->> :other_same
-		_ ->> :not_same
+		0, 0, "zero" :~ :zero
+		1, 1, "one"  :~ :one
+		n, n, w where w == n:-String :~ :other_same
+		_ :~ :not_same
 	end
 end
 
-def sum{NumType |: Numeric}(arr : Array{NumType}, acc := NumType()) : NumType
+def sum(arr : Array{Int}, acc := 0) : Int
 	match arr with
-		[] ->> acc
-		x, xs ->> sum(xs, acc + x)
+		[||]  :~ acc
+		x, xs :~ sum(xs, acc + x)
 	end
 end
 
@@ -1054,9 +1093,9 @@ end
 
 def dangerous_operation() : void :! Exception1, Exception2
 	match rand() % 3 with
-		0 ->> 42
-		1 ->> Exception1(42)
-		2 ->> Exception2(42, 42)
+		0 :~ 42
+		1 :~ Exception1(42)
+		2 :~ Exception2(42, 42)
 	end
 end
 
@@ -1070,6 +1109,91 @@ handle Exception2(v0, v1) as e
 	...
 end
 
+####################
+# Old Polymorphism #
+####################
+
+class LinkedList {ElType}
+	# FIXME: Do linked list example
+end
+
+Maybe{Int}(42)
+
+# Multiple type arguments
+class Graph {NodeType, EdgeType}
+	let-i nodes : Array{NodeType}
+	let-i edges : Array{EdgeType}
+end
+
+# Subclass requirement
+class Zoo {AnimalType <: Animal}
+	let-i animals : Array{AnimalType}
+end
+
+# Interface requirement
+class IntStore {ContainerType |: Container}
+	let-i storage : ContainerType{Int}
+end
+
+# Multiple interface requirements
+class LoggingClass {StreamType |: Writable, Seekable}
+	let-i stream : StreamType
+end
+
+# Non-type parameters.
+class Vector{n : Int, ElementType}
+end
+
+let vec0 := [1, 2, 3] : Vector{3, Int}
+
+let num := getNumElements()
+let vec1 := Vector{num, Int}(getElements())
+
+# Default type parameters:
+class Graph{NodeType := Int, EdgeType := Int}
+	...
+end
+
+#######################
+# Polymorphic Objects #
+#######################
+
+#*
+ * Syntax
+ *#
+
+## Type Parameters
+
+## Non-type Parameters
+
+## Default parameters
+
+#*
+ * Namespaces
+ *#
+
+#*
+ * Functions
+ *#
+
+#*
+ * Interfaces
+ *#
+
+#*
+ * Modules
+ *#
+
+#*
+ * Classes
+ *#
+
+##############################
+# Default exception handlers #
+##############################
+
+# TODO
+
 ########################
 # String interpolation #
 ########################
@@ -1078,27 +1202,13 @@ def great(p : Person) : String
 	"Hello #{p.name}!"
 end
 
-###########################
-# Return type overloading #
-###########################
-
-class Simulation
-	def-i run : void
-		# Execute simulation without collecting statistics
-	end
-
-	def-i run : Report
-		# Execute simulation and collect statistics
-	end
-end
-
 #################
 # Synchronizers #
 #################
 
 # This synchronizer will process messages in the order they are received.
 synchronizer FIFO
-	receive ->> (messages : Mailbox, mailboxes : PostOffice) messages
+	receive :~ (messages : Mailbox, mailboxes : PostOffice) messages
 end
 
 # This synchronizer will select one message from each sender in turn.
@@ -1124,7 +1234,7 @@ mixin Lockable
 			accept
 		end
 
-		default ->> accept
+		default :~ accept
 
 		receive := FIFO
 	end
@@ -1144,7 +1254,7 @@ mixin Lockable
 			if sender == $lock_holder then accept else reject end
 		end
 
-		receive ->> (messages : Mailbox, mailboxes : PostOffice) mailboxes[$lock_holder]
+		receive :~ (messages : Mailbox, mailboxes : PostOffice) mailboxes[$lock_holder]
 	end
 end
 
@@ -1168,7 +1278,7 @@ end
 
 class Point
 	@reader
-	let-i x, y : Integer
+	let-i x, y : Int
 end
 
 ############################
@@ -1190,14 +1300,14 @@ shortest_path(my_graph)
 shortest_path[:Dijkstra](my_graph)
 
 # Implementation selectors can also be used to describe other properties.
-def sort[:stable](array : Array{Integer}) : Array{Integer} ->> void
+def sort[:stable](array : Array{Int}) : Array{Int} :~ void
 
 class Point
 	@reader
-	let-i x, y : Integer
+	let-i x, y : Int
 
 	# This could cause a lot of horizontal creep.  Is there a better way to do this?
-	def-i +[:commutative, :associative](other : ref Point) ->> Point($x + other.x, $y + other.y)
+	def-i +[:commutative, :associative](other : ref Point) :~ Point($x + other.x, $y + other.y)
 end
 
 #######################

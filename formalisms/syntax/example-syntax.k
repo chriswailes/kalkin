@@ -336,9 +336,11 @@ min(splat get_array())
 # Type conversion #
 ###################
 
-let x = 42 :- Float
+let x := 42
+float_fun(x.to Float) # This would normally get done automatically
 
-array.map(lambda (x) :~ x + 10):-List-:.each ...
+# Converting inline.
+array.map(lambda (x) :~ x + 10).to(List).each ...
 
 ##############
 # Namespaces #
@@ -985,8 +987,6 @@ let a, b, c <~ Foo()
 # Pattern matching #
 ####################
 
-# TODO: MARKER
-
 # Pattern matching options
 
 def foo(node : BinOp) : void
@@ -1097,51 +1097,6 @@ handle e : Exception2~>(v0, v1)
 	...
 end
 
-####################
-# Old Polymorphism #
-####################
-
-class LinkedList {ElType}
-	# FIXME: Do linked list example
-end
-
-Maybe{Int}(42)
-
-# Multiple type arguments
-class Graph {NodeType, EdgeType}
-	let-i nodes : Array{NodeType}
-	let-i edges : Array{EdgeType}
-end
-
-# Subclass requirement
-class Zoo {AnimalType <: Animal}
-	let-i animals : Array{AnimalType}
-end
-
-# Interface requirement
-class IntStore {ContainerType |: Container}
-	let-i storage : ContainerType{Int}
-end
-
-# Multiple interface requirements
-class LoggingClass {StreamType |: Writable, Seekable}
-	let-i stream : StreamType
-end
-
-# Non-type parameters.
-class Vector{n : Int, ElementType}
-end
-
-let vec0 := [1, 2, 3] : Vector{3, Int}
-
-let num := getNumElements()
-let vec1 := Vector{num, Int}(getElements())
-
-# Default type parameters:
-class Graph{NodeType := Int, EdgeType := Int}
-	...
-end
-
 #######################
 # Polymorphic Objects #
 #######################
@@ -1247,37 +1202,98 @@ use SomeClass{Type1, Type2} as RealClass
 
 ## Specialization
 
+poly ElType : Type
+class BinaryPrefixTree
+	...
+end
+
+class BinaryPrefixTree{Float}
+end
+
+# You can also specialize with keywords
+class BinaryPrefixTree{ElType := Float}
+end
+
 ## Partial Specification
+
+poly A, B : Type
+class Foo
+end
+
+poly B : Type
+use Foo{Int, B} as FooInt
 
 ## Re-specification
 
+# TODO: Figure out what this should look like.  To do it properly we need a way to talk about numbers and names of type parameters.
+
 ## Extra-shorthand
+
+# TODO: Develop the extra-short shorthand.
 
 #*
  * Namespaces
  *#
 
+poly T : Type
+namespace
+	use Tuple{T, T} as pair
+	def foo(a : T) :~ void
+end
+
 #*
  * Functions
  *#
+
+poly T : Type
+def id(obj : T) -> T :~ obj
 
 #*
  * Interfaces
  *#
 
+poly T : Type
+interface Convertable
+	def-i to -> T
+end
+
 #*
  * Modules
  *#
+
+poly T : Type
+module Foo
+	def bar(obj : T) -> T :~ obj
+end
 
 #*
  * Classes
  *#
 
+poly T : ElType
+class Wrapper
+	let-i el : ElType
+end
+
 ##############################
 # Default exception handlers #
 ##############################
 
-# TODO
+handle DivideByZero~>(numerator, denominator : Int)
+	return 0
+end
+
+def foo(a, b : Int)
+	...
+
+	let result := a / b
+
+	...
+
+	return result
+end
+
+foo(12, 0) # returns 0 (zero)
 
 ########################
 # String interpolation #

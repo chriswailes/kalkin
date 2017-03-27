@@ -396,9 +396,6 @@ SomeNamespace::[alias ns_name0 as local_name0]::[hide ns_name1]::[rename ns_name
 # Adds a new name `other_funame` that can be used to refer to `some_funame`
 alias some_funame as other_funame
 
-# Instantiate a polymorphic namespace
-use SomeNamespace::PolymorphicNamespace{Arg1, Arg2, arg_3} as InstantiatedName
-
 # Add the names from SomeNamespace::InnerNamespace to the current namespace.
 import SomeNamespace::InnerNamespace
 
@@ -994,21 +991,9 @@ let a, b, c <~ Foo()
 
 def foo(node : BinOp) : void
 	match node with
-		Add~>(IntLiteral as l0, Add~>(IntLiteral as l1, r1) as r0) :~ Add(l0 + l1, r0)
-
-		# Option #1
-		Add~>(l0 : IntLiteral, r0 : Add)
-
-		                   # This : implies more than just a type relation.
+		Add~>(l0, r0 : ASTNode)
+		Add~>(l0 : IntLiteral, r0 : ASTNode)
 		Add~>(l0 : IntLiteral, r0 : Add~>(l1 : IntLiteral, r1))
-		Add~>(l0 : IntLiteral, r0 : Add~>(l1 : IntLiteral, r1))
-
-		# Option #2
-		Add~>(IntLiteral as l0, Add as r0)
-		Add~>(IntLiteral as l0, Add~>(IntLiteral as l1, r1) as r0)
-
-		# Mixed (Strong dislike)
-		Add~>(l0 : IntLiteral, Add~>(l1 : IntLiteral, r1) as r0) :~ Add(l0 + l1, r0)
 	end
 end
 
@@ -1028,6 +1013,7 @@ def binornot(n : Int) : Symbol
 		_      :~ :not_binary
 	end
 end
+
 def point_function(p : Point) : Symbol
 	# Longhand
 	match p with
@@ -1044,7 +1030,7 @@ def point_function(p : Point) : Symbol
 		0, _ :~ :vertical
 		_, 0 :~ :horizontal
 		a, a :~ :diagonal
-		_             :~ :other
+		_    :~ :other
 	end
 end
 
@@ -1054,20 +1040,22 @@ def handle_request(r : Request) -> Response
 		Request~>(:complex, data) do
 			# Do something complicated.
 		end
+		Request~>(:other, data) :~ handle_other_request(data)
 	end
 end
 
 match get_animal() with
-	Cat as c     :~ "cat"
+	c : Cat      :~ "cat"
 	Dog~>(breed) :~ "dog - #{breed}"
-	Animal as a  :~ p.class.name
+	a: Animal    :~ p.class.name
 end
 
+# TODO: Name captures
 def string_function(str : String) -> Symbol
 	match str with
 		/cat/ :~ :cat
 		/\d+/ :~ :number
-		/(\d+):num bottles of beer/ :~ Symbol(num + "bb")
+		/(\d+) bottles of beer/ :~ Symbol(num + "bb")
 	end
 end
 
@@ -1094,18 +1082,18 @@ end
 def dangerous_operation() : void :! Exception1, Exception2
 	match rand() % 3 with
 		0 :~ 42
-		1 :~ Exception1(42)
-		2 :~ Exception2(42, 42)
+		1 :~ raise Exception1(42)
+		2 :~ raise Exception2(42, 42)
 	end
 end
 
 do
 	dangerous_operation()
 
-handle Exception1(v) as e
+handle e : Exception1~>(v)
 	...
 
-handle Exception2(v0, v1) as e
+handle e : Exception2~>(v0, v1)
 	...
 end
 
@@ -1162,11 +1150,108 @@ end
  * Syntax
  *#
 
+# Full form
+poly
+	# Complex params
+class Foo
+	...
+end
+
+# Shorthand
+poly #* Simple Params *#
+def fun(args : Type)
+...
+end
+
 ## Type Parameters
+
+poly A, B : Type
+def fun(a : A, b : B) :~ void
+
+poly
+	A : Type
+	B : Type
+class Foo
+	let-i a : A
+	let-i b : B
+
+	constructor ($a, $b)
+end
+
+fun("hello", 42)
+fun{String, Int}("hello", 42)
+
+let f := Foo("hello", 42)
+let f := Foo{String, Int}("hello", 42)
+
+# Access type parameters
+f.class::A
+
+poly A, bType : Type
+class Bar
+	def-i a : A
+	def-i b : bType
+end
+
+# If we use a "variable" name we can't access it outside the class later.
+let b := Bar("hello", 42)
+b.class::bType # FAILS!
 
 ## Non-type Parameters
 
+poly n, m : Int, ElType : Type
+class Matrix
+	let-i data : Vector{n, Vector{m, ElType}}
+end
+
 ## Default parameters
+
+poly ResultType := Float
+def foo(a, b : Int) -> ResultType :~ void
+
+poly ResultType := Float : Type
+def foo(a, b : Int) -> ResultType :~ void
+
+## Named parameters
+
+poly
+	A, B : Type
+	C := Bar
+	d := 12
+class Foo
+	void
+end
+
+let f := Foo{Int, Int, d := 42}()
+
+## Polymorphic parameters
+
+poly ElType : Type, ContainerType : Type{1} #* Type{Type} *#
+class Foo
+	let-i data : ContainerType{ElType}
+end
+
+## Requirements
+
+poly T : Type
+	require T implements Loggable
+def foo(item : T) :~ void
+
+## Instantiation of Polymorphics
+
+# Instantiate a polymorphic namespace
+use SomeNamespace::PolymorphicNamespace{Arg1, Arg2, arg_3} as InstantiatedName
+
+# Instantiate a polymorphic class
+use SomeClass{Type1, Type2} as RealClass
+
+## Specialization
+
+## Partial Specification
+
+## Re-specification
+
+## Extra-shorthand
 
 #*
  * Namespaces
@@ -1221,7 +1306,7 @@ synchronizer RoundRobin
 end
 
 # Implements two synchronizers that work together to lock access to an object.
-mixin Lockable
+module Lockable
 	let-i lock_holder : Maybe{ref Object}
 
 	require-i lock : void

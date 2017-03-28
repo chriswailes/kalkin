@@ -87,6 +87,7 @@
 			<keyword>handle</keyword>
 			<keyword>hide(-([ci]))?</keyword>
 			<keyword>if</keyword>
+			<keyword>implementation</keyword>
 			<keyword>implements</keyword>
 			<keyword>import</keyword>
 			<keyword>in</keyword>
@@ -105,7 +106,6 @@
 			<keyword>on</keyword>
 			<keyword>or</keyword>
 			<keyword>poly</keyword>
-			<keyword>polymorphic</keyword>
 			<keyword>private</keyword>
 			<keyword>protected</keyword>
 			<keyword>public</keyword>
@@ -118,6 +118,7 @@
 			<keyword>require(-([ci]))?</keyword>
 			<keyword>signed</keyword>
 			<keyword>splat</keyword>
+			<keyword>strong</keyword>
 			<keyword>super</keyword>
 			<keyword>synchronizer</keyword>
 			<keyword>sync</keyword>
@@ -125,6 +126,7 @@
 			<keyword>unsigned</keyword>
 			<keyword>use</keyword>
 			<keyword>void</keyword>
+			<keyword>weak</keyword>
 			<keyword>when</keyword>
 			<keyword>where</keyword>
 			<keyword>with</keyword>

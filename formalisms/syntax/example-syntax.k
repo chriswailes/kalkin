@@ -1184,6 +1184,7 @@ let f := Foo{Int, Int, d := 42}()
 poly ElType : Type, ContainerType : Type{1} #* Type{Type} *#
 class Foo
 	let-i data : ContainerType{ElType}
+	constructor ($data)
 end
 
 ## Requirements
@@ -1236,8 +1237,8 @@ use Foo{Int, B} as FooInt
  *#
 
 poly T : Type
-namespace
-	use Tuple{T, T} as pair
+namespace Foo
+	use Tuple{T, T} as Pair
 	def foo(a : T) :~ void
 end
 
@@ -1279,21 +1280,7 @@ end
 # Default exception handlers #
 ##############################
 
-handle DivideByZero~>(numerator, denominator : Int)
-	return 0
-end
-
-def foo(a, b : Int)
-	...
-
-	let result := a / b
-
-	...
-
-	return result
-end
-
-foo(12, 0) # returns 0 (zero)
+# TODO
 
 ########################
 # String interpolation #
@@ -1309,30 +1296,38 @@ end
 
 # This synchronizer will process messages in the order they are received.
 synchronizer FIFO
-	receive :~ (messages : Mailbox, mailboxes : PostOffice) messages
+	receive (messages : Mailbox, mailboxes : PostOffice) :~ messages
 end
 
 # This synchronizer will select one message from each sender in turn.
 synchronizer RoundRobin
 	require-i last_sender : Object
 
-	receive do (messages : Mailbox, mailboxes : PostOffice)
+	receive (messages : Mailbox, mailboxes : PostOffice)
 		$last_sender = mailboxes.next($last_sender)
 	end
 end
 
 # Implements two synchronizers that work together to lock access to an object.
 module Lockable
-	let-i lock_holder : Maybe{ref Object}
+	let-i lock_holder : Maybe{Object}
 
-	require-i lock : void
-	require-i unlock : void
+	require-i lock : void -> void
+	require-i unlock : void -> void
 
-	default synchronizer Unlocked
-		on lock : void do (sender : ref Object)
-			$lock_holder = Maybe(sender)
+	default
+	synchronizer Unlocked
+		# Here the type of lock is made explicit
+		on lock : void -> void
+			$lock_holder = Maybe($!)
 			sync Locked
 			accept
+		end
+
+		# However, since there aren't any other `lock`s in scope this also
+		# works.
+		on lock
+			...
 		end
 
 		default :~ accept
@@ -1341,9 +1336,9 @@ module Lockable
 	end
 
 	synchronizer Locked
-		on unlock : void do (sender : ref Object)
-			if sender == $lock_holder
-				$lock_holder = Maybe{ref Object}()
+		on unlock
+			if $! == $lock_holder
+				$lock_holder = Maybe{Object}()
 				sync Unlocked
 				accept
 			else
@@ -1351,11 +1346,11 @@ module Lockable
 			end
 		end
 
-		default do (sender : Object)
-			if sender == $lock_holder then accept else reject end
+		default do
+			if $! == $lock_holder then accept else reject end
 		end
 
-		receive :~ (messages : Mailbox, mailboxes : PostOffice) mailboxes[$lock_holder]
+		receive (messages : Mailbox, mailboxes : PostOffice) :~ mailboxes[$lock_holder]
 	end
 end
 
@@ -1368,12 +1363,19 @@ end
  *       message for it to be handled).
  *#
 
+########################
+# Aggregation patterns #
+########################
+
+# TODO
+
 ###############
 # Annotations #
 ###############
 
 @O(arr.size)
-def my_algorithm{DataType}(arr : Array{DataType}) : DataType
+poly DataType : Type
+def my_algorithm(arr : Array{DataType}) -> DataType
 	...
 end
 
@@ -1386,11 +1388,27 @@ end
 # Implementation selectors #
 ############################
 
-def shortest_path[:Dijkstra](ref g : Graph{NodeData, EdgeData}) : NodeData
+# Syntax
+
+implementation
+	# Weak implementation selectors aren't required in recursive calls.
+	weak :Name0
+
+	# Strong implementation selectors are required in recursive calls.
+	strong :Name1
+def foo void -> void
 	...
 end
 
-def shortest_path[:BellmanFord](ref g : Graph{NodeData, EdgeData}) : NodeData
+implementation
+	weak :Dijkstra
+def shortest_path(g : Graph{NodeData, EdgeData}) -> NodeData
+	...
+end
+
+implementation
+	weak :BellmanFord
+def shortest_path[:BellmanFord](g : Graph{NodeData, EdgeData}) -> NodeData
 	...
 end
 
@@ -1401,14 +1419,19 @@ shortest_path(my_graph)
 shortest_path[:Dijkstra](my_graph)
 
 # Implementation selectors can also be used to describe other properties.
-def sort[:stable](array : Array{Int}) : Array{Int} :~ void
+implementation
+	strong :stable
+def sort(array : Array{Int}) -> Array{Int}
+	...
+end
 
 class Point
 	@reader
 	let-i x, y : Int
 
-	# This could cause a lot of horizontal creep.  Is there a better way to do this?
-	def-i +[:commutative, :associative](other : ref Point) :~ Point($x + other.x, $y + other.y)
+	implementation
+		strong :commutative, :associative
+	def-i +(other : Point) :~ Point($x + other.x, $y + other.y)
 end
 
 #######################

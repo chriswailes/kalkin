@@ -1,7 +1,7 @@
-# Author:		Chris Wailes <chris.wailes@gmail.com>
-# Project: 	Kalkin
-# Date:		2014/03/26
-# Description:	This file contains the lexer definition for Kalkin.
+# Author:      Chris Wailes <chris.wailes@gmail.com>
+# Project:     Kalkin
+# Date:        2014/03/26
+# Description: This file contains the lexer definition for Kalkin.
 
 ############
 # Requires #
@@ -21,76 +21,72 @@ module Kalkin
 		# Character Sets #
 		##################
 
-		OP_CHARACTERS = '[~!%^&*+=?<>|\/-]'
+#		OP_CHARACTERS = '[~!%^&*+=?<>|\/-]'
+
+		OP_CHARACTERS = '[\+]'
 
 		############
 		# Keywords #
 		############
 
-		rule(/class/)     { :CLASS         }
-		rule(/def/)       { :DEF           }
-		rule(/do/)        { :DO            }
-		rule(/else/)      { :ELSE          }
-		rule(/end/)       { :END           }
-		rule(/false/)     { [:BOOL, false] }
-		rule(/if/)        { :IF            }
-		rule(/lambda/)    { :LAMBDA        }
-		rule(/let/)       { :LET           }
-		rule(/match/)     { :WITH          }
-		rule(/namespace/) { :NAMESPACE     }
-		rule(/return/)    { :RETURN        }
-		rule(/self/)      { :SELF          }
-		rule(/then/)      { :THEN          }
-		rule(/true/)      { [:BOOL, true]  }
-		rule(/void/)      { :VOID          }
-		rule(/when/)      { :WHEN          }
-		rule(/with/)      { :WITH          }
+		rule(/and/)         { :AND           }
+		rule(/def/)         { :DEF           }
+		rule(/do/)          { :DO            }
+		rule(/else/)        { :ELSE          }
+		rule(/end/)         { :END           }
+		rule(/false/)       { [:BOOL, false] }
+		rule(/if/)          { :IF            }
+		rule(/let/)         { :LET           }
+		rule(/nor/)         { :NOR           }
+		rule(/not/)         { :NOT           }
+		rule(/or/)          { :OR            }
+		rule(/return/)      { :RETURN        }
+		rule(/then/)        { :THEN          }
+		rule(/true/)        { [:BOOL, true]  }
+		rule(/void/)        { :VOID          }
+		rule(/xor/)         { :XOR           }
 
 		###########################
 		# Punctuation and Symbols #
 		###########################
 
-		rule(/->/) { :ARROW      }
-		rule(/:/)  { :COLON      }
-		rule(/,/)  { :COMMA      }
-		rule(/\./) { :DOT        }
-		rule(/{/)  { :LBRACE     }
-		rule(/\[/) { :LBRACKET   }
-		rule(/\(/) { :LPAREN     }
-		rule(/\n/) { :NEWLINE    }
-		rule(/}/)  { :RBRACE     }
-		rule(/\]/) { :RBRACKET   }
-		rule(/\)/) { :RPAREN     }
-		rule(/;/)  { :SEMICOLON  }
-		rule(/\$/) { :SIGIL      }
-		rule(/_/)  { :UNDERSCORE }
+		# Single characters
+		rule(/:/)  { :COLON     }
+		rule(/,/)  { :COMMA     }
+		rule(/\./) { :DOT       }
+		rule(/{/)  { :LBRACE    }
+		rule(/\(/) { :LPAREN    }
+		rule(/\n/) { :NEWLINE   }
+		rule(/}/)  { :RBRACE    }
+		rule(/\)/) { :RPAREN    }
+		rule(/;/)  { :SEMICOLON }
+
+		# Multiple characters
+		rule(/->/)   { :ARROW    }
+		rule(/:~/)   { :CODEDEF  }
+
+        #############
+		# Operators #
+		#############
 
 		rule(/#{OP_CHARACTERS}+/) { |t| [:OPERATOR, t] }
-
-		###############
-		# Annotations #
-		###############
-
-		rule(/@\w*/)   { |t| [:ANNOTATION, [t[1..-1],  :inform]] }
-		rule(/@!\w*/)  { |t| [:ANNOTATION, [t[1..-1],  :insist]] }
-		rule(/@\?\w*/) { |t| [:ANNOTATION, [t[1..-1], :inquire]] }
-		rule(/@‽\w*/)  { |t| [:ANNOTATION, [t[1..-1],    :warn]] }
 
 		############
 		# Literals #
 		############
 
 		rule(/:[a-z_]+/)                  { |t| [:ATOM,    t[1..-1]] }
-		rule(/[+-]?\d+\.\d+/)             { |t| [:FLOAT,     t.to_f] }
-		rule(/[+-]?\d+/)                  { |t| [:INTEGER,   t.to_i] }
+		rule(/\d+\.\d+/ )                 { |t| [:FLOAT,     t.to_f] }
+		rule(/\d+/)                       { |t| [:INTEGER,   t.to_i] }
 		rule(/['"](\\'\\"|[^'"\n])*['"]/) { |t| [:STRING,         t] }
 
 		###############
 		# Identifiers #
 		###############
 
-		rule(/[A-Z][A-Za-z]*/)                    { |t| [:NSIDENT, t] }
-		rule(/[a-z](\w|#{OP_CHARACTERS})*/)       { |t| [:IDENT,   t] }
+		rule(/[A-Z][A-Za-z]*/)                { |t| [:NSIDENT, t] }
+		rule(/[a-z](\w|#{OP_CHARACTERS})*/)   { |t| [:IDENT,   t] }
+		rule(/\$[a-z](\w|#{OP_CHARACTERS})*/) { |t| [:IIDENT,  t] }
 
 		##############
 		# Whitespace #

@@ -1,7 +1,7 @@
-# Author:		Chris Wailes <chris.wailes@gmail.com>
-# Project: 	Kalkin
-# Date:		2014/03/25
-# Description:	This file specifies the version number for Kalkin.
+# Author:      Chris Wailes <chris.wailes@gmail.com>
+# Project:     Kalkin
+# Date:        2014/03/25
+# Description: This file specifies the version number for Kalkin.
 
 module Kalkin
 	# The Kalkin's version number.

@@ -13,7 +13,7 @@ require 'filigree/request_file'
 
 # Kalkin
 require 'kalkin/lexer'
-require 'kalkin/parser'
+require 'kalkin/parser_core'
 
 # Standard Library
 request_file('simplecov', 'SimpleCov is not installed.') do
@@ -29,7 +29,7 @@ end
 def get_ast(file_name, verbose = false)
 	input  = File.open(File.join(File.dirname(File.expand_path(__FILE__)), 'inputs', file_name)) { |f| f.read }.chomp
 	tokens = Kalkin::Lexer::lex(input)
-	
+
 	Kalkin::Parser::parse(tokens, verbose: verbose)
 end
 
@@ -41,4 +41,4 @@ end
 #require 'tc_namespace.rb'
 #require 'tc_types.rb'
 
-require 'tc_interp.rb'
+#require 'tc_interp.rb'

@@ -33,9 +33,8 @@ module Kalkin
 		end
 
 		class Expression < KNode
-#			value :type, Type
 		end
-		
+
 		Expr = Expression
 
 #		class ArgList < KNode
@@ -235,25 +234,25 @@ module Kalkin
 #			custom_order :name, :parameters, :generator, :type
 #		end
 
-#		class NodeList < KNode
-#			child :nodes, [KNode]
+		class NodeList < KNode
+			child :nodes, [KNode]
 
-#			def each(&block)
-#				self.nodes.each(&block)
-#			end
+			def each(&block)
+				self.nodes.each(&block)
+			end
 
-#			def empty?
-#				self.nodes.empty?
-#			end
+			def empty?
+				self.nodes.empty?
+			end
 
-#			def first
-#				self.nodes.first
-#			end
+			def first
+				self.nodes.first
+			end
 
-#			def last
-#				self.nodes.last
-#			end
-#		end
+			def last
+				self.nodes.last
+			end
+		end
 
 #		class Namespace < KNode
 #			value :name, String

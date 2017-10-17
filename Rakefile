@@ -1,17 +1,21 @@
-# Author:		Chris Wailes <chris.wailes@gmail.com>
-# Project: 	Kalkin
-# Date:		2014/03/25
-# Description:	This is the Rakefile for Kalkin.
+# Author:      Chris Wailes <chris.wailes@gmail.com>
+# Project:     Kalkin
+# Date:        2014/03/25
+# Description: This is the Rakefile for Kalkin.
 
 ##############
 # Rake Tasks #
 ##############
 
+# Add the Kalkin source directory to the load path.
+lib_dir = File.expand_path("./lib/", File.dirname(__FILE__))
+$LOAD_PATH << lib_dir unless $LOAD_PATH.include?(lib_dir)
+
 # Gems
 require 'filigree/request_file'
 
 # Kalkin
-require File.expand_path("../lib/kalkin/version", __FILE__)
+require 'kalkin/version'
 
 ###########
 # Bundler #
@@ -106,12 +110,13 @@ end
 # Kalkin Tasks #
 ################
 
-desc 'Re-generate the Kalkin parser table.'
+desc 'Re-generate the Kalkin parser tables.'
 task :grammar do
+	require 'rltk/version'
+
 	begin
-		$: << File.expand_path('../lib', __FILE__)
-		require 'kalkin'
-		Kalkin::Parser
+		puts "Using RLTK version #{RLTK::VERSION}"
+		require 'kalkin/parser'
 
 	rescue Exception => e
 		puts e.message

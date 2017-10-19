@@ -268,7 +268,7 @@ def fib(n : Int) -> Int :~ fib(n - 1) + fib(n - 2)
 
 # OR
 
-def fib(n : Int)
+def fib(n : Int) -> Int
 	if n <= 1 then 1 else fib(n-1) + fib(n-2) end
 end
 
@@ -360,6 +360,16 @@ Math::cos(0.1234)
  * Namespace Scoping
  *#
 
+import A::B::[x, y]
+import A::B::[hide z]
+
+import A::B::[x, y]::x
+
+import A::name
+import A::[a, b]
+import A::B::*
+import A::B::* [rename name as weed]
+
 # Reference a name in a namespace
 SomeNamespace::name
 SomeNamespace::InnerNamespace
@@ -389,7 +399,7 @@ SomeNamespace::[alias ns_name0 as local_name1]
 SomeNamespace::[hide ns_name0, ns_name1]
 
 # Putting it all together
-SomeNamespace::[alias ns_name0 as local_name0]::[hide ns_name1]::[rename ns_name1 as local_name1]
+SomeNamespace::[alias ns_name0 as local_name0]::[hide ns_name1]::[rename ns_name2 as local_name2]
 
 #*
  * Aliasing, instantiating, and importing names

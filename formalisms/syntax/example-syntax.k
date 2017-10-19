@@ -1290,8 +1290,8 @@ end
 # Parameter Conversions #
 #########################
 
-convert file as file_name : File :~ File(file_name)
-convert cfg  as ast       : AST  :~ ast.getCFG
+convert file as file_name : String :~ File(file_name)
+convert cfg  as ast       : AST    :~ ast.getCFG
 def print_cfg(file : File, cfg : CFG) :~ void
 
 # All of these calls are valid

@@ -34,14 +34,11 @@ module Kalkin
 		# Top Level Input Productions #
 		###############################
 
-		p :input do
-			c('NEWLINE*')                       { |_| NodeList.new [] }
-			c('NEWLINE* .input_prime NEWLINE*') { |i| NodeList.new  i }
-		end
+		p(:input, 'NEWLINE* .input_prime') { |ds| ds }
 
 		p :input_prime do
-			c('top_level_defs')                        { |d|       [d] }
-			c('.input_prime NEWLINE+ .top_level_defs') { |i, d| i << d }
+			c('')                                      { ||           [] }
+			c('.input_prime NEWLINE* .top_level_defs') { |ds, d| ds << d }
 		end
 
 		p :top_level_defs do
@@ -206,6 +203,6 @@ module Kalkin
 		# Finalization #
 		################
 
-		finalize explain: 'kalkin.automata'
+		finalize explain: 'kalkin.pdesc'
 	end
 end

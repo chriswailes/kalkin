@@ -961,12 +961,12 @@ a, b <~ [|1, 2|] # Fine
 a, b <~ [|1, 2, 3|] # Type error
 
 # Binaries
-let bin := [|1, 17, 42|]
-let [|a{8}, b, c|} <~ bin
+let bin := {|1, 17, 42|}
+let {|a{8}, b, c|} <~ bin
 
 def bin_func(bin : Binary) : Maybe{(Int, Int, Int)}
 	if (bin.length == 32)
-		let [|a{16;:signed;:big}, b{12;:unsigned;:little}, c{4}|] <~ bin in Maybe((a, b, c))
+		let {|a{16;:signed;:big}, b{12;:unsigned;:little}, c{4}|] <~ bin in Maybe((a, b, c))
 	else
 		None
 	end
@@ -1285,6 +1285,20 @@ poly T : ElType
 class Wrapper
 	let-i el : ElType
 end
+
+#########################
+# Parameter Conversions #
+#########################
+
+convert file as file_name : File :~ File(file_name)
+convert cfg  as ast       : AST  :~ ast.getCFG
+def print_cfg(file : File, cfg : CFG) :~ void
+
+# All of these calls are valid
+print_cfg(File("output.dot"), some_cfg)
+print_cfg("output.dot", some_cfg)
+print_cfg(File("output.dot"), some_ast)
+print_cfg("output.dot", some_ast)
 
 ##############################
 # Default exception handlers #

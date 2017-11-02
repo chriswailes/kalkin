@@ -62,8 +62,6 @@ module Kalkin
 			c(:expr_multi_line)  { |o| o }
 		end
 
-		list :expr_sequence, :expr_multi_line, 'NEWLINE+'
-
 		p :expr_core do
 			c('literal') { |l|         l }
 			c('IDENT')   { |i| @st.use i }
@@ -107,8 +105,11 @@ module Kalkin
 			c('.IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') { |i, a| FunctionCall.new(i, ArgList.new(a)) }
 
 			# Method call
-			c('.expr_multi_line DOT .IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') { |r, m, a| MessageSend.new(m, r, ArgList.new(a))  }
-			c('.expr_multi_line DOT .IDENT')                                                      { |r, m|    MessageSend.new(m, r, ArgList.new([])) }
+			c('.expr_multi_line DOT .IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') do |r, m, a|
+				MessageSend.new(m, r, ArgList.new(a))
+			end
+
+			c('.expr_multi_line DOT .IDENT') { |r, m|  MessageSend.new(m, r, ArgList.new([])) }
 
 			# Operator call
 			c('.expr_multi_line .OPERATOR NEWLINE* .expr_multi_line') { |r, o, a| MessageSend.new(o, r, ArgList.new([a])) }
@@ -119,6 +120,8 @@ module Kalkin
 				SplitMessageSend.new m, o, s, ArgList.new([a])
 			end
 		end
+
+		nonempty_list :expr_sequence, :expr_multi_line, 'NEWLINE+'
 
 		##################
 		# Argument Lists #
@@ -154,7 +157,10 @@ module Kalkin
 		########################
 
 		p :function_def do
-			c('.function_sig ARROW .NSIDENT NEWLINE+ .expr_sequence NEWLINE* END') do |sig, t, es|
+			# This is a block because we'll be adding more function definition
+			# forms later.
+
+			c('.function_sig ARROW .NSIDENT .function_body END') do |sig, t, es|
 				@st.drop_frame
 
 				name, params = sig
@@ -167,6 +173,11 @@ module Kalkin
 			c('DEF .IDENT LPAREN NEWLINE* .param_list NEWLINE* RPAREN') { |i, ps| [i,                ps] }
 		end
 
+		p :function_body do
+			c('NEWLINE+')                         { |_|  [] }
+			c('NEWLINE+ .expr_sequence NEWLINE+') { |es| es }
+		end
+
 		###################
 		# Parameter Lists #
 		###################
@@ -177,8 +188,13 @@ module Kalkin
 		end
 
 		p :param_list_prime do
-			c('.IDENT COLON .NSIDENT')                                           { |i, t|               [@st.bind(i, UnresolvedType.new(t))] }
-			c('.IDENT COLON .NSIDENT NEWLINE* COMMA NEWLINE* .param_list_prime') { |i, t, ps| ps.unshift(@st.bind(i, UnresolvedType.new(t))) }
+			c('.IDENT COLON .NSIDENT') do |i, t|
+				[@st.bind(i, UnresolvedType.new(t))]
+			end
+
+			c('.IDENT COLON .NSIDENT NEWLINE* COMMA NEWLINE* .param_list_prime') do |i, t, ps|
+				ps.unshift(@st.bind(i, UnresolvedType.new(t)))
+			end
 
 			# Deferred types
 #			c('.IDENT COMMA NEWLINE* .param_list_prime') do |i, ps|

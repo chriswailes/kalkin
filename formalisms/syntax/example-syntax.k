@@ -1294,6 +1294,15 @@ convert file as file_name : String :~ File(file_name)
 convert cfg  as ast       : AST    :~ ast.getCFG
 def print_cfg(file : File, cfg : CFG) :~ void
 
+conversions
+	file as file_name : String :~ File(file_name)
+	cfg  as ast       : AST    :~ ast.getCFG
+def print_cfg(file : File, cfg : CFG) :~ void
+
+conversions
+	arg0 as other_name : Foo :~ Foo(other_name)
+for SomeNamespace::some_func
+
 # All of these calls are valid
 print_cfg(File("output.dot"), some_cfg)
 print_cfg("output.dot", some_cfg)

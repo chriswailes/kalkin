@@ -206,6 +206,6 @@ module Kalkin
 		# Finalization #
 		################
 
-		finalize explain: 'kalkin.automata'
+		finalize explain: 'kalkin.pdesc'
 	end
 end

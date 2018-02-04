@@ -57,20 +57,9 @@ module Kalkin
 			c('BOOL')    { |b| KBool.new    b, UnresolvedType.new('Bool')    }
 		end
 
-		p :expr do
-			c(:expr_single_line) { |o| o }
-			c(:expr_multi_line)  { |o| o }
-		end
-
-		p :expr_core do
+		p :expr_single_line do
 			c('literal') { |l|         l }
 			c('IDENT')   { |i| @st.use i }
-		end
-
-		p :expr_single_line do
-
-			# Core expressions
-			c('expr_core') { |e| e }
 
 			# Single-line if-expr
 			c('IF .expr_single_line THEN .expr_single_line ELSE .expr_single_line END') { |c, t, e| If.new(c, t, e) }
@@ -90,38 +79,122 @@ module Kalkin
 			c('.expr_single_line DOT .IDENT .OPERATOR .expr_single_line') do |s, m, o, a|
 				SplitMessageSend.new m, o, s, ArgList.new([a])
 			end
+
 		end
 
-		p :expr_multi_line do
+####################
 
-			# Core expressions
-			c('expr_core') { |e| e }
-
-			# If expressions
-			c('IF .expr_multi_line THEN NEWLINE* .expr_multi_line ELSE .expr_multi_line END') { |c, t, e| If.new(c, t, e) }
-			c('IF .expr_single_line NEWLINE+ .expr_multi_line ELSE .expr_multi_line END')     { |c, t, e| If.new(c, t, e) }
-
-			# Function call
-			c('.IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') { |i, a| FunctionCall.new(i, ArgList.new(a)) }
-
-			# Method call
-			c('.expr_multi_line DOT .IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') do |r, m, a|
-				MessageSend.new(m, r, ArgList.new(a))
-			end
-
-			c('.expr_multi_line DOT .IDENT') { |r, m|  MessageSend.new(m, r, ArgList.new([])) }
-
-			# Operator call
-			c('.expr_multi_line .OPERATOR NEWLINE* .expr_multi_line') { |r, o, a| MessageSend.new(o, r, ArgList.new([a])) }
-			c('OPERATOR expr_multi_line')                             { |o, r|    UnaryMessageSend.new(o, r)              }
-
-			# Method/Operator Call
-			c('.expr_multi_line DOT .IDENT .OPERATOR NEWLINE* .expr_multi_line') do |s, m, o, a|
-				SplitMessageSend.new m, o, s, ArgList.new([a])
-			end
+		p :expr do
+			c('expr_single_line') { |e| e }
 		end
 
-		nonempty_list :expr_sequence, :expr_multi_line, 'NEWLINE+'
+####################
+
+#		p :expr do
+#			c('literal') { |l|         l }
+#			c('IDENT')   { |i| @st.use i }
+
+#			# If expressions
+#			c('IF .expr THEN? NEWLINE* .expr ELSE .expr END') { |c, t, e| If.new(c, t, e) }
+
+#			# Function call
+#			c('.IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') { |i, a| FunctionCall.new(i, ArgList.new(a)) }
+
+#			# Method call
+#			c('.expr DOT .IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') do |r, m, a|
+#				MessageSend.new(m, r, ArgList.new(a))
+#			end
+
+#			c('.expr DOT .IDENT') { |r, m|  MessageSend.new(m, r, ArgList.new([])) }
+
+#			# Operator call
+#			c('.expr .OPERATOR NEWLINE* .expr') { |r, o, a| MessageSend.new(o, r, ArgList.new([a])) }
+#			c('OPERATOR expr')                             { |o, r|    UnaryMessageSend.new(o, r)              }
+
+#			# Method/Operator Call
+#			c('.expr DOT .IDENT .OPERATOR NEWLINE* .expr') do |s, m, o, a|
+#				SplitMessageSend.new m, o, s, ArgList.new([a])
+#			end
+#		end
+
+##################
+
+#		p :expr_multi_line do
+#			# If expressions
+#			c('IF .expr_multi_line THEN NEWLINE* .expr_multi_line ELSE .expr_multi_line END') { |c, t, e| If.new(c, t, e) }
+#			c('IF .expr_single_line THEN? NEWLINE+ .expr_multi_line ELSE .expr_multi_line END')     { |c, t, e| If.new(c, t, e) }
+#		end
+
+#		p :expr do
+#			c(:expr_single_line)  { |e| e }
+
+#			# If expressions
+#			c('IF .expr_multi_line THEN NEWLINE* .expr_multi_line ELSE .expr_multi_line END') { |c, t, e| If.new(c, t, e) }
+#			c('IF .expr_single_line THEN? NEWLINE+ .expr ELSE .expr END')     { |c, t, e| If.new(c, t, e) }
+#		end
+
+##################
+
+#		p :expr_core do
+#			c('literal') { |l|         l }
+#			c('IDENT')   { |i| @st.use i }
+#		end
+
+#		p :expr_single_line do
+
+#			# Core expressions
+#			c('expr_core') { |e| e }
+
+#			# Single-line if-expr
+#			c('IF .expr_single_line THEN .expr_single_line ELSE .expr_single_line END') { |c, t, e| If.new(c, t, e) }
+
+#			# Function call
+#			c('.IDENT LPAREN .arg_list_single_line RPAREN') { |i, a| FunctionCall.new(i, ArgList.new(a)) }
+
+#			# Method call
+#			c('.expr_single_line DOT .IDENT LPAREN .arg_list_single_line RPAREN') { |r, m, a| MessageSend.new(m, r, ArgList.new(a))  }
+#			c('.expr_single_line DOT .IDENT')                                     { |r, m|    MessageSend.new(m, r, ArgList.new([])) }
+
+#			# Operator call
+#			c('.expr_single_line .OPERATOR .expr_single_line') { |r, o, a| MessageSend.new(o, r, ArgList.new([a])) }
+#			c('OPERATOR expr_single_line')                     { |o, r|    UnaryMessageSend.new(o, r)              }
+
+#			# Method/Operator Call
+#			c('.expr_single_line DOT .IDENT .OPERATOR .expr_single_line') do |s, m, o, a|
+#				SplitMessageSend.new m, o, s, ArgList.new([a])
+#			end
+#		end
+
+#		p :expr_multi_line do
+
+#			# Core expressions
+#			c('expr_core') { |e| e }
+
+#			# If expressions
+#			c('IF .expr_multi_line THEN NEWLINE* .expr_multi_line ELSE .expr_multi_line END') { |c, t, e| If.new(c, t, e) }
+#			c('IF .expr_single_line NEWLINE+ .expr_multi_line ELSE .expr_multi_line END')     { |c, t, e| If.new(c, t, e) }
+
+#			# Function call
+#			c('.IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') { |i, a| FunctionCall.new(i, ArgList.new(a)) }
+
+#			# Method call
+#			c('.expr_multi_line DOT .IDENT LPAREN NEWLINE* .arg_list_multi_line NEWLINE* RPAREN') do |r, m, a|
+#				MessageSend.new(m, r, ArgList.new(a))
+#			end
+
+#			c('.expr_multi_line DOT .IDENT') { |r, m|  MessageSend.new(m, r, ArgList.new([])) }
+
+#			# Operator call
+#			c('.expr_multi_line .OPERATOR NEWLINE* .expr_multi_line') { |r, o, a| MessageSend.new(o, r, ArgList.new([a])) }
+#			c('OPERATOR expr_multi_line')                             { |o, r|    UnaryMessageSend.new(o, r)              }
+
+#			# Method/Operator Call
+#			c('.expr_multi_line DOT .IDENT .OPERATOR NEWLINE* .expr_multi_line') do |s, m, o, a|
+#				SplitMessageSend.new m, o, s, ArgList.new([a])
+#			end
+#		end
+
+		nonempty_list :expr_sequence, :expr, 'NEWLINE+'
 
 		##################
 		# Argument Lists #
@@ -148,8 +221,8 @@ module Kalkin
 		end
 
 		p :arg_list_multi_line_prime do
-			c('.expr_multi_line')                                                    { |a|                  [a] }
-			c('.expr_multi_line NEWLINE* COMMA NEWLINE* .arg_list_multi_line_prime') { |a, args| args.unshift a }
+			c('.expr')                                                    { |a|                  [a] }
+			c('.expr NEWLINE* COMMA NEWLINE* .arg_list_multi_line_prime') { |a, args| args.unshift a }
 		end
 
 		########################
@@ -170,6 +243,7 @@ module Kalkin
 
 		p :function_sig do
 			c('DEF .IDENT')                                             { |i|     [i, ParamList.new([])] }
+			c('DEF .IDENT LPAREN NEWLINE* RPAREN')                      { |i|     [i, ParamList.new([])] }
 			c('DEF .IDENT LPAREN NEWLINE* .param_list NEWLINE* RPAREN') { |i, ps| [i,                ps] }
 		end
 
@@ -183,16 +257,11 @@ module Kalkin
 		###################
 
 		p :param_list do
-			c('')                 { ||   [] }
-			c('param_list_prime') { |ps| ps }
-		end
-
-		p :param_list_prime do
 			c('.IDENT COLON .NSIDENT') do |i, t|
 				[@st.bind(i, UnresolvedType.new(t))]
 			end
 
-			c('.IDENT COLON .NSIDENT NEWLINE* COMMA NEWLINE* .param_list_prime') do |i, t, ps|
+			c('.IDENT COLON .NSIDENT NEWLINE* COMMA NEWLINE* .param_list') do |i, t, ps|
 				ps.unshift(@st.bind(i, UnresolvedType.new(t)))
 			end
 
